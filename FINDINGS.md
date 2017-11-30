@@ -236,6 +236,7 @@ index 90e8316..4fdf8bf 100644
  }
 ```
 
+
 # rigtorp/ipc-bench (2017.30.11)
 
 ```
@@ -248,6 +249,7 @@ cp tcp_lat.bc ../../../java-llvm-ir-builder-dev/sulong/tcp_lat.bc
 command uses fork -> not usable in sulong yet
 benchmark questionable, because it's mainly targeted at the host system
 
+
 # nitlang/nit (2017.30.11)
 
 ```
@@ -258,6 +260,7 @@ CC=wllvm make
 ```
 
 Some problems with building the benchmarks
+
 
 # wbhart/bsdnt (2017.30.11)
 
@@ -272,3 +275,39 @@ cp build/test/t-nn_linear.bc ../../../java-llvm-ir-builder-dev/sulong/t-nn_linea
 Similar bug found as for: swenston/sort
 
 Bugreport: https://github.com/graalvm/sulong/issues/824
+
+
+# antirez/otree (2017.30.11)
+
+```
+export LLVM_COMPILER=clang
+wllvm -o btree_example btree.c btree_example.c -Wall -g -rdynamic -ggdb -O2  # -W causes wllvm to not work?
+extract-bc btree_example
+cp btree_example.bc ../../../java-llvm-ir-builder-dev/sulong/btree_example.bc
+```
+
+```
+time mx --jdk jvmci --dynamicimports=/compiler lli btree_example.bc allocfree 10000000000 200000 -Dgraal.TraceTruffleCompilation=true -Dgraal.TraceTruffleCompilation=true
+```
+
+# chrismoos/hash-ring (2017.30.11)
+
+```
+sudo pacman -S erlang  # for test script (didn't worked)
+```
+
+# zhemao/libds (2017.30.11)
+
+```
+export LLVM_COMPILER=clang
+make CC='wllvm' test
+extract-bc vectest
+cp vectest.bc ../../../java-llvm-ir-builder-dev/sulong/vectest.bc
+```
+
+# openSUSE/libsolv (2017.30.11)
+
+```
+cmake .
+make test # TODO: continue
+
