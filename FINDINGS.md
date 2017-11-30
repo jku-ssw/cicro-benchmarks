@@ -1,6 +1,7 @@
 # swenston/sort (2017.24.11)
 
 ```
+export LLVM_COMPILER=clang
 CC=wllvm make multidemo
 extract-bc multidemo
 cp multidemo.bc ../../../java-llvm-ir-builder-dev/sulong/multidemo.bc
@@ -234,3 +235,40 @@ index 90e8316..4fdf8bf 100644
    return 0;
  }
 ```
+
+# rigtorp/ipc-bench (2017.30.11)
+
+```
+export LLVM_COMPILER=clang
+CC=wllvm make
+extract-bc tcp_lat
+cp tcp_lat.bc ../../../java-llvm-ir-builder-dev/sulong/tcp_lat.bc
+```
+
+command uses fork -> not usable in sulong yet
+benchmark questionable, because it's mainly targeted at the host system
+
+# nitlang/nit (2017.30.11)
+
+```
+sudo pacman -S ccache
+
+export LLVM_COMPILER=clang
+CC=wllvm make
+```
+
+Some problems with building the benchmarks
+
+# wbhart/bsdnt (2017.30.11)
+
+```
+export LLVM_COMPILER=clang
+./configure
+make AS='wllvm' CC='wllvm'
+extract-bc build/test/t-nn_linear
+cp build/test/t-nn_linear.bc ../../../java-llvm-ir-builder-dev/sulong/t-nn_linear.bc
+```
+
+Similar bug found as for: swenston/sort
+
+Bugreport: https://github.com/graalvm/sulong/issues/824
