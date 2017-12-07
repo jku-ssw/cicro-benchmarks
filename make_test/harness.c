@@ -25,7 +25,7 @@ struct arguments {
 };
 
 static int print_details(_test_harness test_harness);
-static long do_benchmark(_test_harness test_harness, int iterations);
+static double do_benchmark(_test_harness test_harness, int iterations);
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state);
 static error_t read_unsigned_int_arg(int *var, char *arg);
@@ -63,10 +63,10 @@ int _execute_harness(int argc, char* argv[], _test_harness test_harness) {
     printf("\n");
 
     // Final run
-    long result = do_benchmark(test_harness, arguments.measure_it);
+    double result = do_benchmark(test_harness, arguments.measure_it);
     printf("\n");
 
-    printf(" * execution time: %ldus\n", result);
+    printf(" * execution time: %fms\n", result);
     printf("########################################\n");
 
     return 0;
@@ -82,7 +82,7 @@ static int print_details(_test_harness harness) {
     return 0;
 }
 
-static long do_benchmark(_test_harness test_harness, int iterations) {
+static double do_benchmark(_test_harness test_harness, int iterations) {
     struct timeval tv_start, tv_end;
     struct timeval *tv_start_ptr = &tv_start, *tv_end_ptr=&tv_end;
 
@@ -97,7 +97,7 @@ static long do_benchmark(_test_harness test_harness, int iterations) {
         fflush(stdout);
     }
 
-    return time /* /iterations */; // TODO
+    return (double)time / (double)iterations; // TODO
 }
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {

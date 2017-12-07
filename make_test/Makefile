@@ -35,7 +35,7 @@ exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 wbhart-bsdnt_$(TEST_SUFFIX): wbhart-bsdnt wbhart-bsdnt_test.c $(HARNESS_C)
 	(cd ./wbhart-bsdnt; ./configure)
 	(cd ./wbhart-bsdnt; make AS=$(AS) CC=$(CC))
-	$(CC) wbhart-bsdnt_test.c $(HARNESS_C) -o "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)"
+	$(CC) wbhart-bsdnt_test.c $(HARNESS_C) -o "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)" -lm ./wbhart-bsdnt/libbsdnt.a
 
 wbhart-bsdnt_clean:
 ifneq ("$(wildcard ./wbhart-bsdnt/Makefile)","")
