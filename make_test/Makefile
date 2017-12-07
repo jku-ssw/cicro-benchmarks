@@ -8,6 +8,8 @@ CC=clang
 TEST_SUFFIX=test
 TEST_DIR=.
 
+HARNESS_C=harness.c
+
 # Projects to build
 
 PROJECTS = wbhart-bsdnt
@@ -30,10 +32,10 @@ exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 
 ########## https://github.com/wbhart/bsdnt
 
-wbhart-bsdnt_$(TEST_SUFFIX):
+wbhart-bsdnt_$(TEST_SUFFIX): wbhart-bsdnt wbhart-bsdnt_test.c $(HARNESS_C)
 	(cd ./wbhart-bsdnt; ./configure)
 	(cd ./wbhart-bsdnt; make AS=$(AS) CC=$(CC))
-	$(CC) wbhart-bsdnt_test.c -o "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)"
+	$(CC) wbhart-bsdnt_test.c $(HARNESS_C) -o "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)"
 
 wbhart-bsdnt_clean:
 ifneq ("$(wildcard ./wbhart-bsdnt/Makefile)","")
