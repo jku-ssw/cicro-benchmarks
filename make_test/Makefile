@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = antirez-otree swenson-sort wbhart-bsdnt
+PROJECTS = antirez-otree swenson-sort wbhart-bsdnt zhemao-libds
 
 # Global commands
 
@@ -54,3 +54,8 @@ ifneq ("$(wildcard ./wbhart-bsdnt/Makefile)","")
 	(cd ./wbhart-bsdnt; make distclean; rm -f Makefile)
 endif
 	rm -f "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)"
+
+########## https://github.com/zhemao/libds
+
+zhemao-libds_$(TEST_SUFFIX): zhemao-libds zhemao-libds_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) zhemao-libds_test.c zhemao-libds/vector.c -o "$(TEST_DIR)/zhemao-libds_$(TEST_SUFFIX)"
