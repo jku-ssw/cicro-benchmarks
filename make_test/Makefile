@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = antirez-otree wbhart-bsdnt
+PROJECTS = antirez-otree swenson-sort wbhart-bsdnt
 
 # Global commands
 
@@ -36,6 +36,11 @@ exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 
 antirez-otree_$(TEST_SUFFIX): antirez-otree antirez-otree_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) antirez-otree_test.c antirez-otree/btree.c -o "$(TEST_DIR)/antirez-otree_$(TEST_SUFFIX)"
+
+########## https://github.com/swenson/sort
+
+swenson-sort_$(TEST_SUFFIX): swenson-sort swenson-sort_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) swenson-sort_test.c -o "$(TEST_DIR)/swenson-sort_$(TEST_SUFFIX)"
 
 ########## https://github.com/wbhart/bsdnt
 
