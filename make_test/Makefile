@@ -19,6 +19,7 @@ PROJECTS = antirez-otree wbhart-bsdnt
 all: $(PROJECTS:=_$(TEST_SUFFIX))
 
 clean: $(PROJECTS:=_clean)
+	rm .*.o
 
 test: $(addprefix exec_, $(PROJECTS:=_$(TEST_SUFFIX)))
 
