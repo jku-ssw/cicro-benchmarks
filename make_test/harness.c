@@ -8,6 +8,19 @@
 
 #include "harness.h"
 
+#define OVERRIDE_STD_CALLS
+
+#ifdef OVERRIDE_STD_CALLS
+// override printf function
+int printf (const char * format, ...) {
+    return 0;
+}
+
+#define printf(format, ...) fprintf (stdout, format, __VA_ARGS__)
+
+#endif
+
+
 
 static char doc[] = "Test Harness";
 static char args_doc[] = "[FILENAME]...";
@@ -47,7 +60,7 @@ int _execute_harness(int argc, char* argv[], _test_harness test_harness) {
 
     printf(" * Warmup Iterations: %d\n", arguments.warmup_it);
     printf(" * Measure Iterations: %d\n", arguments.measure_it);
-    printf("########################################\n");
+    puts("########################################");
 
     // Do benchmark
     int problem_size = arguments.measure_it;
@@ -60,24 +73,24 @@ int _execute_harness(int argc, char* argv[], _test_harness test_harness) {
     for(int i=0; i < warmup_iterations; i++) {
         do_benchmark(test_harness, problem_size);
     }
-    printf("\n");
+    putchar('\n');
 
     // Final run
     double result = do_benchmark(test_harness, arguments.measure_it);
-    printf("\n");
+    putchar('\n');
 
     printf(" * execution time: %fms\n", result);
-    printf("########################################\n");
+    puts("########################################");
 
     return 0;
 }
 
 static int print_details(_test_harness harness) {
-    printf("########################################\n");
+    puts("########################################");
     printf(" * Name: \"%s\"\n", harness.name);
     printf(" * Description: \"%s\"\n", harness.description);
     printf(" * Expected Iteration time: %.3fs\n", harness.expected_runtime/1000.);
-    printf("########################################\n");
+    puts("########################################");
 
     return 0;
 }
@@ -93,7 +106,7 @@ static double do_benchmark(_test_harness test_harness, int iterations) {
         test_harness.test_harness(); // TODO: do not optimize away
         gettimeofday(tv_end_ptr, NULL);
         time += (tv_end.tv_sec-tv_start.tv_sec)*1000L+(long)((tv_end.tv_usec-tv_start.tv_usec)*0.001);
-        printf(".");
+        putchar('.');
         fflush(stdout);
     }
 
@@ -132,4 +145,3 @@ static error_t read_unsigned_int_arg(int *var, char *arg) {
     *var = parsed;
     return 0;
 }
-

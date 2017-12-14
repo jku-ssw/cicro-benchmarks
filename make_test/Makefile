@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = wbhart-bsdnt
+PROJECTS = antirez-otree wbhart-bsdnt
 
 # Global commands
 
@@ -30,12 +30,18 @@ test: $(addprefix exec_, $(PROJECTS:=_$(TEST_SUFFIX)))
 exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 	./$<
 
+
+########## https://github.com/antirez/otree
+
+antirez-otree_$(TEST_SUFFIX): antirez-otree antirez-otree_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) antirez-otree_test.c antirez-otree/btree.c -o "$(TEST_DIR)/antirez-otree_$(TEST_SUFFIX)"
+
 ########## https://github.com/wbhart/bsdnt
 
 wbhart-bsdnt_$(TEST_SUFFIX): wbhart-bsdnt wbhart-bsdnt_test.c $(HARNESS_C)
 	(cd ./wbhart-bsdnt; ./configure)
 	(cd ./wbhart-bsdnt; make AS=$(AS) CC=$(CC))
-	$(CC) wbhart-bsdnt_test.c $(HARNESS_C) -o "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)" -lm ./wbhart-bsdnt/libbsdnt.a
+	$(CC) $(HARNESS_C) wbhart-bsdnt_test.c -o "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)" -lm ./wbhart-bsdnt/libbsdnt.a
 
 wbhart-bsdnt_clean:
 ifneq ("$(wildcard ./wbhart-bsdnt/Makefile)","")
