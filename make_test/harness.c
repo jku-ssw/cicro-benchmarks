@@ -25,8 +25,10 @@ int printf (const char * format, ...) {
 static char doc[] = "Test Harness";
 static char args_doc[] = "[FILENAME]...";
 static struct argp_option options[] = {
-    { "warmup", 'w', "COUNT", OPTION_ARG_OPTIONAL, "number of warmup iterations to do"},
-    { "measure", 'm', "COUNT", OPTION_ARG_OPTIONAL, "number of measured iterations to do"},
+    { "warmup_i", 'w', "COUNT", OPTION_ARG_OPTIONAL, "minimal number of warmup iterations to do"},
+    { "measure_i", 'm', "COUNT", OPTION_ARG_OPTIONAL, "minimal number of measurement iterations to do"},
+    { "warmup_t", 'x', "COUNT", OPTION_ARG_OPTIONAL, "minimal time to do warmup (in milliseconds)"},
+    { "measure_t", 'y', "COUNT", OPTION_ARG_OPTIONAL, "minimal time to do measurements (in milliseconds)"},
     { "details", 'd', 0, 0, "show details about the test harness to execute"},
     { 0 }
 };
@@ -34,11 +36,15 @@ static struct argp_option options[] = {
 struct arguments {
     int warmup_it;
     int measure_it;
+    int warmup_time;
+    int measure_time;
     bool show_details;
 };
 
 static int print_details(_test_harness test_harness);
-static double do_benchmark(_test_harness test_harness, int iterations);
+static double do_benchmark(_test_harness test_harness, int min_iterations, int min_time_ms);
+
+double getCPUTime();
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state);
 static error_t read_unsigned_int_arg(int *var, char *arg);
@@ -47,36 +53,37 @@ int _execute_harness(int argc, char* argv[], _test_harness test_harness) {
     struct argp argp = { options, parse_opt, args_doc, doc, 0, 0, 0 };
 
     struct arguments arguments = {
-        .warmup_it = 10,
-        .measure_it = 10,
+        .warmup_it = 0,
+        .measure_it = 0,
+        .warmup_time = 0,
+        .measure_time = 0,
         .show_details = false
     };
 
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
-    if(arguments.show_details || true) {
-        /*return*/ print_details(test_harness);
+    // Load default values if nothing was specified
+    if(arguments.warmup_it == 0 && arguments.measure_it == 0 && arguments.warmup_time == 0 && arguments.measure_time == 0 ) {
+        arguments.warmup_it = 10;
+        arguments.measure_it = 10;
     }
 
-    printf(" * Warmup Iterations: %d\n", arguments.warmup_it);
-    printf(" * Measure Iterations: %d\n", arguments.measure_it);
-    puts("########################################");
+    if(arguments.show_details) {
+        print_details(test_harness);
 
-    // Do benchmark
-    int problem_size = arguments.measure_it;
-    int warmup_iterations = arguments.warmup_it / problem_size;
+        printf(" * Warmup Iterations: %d\n", arguments.warmup_it);
+        printf(" * Measure Iterations: %d\n", arguments.measure_it);
+        printf(" * Warmup Time: %d\n", arguments.warmup_time);
+        printf(" * Measure Time: %d\n", arguments.measure_time);
+        puts("########################################");
+    }
 
     // Warmup
-    if(arguments.warmup_it%problem_size) {
-        do_benchmark(test_harness, arguments.warmup_it%problem_size);
-    }
-    for(int i=0; i < warmup_iterations; i++) {
-        do_benchmark(test_harness, problem_size);
-    }
+    do_benchmark(test_harness, arguments.warmup_it, arguments.warmup_time);
     putchar('\n');
 
     // Final run
-    double result = do_benchmark(test_harness, arguments.measure_it);
+    double result = do_benchmark(test_harness, arguments.measure_it, arguments.measure_time);
     putchar('\n');
 
     printf(" * execution time: %fms\n", result);
@@ -95,22 +102,20 @@ static int print_details(_test_harness harness) {
     return 0;
 }
 
-static double do_benchmark(_test_harness test_harness, int iterations) {
-    struct timeval tv_start, tv_end;
-    struct timeval *tv_start_ptr = &tv_start, *tv_end_ptr=&tv_end;
+static double do_benchmark(_test_harness test_harness, int min_iterations, int min_time_ms) {
+    double startTime, endTime;
+    double sumTime = 0;
 
-    long time = 0L;
-
-    for(int i = 0; i < iterations; i++) {
-        gettimeofday(tv_start_ptr, NULL);
+    for(int i = 0; i < min_iterations; i++) {
+        startTime = getCPUTime();
         test_harness.test_harness(); // TODO: do not optimize away
-        gettimeofday(tv_end_ptr, NULL);
-        time += (tv_end.tv_sec-tv_start.tv_sec)*1000L+(long)((tv_end.tv_usec-tv_start.tv_usec)*0.001);
+        endTime = getCPUTime();
+        sumTime += endTime - startTime;
         putchar('.');
         fflush(stdout);
     }
 
-    return (double)time / (double)iterations; // TODO
+    return sumTime / (double)min_iterations; // TODO
 }
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
@@ -121,6 +126,12 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 
         case 'm':
             return read_unsigned_int_arg(&(arguments->measure_it), arg+1);
+
+        case 'x':
+            return read_unsigned_int_arg(&(arguments->warmup_time), arg+1);
+
+        case 't':
+            return read_unsigned_int_arg(&(arguments->measure_time), arg+1);
 
         case 'd':
             arguments->show_details = true;
@@ -144,4 +155,65 @@ static error_t read_unsigned_int_arg(int *var, char *arg) {
     }
     *var = parsed;
     return 0;
+}
+
+#include <sys/times.h>
+#include <unistd.h>
+#include <time.h>
+
+/**
+ * Returns the amount of CPU time used by the current process,
+ * in seconds, or -1.0 if an error occurred.
+ *
+ * Author:  David Robert Nadeau
+ * Site:    http://NadeauSoftware.com/
+ * License: Creative Commons Attribution 3.0 Unported License
+ *          http://creativecommons.org/licenses/by/3.0/deed.en_US
+ *
+ * See: http://nadeausoftware.com/articles/2012/03/c_c_tip_how_measure_cpu_time_benchmarking
+ */
+double getCPUTime( )
+{
+
+#if defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
+	/* Prefer high-res POSIX timers, when available. */
+	{
+		clockid_t id;
+		struct timespec ts;
+#if _POSIX_CPUTIME > 0
+		/* Clock ids vary by OS.  Query the id, if possible. */
+		if ( clock_getcpuclockid( 0, &id ) == -1 )
+#endif
+#if defined(CLOCK_PROCESS_CPUTIME_ID)
+			/* Use known clock id for AIX, Linux, or Solaris. */
+			id = CLOCK_PROCESS_CPUTIME_ID;
+#elif defined(CLOCK_VIRTUAL)
+			/* Use known clock id for BSD or HP-UX. */
+			id = CLOCK_VIRTUAL;
+#else
+			id = (clockid_t)-1;
+#endif
+		if ( id != (clockid_t)-1 && clock_gettime( id, &ts ) != -1 )
+			return (double)ts.tv_sec +
+				(double)ts.tv_nsec / 1000000000.0;
+	}
+#endif
+
+#if defined(RUSAGE_SELF)
+	{
+		struct rusage rusage;
+		if ( getrusage( RUSAGE_SELF, &rusage ) != -1 )
+			return (double)rusage.ru_utime.tv_sec +
+				(double)rusage.ru_utime.tv_usec / 1000000.0;
+	}
+#endif
+
+	{
+		const double ticks = (double)sysconf( _SC_CLK_TCK );
+		struct tms tms;
+		if ( times( &tms ) != (clock_t)-1 )
+			return (double)tms.tms_utime / ticks;
+	}
+
+    return -1;		/* Failed. */
 }
