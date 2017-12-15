@@ -42,7 +42,7 @@ struct arguments {
 };
 
 static int print_details(_test_harness test_harness);
-static double do_benchmark(_test_harness test_harness, int min_iterations, int min_time_ms);
+static double do_benchmark(_test_harness test_harness, int min_iterations, double min_time);
 
 double getCPUTime();
 
@@ -63,8 +63,10 @@ int _execute_harness(int argc, char* argv[], _test_harness test_harness) {
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
     // Load default values if nothing was specified
-    if(arguments.warmup_it == 0 && arguments.measure_it == 0 && arguments.warmup_time == 0 && arguments.measure_time == 0 ) {
+    if(arguments.warmup_it == 0&& arguments.warmup_time == 0) {
         arguments.warmup_it = 10;
+    }
+    if(arguments.measure_it == 0 && arguments.measure_time == 0) {
         arguments.measure_it = 10;
     }
 
@@ -79,11 +81,11 @@ int _execute_harness(int argc, char* argv[], _test_harness test_harness) {
     }
 
     // Warmup
-    do_benchmark(test_harness, arguments.warmup_it, arguments.warmup_time);
+    do_benchmark(test_harness, arguments.warmup_it, ((double)arguments.warmup_time)/1000.);
     putchar('\n');
 
     // Final run
-    double result = do_benchmark(test_harness, arguments.measure_it, arguments.measure_time);
+    double result = do_benchmark(test_harness, arguments.measure_it, ((double)arguments.measure_time)/1000.);
     putchar('\n');
 
     printf(" * execution time: %fms\n", result);
@@ -102,20 +104,25 @@ static int print_details(_test_harness harness) {
     return 0;
 }
 
-static double do_benchmark(_test_harness test_harness, int min_iterations, int min_time_ms) {
+static double do_benchmark(_test_harness test_harness, int min_iterations, double min_time) {
     double startTime, endTime;
     double sumTime = 0;
 
-    for(int i = 0; i < min_iterations; i++) {
+    int it = 0;
+
+    for(; it < min_iterations || sumTime < min_time; it++) {
         startTime = getCPUTime();
+
         test_harness.test_harness(); // TODO: do not optimize away
+
         endTime = getCPUTime();
         sumTime += endTime - startTime;
+
         putchar('.');
         fflush(stdout);
     }
 
-    return sumTime / (double)min_iterations; // TODO
+    return sumTime / (double)it;
 }
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
@@ -130,7 +137,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
         case 'x':
             return read_unsigned_int_arg(&(arguments->warmup_time), arg+1);
 
-        case 't':
+        case 'y':
             return read_unsigned_int_arg(&(arguments->measure_time), arg+1);
 
         case 'd':
