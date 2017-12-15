@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = antirez-otree swenson-sort wbhart-bsdnt zhemao-libds
+PROJECTS = antirez-otree dcjones-hat-trie swenson-sort wbhart-bsdnt zhemao-libds
 
 # Global commands
 
@@ -36,6 +36,11 @@ exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 
 antirez-otree_$(TEST_SUFFIX): antirez-otree antirez-otree_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) antirez-otree_test.c antirez-otree/btree.c -o "$(TEST_DIR)/antirez-otree_$(TEST_SUFFIX)"
+
+########## https://github.com/dcjones/hat-trie
+
+dcjones-hat-trie_$(TEST_SUFFIX): dcjones-hat-trie dcjones-hat-trie_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) dcjones-hat-trie_test.c dcjones-hat-trie/src/*.c -o "$(TEST_DIR)/dcjones-hat-trie_$(TEST_SUFFIX)"
 
 ########## https://github.com/swenson/sort
 

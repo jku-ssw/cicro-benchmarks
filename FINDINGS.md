@@ -310,4 +310,13 @@ cp vectest.bc ../../../java-llvm-ir-builder-dev/sulong/vectest.bc
 ```
 cmake .
 make test # TODO: continue
+```
 
+# dcjones/hat-trie (2017.15.12)
+
+```
+autoreconf -i
+./configure
+export LLVM_COMPILER=clang
+make CC='wllvm' check
+```
