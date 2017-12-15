@@ -129,16 +129,16 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     struct arguments *arguments = state->input;
     switch (key) {
         case 'w':
-            return read_unsigned_int_arg(&(arguments->warmup_it), arg+1);
+            return read_unsigned_int_arg(&(arguments->warmup_it), arg);
 
         case 'm':
-            return read_unsigned_int_arg(&(arguments->measure_it), arg+1);
+            return read_unsigned_int_arg(&(arguments->measure_it), arg);
 
         case 'x':
-            return read_unsigned_int_arg(&(arguments->warmup_time), arg+1);
+            return read_unsigned_int_arg(&(arguments->warmup_time), arg);
 
         case 'y':
-            return read_unsigned_int_arg(&(arguments->measure_time), arg+1);
+            return read_unsigned_int_arg(&(arguments->measure_time), arg);
 
         case 'd':
             arguments->show_details = true;
@@ -153,11 +153,14 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
 }
 
 static error_t read_unsigned_int_arg(int *var, char *arg) {
+    if(arg == NULL) {
+        return ARGP_ERR_UNKNOWN;
+    }
     char *endptr;
     errno = 0;
-    int parsed = (int) strtol(arg, &endptr, 10);
-    if (errno == ERANGE || *endptr != '\0' || arg == endptr || parsed < 0) {
-        printf("Invalid number: \"%s\"\n", arg);
+    int parsed = (int) strtol(arg+1, &endptr, 10);
+    if (errno == ERANGE || *endptr != '\0' || arg+1 == endptr || parsed < 0) {
+        printf("Invalid number: \"%s\"\n", arg+1);
         return ARGP_ERR_UNKNOWN;
     }
     *var = parsed;
