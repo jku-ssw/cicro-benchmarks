@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = antirez-otree dcjones-hat-trie swenson-sort wbhart-bsdnt zhemao-libds
+PROJECTS = antirez-otree dcjones-hat-trie fabianishere-brainfuck swenson-sort wbhart-bsdnt zhemao-libds
 
 # Global commands
 
@@ -41,6 +41,11 @@ antirez-otree_$(TEST_SUFFIX): antirez-otree antirez-otree_test.c $(HARNESS_C)
 
 dcjones-hat-trie_$(TEST_SUFFIX): dcjones-hat-trie dcjones-hat-trie_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) dcjones-hat-trie_test.c dcjones-hat-trie/src/*.c -o "$(TEST_DIR)/dcjones-hat-trie_$(TEST_SUFFIX)"
+
+########## https://github.com/dcjones/hat-trie
+
+fabianishere-brainfuck_$(TEST_SUFFIX): fabianishere-brainfuck fabianishere-brainfuck_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) fabianishere-brainfuck_test.c fabianishere-brainfuck/src/brainfuck.c -I fabianishere-brainfuck/include/ -o "$(TEST_DIR)/fabianishere-brainfuck_$(TEST_SUFFIX)"
 
 ########## https://github.com/swenson/sort
 
