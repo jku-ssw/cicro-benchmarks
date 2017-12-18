@@ -320,3 +320,73 @@ autoreconf -i
 export LLVM_COMPILER=clang
 make CC='wllvm' check
 ```
+
+# Ed-von-Schleck/shoco (2017.18.12)
+
+does not build due to syntax problems
+
+# chrismoos/hash-ring (2017.18.12)
+
+unclear which code to use
+
+# cvxgrp/scs (2017.18.12)
+
+unclear how to use code as benchmark
+
+# PetteriAimonen/libfixmatrix (2017.18.12)
+
+svn dependency not available
+
+# andikleen/snappy-c (2017.18.12)
+
+Some valgrind warnings:
+
+```
+==19718== Conditional jump or move depends on uninitialised value(s)
+==19718==    at 0x10B3BA: decompress_all_tags (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109F21: internal_uncompress (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109E66: snappy_uncompress (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x1096B1: test_harness (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x1093BC: do_benchmark (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109086: _execute_harness (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109756: main (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718== 
+==19718== Conditional jump or move depends on uninitialised value(s)
+==19718==    at 0x10BAEA: writer_try_fast_append (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x10B3EF: decompress_all_tags (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109F21: internal_uncompress (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109E66: snappy_uncompress (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x1096B1: test_harness (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x1093BC: do_benchmark (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109086: _execute_harness (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109756: main (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718== 
+==19718== Conditional jump or move depends on uninitialised value(s)
+==19718==    at 0x10B49C: decompress_all_tags (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109F21: internal_uncompress (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109E66: snappy_uncompress (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x1096B1: test_harness (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x1093BC: do_benchmark (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109086: _execute_harness (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109756: main (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718== 
+==19718== Conditional jump or move depends on uninitialised value(s)
+==19718==    at 0x10B4F7: decompress_all_tags (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109F21: internal_uncompress (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109E66: snappy_uncompress (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x1096B1: test_harness (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x1093BC: do_benchmark (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109086: _execute_harness (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109756: main (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718== 
+==19718== Conditional jump or move depends on uninitialised value(s)
+==19718==    at 0x10BBDF: writer_append (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x10B598: decompress_all_tags (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109F21: internal_uncompress (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109E66: snappy_uncompress (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x1096B1: test_harness (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x1093BC: do_benchmark (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109086: _execute_harness (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718==    by 0x109756: main (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
+==19718== 
+```

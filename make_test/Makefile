@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = antirez-otree dcjones-hat-trie fabianishere-brainfuck lucasb-eyer-heatmap swenson-sort wbhart-bsdnt zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree dcjones-hat-trie fabianishere-brainfuck lucasb-eyer-heatmap swenson-sort wbhart-bsdnt zhemao-libds
 
 # Global commands
 
@@ -31,6 +31,11 @@ test: $(addprefix exec_, $(PROJECTS:=_$(TEST_SUFFIX)))
 exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 	./$<
 
+
+########## https://github.com/andikleen/snappy-c
+
+andikleen-snappy-c_$(TEST_SUFFIX): andikleen-snappy-c andikleen-snappy-c_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) andikleen-snappy-c_test.c andikleen-snappy-c/snappy.c -o "$(TEST_DIR)/andikleen-snappy-c_$(TEST_SUFFIX)"
 
 ########## https://github.com/antirez/otree
 
