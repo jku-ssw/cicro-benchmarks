@@ -390,3 +390,17 @@ Some valgrind warnings:
 ==19718==    by 0x109756: main (in /home/thomas/JKU/ssw_msr2018/make_test/andikleen-snappy-c_test)
 ==19718== 
 ```
+
+# https://github.com/josephg/librope (2017.18.12)
+
+code in README.md uses function names which no longer exists
+
+```
+==21245== LEAK SUMMARY:
+==21245==    definitely lost: 154,310,156 bytes in 17 blocks
+==21245==    indirectly lost: 0 bytes in 0 blocks
+==21245==      possibly lost: 27,231,204 bytes in 3 blocks
+==21245==    still reachable: 0 bytes in 0 blocks
+==21245==         suppressed: 0 bytes in 0 blocks
+==21245== Rerun with --leak-check=full to see details of leaked memory
+```

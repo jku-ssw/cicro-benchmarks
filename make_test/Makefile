@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree dcjones-hat-trie fabianishere-brainfuck lucasb-eyer-heatmap swenson-sort wbhart-bsdnt zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree dcjones-hat-trie fabianishere-brainfuck josephg-librope lucasb-eyer-heatmap swenson-sort wbhart-bsdnt zhemao-libds
 
 # Global commands
 
@@ -41,6 +41,11 @@ andikleen-snappy-c_$(TEST_SUFFIX): andikleen-snappy-c andikleen-snappy-c_test.c 
 
 antirez-otree_$(TEST_SUFFIX): antirez-otree antirez-otree_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) antirez-otree_test.c antirez-otree/btree.c -o "$(TEST_DIR)/antirez-otree_$(TEST_SUFFIX)"
+
+########## https://github.com/josephg/librope
+
+josephg-librope_$(TEST_SUFFIX): josephg-librope josephg-librope_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) josephg-librope_test.c josephg-librope/rope.c -o "$(TEST_DIR)/josephg-librope_$(TEST_SUFFIX)"
 
 ########## https://github.com/dcjones/hat-trie
 
