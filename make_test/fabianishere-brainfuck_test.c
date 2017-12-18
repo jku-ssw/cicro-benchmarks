@@ -19,7 +19,7 @@ int __attribute__ ((noinline)) test_harness(void) {
 int main(int argc, char* argv[]) {
     _test_harness harness = {
         .name="fabianishere-brainfuck",
-        .description="Brainfuck interpreter written in C ",
+        .description="Brainfuck interpreter written in C",
         .test_harness=*test_harness,
         .expected_runtime=370L
     };
