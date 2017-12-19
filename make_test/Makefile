@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree dcjones-hat-trie fabianishere-brainfuck josephg-librope lucasb-eyer-heatmap swenson-sort wbhart-bsdnt zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree dcjones-hat-trie fabianishere-brainfuck josephg-librope lucasb-eyer-heatmap swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt zhemao-libds
 
 # Global commands
 
@@ -66,6 +66,16 @@ fabianishere-brainfuck_$(TEST_SUFFIX): fabianishere-brainfuck fabianishere-brain
 
 swenson-sort_$(TEST_SUFFIX): swenson-sort swenson-sort_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) swenson-sort_test.c -o "$(TEST_DIR)/swenson-sort_$(TEST_SUFFIX)"
+
+########## https://github.com/troydhanson/tpl
+
+troydhanson-tpl_$(TEST_SUFFIX): troydhanson-tpl troydhanson-tpl_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) troydhanson-tpl_test.c troydhanson-tpl/src/tpl.c -o "$(TEST_DIR)/troydhanson-tpl_$(TEST_SUFFIX)"
+
+########## https://github.com/veorq/SipHash
+
+veorq-SipHash_$(TEST_SUFFIX):veorq-SipHash veorq-SipHash_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) veorq-SipHash_test.c -o "$(TEST_DIR)/veorq-SipHash_$(TEST_SUFFIX)"
 
 ########## https://github.com/wbhart/bsdnt
 
