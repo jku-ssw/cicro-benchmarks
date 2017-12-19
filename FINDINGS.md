@@ -408,3 +408,7 @@ implemented
 # https://github.com/snowballstem/snowball (2017.19.12)
 
 Implemented, but way to tight loop at the moment to do good benchmarking
+
+# https://github.com/bashrc/libdeep (2017.19.12)
+
+Implemented
