@@ -412,3 +412,11 @@ Implemented, but way to tight loop at the moment to do good benchmarking
 # https://github.com/bashrc/libdeep (2017.19.12)
 
 Implemented
+
+# https://github.com/haldean/x6502 (2017.19.12)
+
+Dropped: We need an 6502 assembler to build files which can be run
+
+# https://github.com/camgunz/cmp (2017.19.12)
+
+Implemented, but way to tight loop at the moment to do good benchmarking

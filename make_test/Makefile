@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep dcjones-hat-trie fabianishere-brainfuck josephg-librope lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp dcjones-hat-trie fabianishere-brainfuck josephg-librope lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt zhemao-libds
 
 # Global commands
 
@@ -46,6 +46,11 @@ antirez-otree_$(TEST_SUFFIX): antirez-otree antirez-otree_test.c $(HARNESS_C)
 
 bashrc-libdeep_$(TEST_SUFFIX): bashrc-libdeep bashrc-libdeep_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) bashrc-libdeep_test.c bashrc-libdeep/src/*.c -o "$(TEST_DIR)/bashrc-libdeep_$(TEST_SUFFIX)" -lm
+
+########## https://github.com/camgunz/cmp
+
+camgunz-cmp_$(TEST_SUFFIX): camgunz-cmp camgunz-cmp_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) camgunz-cmp_test.c camgunz-cmp/cmp.c -o "$(TEST_DIR)/camgunz-cmp_$(TEST_SUFFIX)"
 
 ########## https://github.com/josephg/librope
 
