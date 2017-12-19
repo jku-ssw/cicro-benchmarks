@@ -404,3 +404,7 @@ implemented
 # https://github.com/troydhanson/tpl (2017.19.12)
 
 implemented
+
+# https://github.com/snowballstem/snowball (2017.19.12)
+
+Implemented, but way to tight loop at the moment to do good benchmarking
