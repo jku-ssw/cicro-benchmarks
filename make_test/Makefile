@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp ctz-cifra dcjones-hat-trie fabianishere-brainfuck ferreiradaselva-mathc jtsiomb-kdtree josephg-librope lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp ctz-cifra dcjones-hat-trie fabianishere-brainfuck ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt zhemao-libds
 
 # Global commands
 
@@ -71,6 +71,16 @@ ferreiradaselva-mathc_$(TEST_SUFFIX): ferreiradaselva-mathc ferreiradaselva-math
 
 jtsiomb-kdtree_$(TEST_SUFFIX): jtsiomb-kdtree jtsiomb-kdtree_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) jtsiomb-kdtree_test.c jtsiomb-kdtree/kdtree.c -o "$(TEST_DIR)/jtsiomb-kdtree_$(TEST_SUFFIX)"
+
+########## https://github.com/khovratovich/Argon2
+
+khovratovich-Argon2_$(TEST_SUFFIX): khovratovich-Argon2 khovratovich-Argon2_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) khovratovich-Argon2_test.c khovratovich-Argon2/Source/C99/Argon2/argon2-core.c \
+	 khovratovich-Argon2/Source/C99/Argon2/argon2.c \
+	 khovratovich-Argon2/Source/C99/Argon2/argon2-ref-core.c \
+	 khovratovich-Argon2/Source/C99/Argon2/kat.c \
+	 khovratovich-Argon2/Source/C99/Blake2/blake2b-ref.c \
+	 -o "$(TEST_DIR)/khovratovich-Argon2_$(TEST_SUFFIX)" -I khovratovich-Argon2/Source/C99/Common -pthread
 
 ########## https://github.com/josephg/librope
 

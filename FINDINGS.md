@@ -434,3 +434,7 @@ Implemented, but way to tight loop at the moment to do good benchmarking
 # https://github.com/ctz/cifra (2017.20.12)
 
 Implement SHA3 Benchmark
+
+# https://github.com/khovratovich/Argon2 (2017.20.12)
+
+Implemented
