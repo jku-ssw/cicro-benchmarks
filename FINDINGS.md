@@ -438,3 +438,7 @@ Implement SHA3 Benchmark
 # https://github.com/khovratovich/Argon2 (2017.20.12)
 
 Implemented
+
+# https://github.com/codeplea/genann (2017.20.12)
+
+Implemented

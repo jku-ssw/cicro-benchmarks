@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp ctz-cifra dcjones-hat-trie fabianishere-brainfuck ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt zhemao-libds
 
 # Global commands
 
@@ -51,6 +51,11 @@ bashrc-libdeep_$(TEST_SUFFIX): bashrc-libdeep bashrc-libdeep_test.c $(HARNESS_C)
 
 camgunz-cmp_$(TEST_SUFFIX): camgunz-cmp camgunz-cmp_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) camgunz-cmp_test.c camgunz-cmp/cmp.c -o "$(TEST_DIR)/camgunz-cmp_$(TEST_SUFFIX)"
+
+########## https://github.com/codeplea/genann
+
+codeplea-genann_$(TEST_SUFFIX): codeplea-genann codeplea-genann_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) codeplea-genann_test.c codeplea-genann/genann.c -o "$(TEST_DIR)/codeplea-genann_$(TEST_SUFFIX)" -lm
 
 ########## https://github.com/ctz/cifra
 
