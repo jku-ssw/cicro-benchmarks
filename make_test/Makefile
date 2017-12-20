@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp dcjones-hat-trie fabianishere-brainfuck jtsiomb-kdtree josephg-librope lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp dcjones-hat-trie fabianishere-brainfuck ferreiradaselva-mathc jtsiomb-kdtree josephg-librope lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt zhemao-libds
 
 # Global commands
 
@@ -52,6 +52,16 @@ bashrc-libdeep_$(TEST_SUFFIX): bashrc-libdeep bashrc-libdeep_test.c $(HARNESS_C)
 camgunz-cmp_$(TEST_SUFFIX): camgunz-cmp camgunz-cmp_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) camgunz-cmp_test.c camgunz-cmp/cmp.c -o "$(TEST_DIR)/camgunz-cmp_$(TEST_SUFFIX)"
 
+########## https://github.com/dcjones/hat-trie
+
+dcjones-hat-trie_$(TEST_SUFFIX): dcjones-hat-trie dcjones-hat-trie_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) dcjones-hat-trie_test.c dcjones-hat-trie/src/*.c -o "$(TEST_DIR)/dcjones-hat-trie_$(TEST_SUFFIX)"
+
+########## https://github.com/ferreiradaselva/mathc
+
+ferreiradaselva-mathc_$(TEST_SUFFIX): ferreiradaselva-mathc ferreiradaselva-mathc_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) ferreiradaselva-mathc_test.c ferreiradaselva-mathc/mathc.c -o "$(TEST_DIR)/ferreiradaselva-mathc_$(TEST_SUFFIX)" -lm
+
 ########## https://github.com/jtsiomb/kdtree
 
 jtsiomb-kdtree_$(TEST_SUFFIX): jtsiomb-kdtree jtsiomb-kdtree_test.c $(HARNESS_C)
@@ -61,11 +71,6 @@ jtsiomb-kdtree_$(TEST_SUFFIX): jtsiomb-kdtree jtsiomb-kdtree_test.c $(HARNESS_C)
 
 josephg-librope_$(TEST_SUFFIX): josephg-librope josephg-librope_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) josephg-librope_test.c josephg-librope/rope.c -o "$(TEST_DIR)/josephg-librope_$(TEST_SUFFIX)"
-
-########## https://github.com/dcjones/hat-trie
-
-dcjones-hat-trie_$(TEST_SUFFIX): dcjones-hat-trie dcjones-hat-trie_test.c $(HARNESS_C)
-	$(CC) $(HARNESS_C) dcjones-hat-trie_test.c dcjones-hat-trie/src/*.c -o "$(TEST_DIR)/dcjones-hat-trie_$(TEST_SUFFIX)"
 
 ########## https://github.com/lucasb-eyer/heatmap
 

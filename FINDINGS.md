@@ -420,3 +420,13 @@ Dropped: We need an 6502 assembler to build files which can be run
 # https://github.com/camgunz/cmp (2017.19.12)
 
 Implemented, but way to tight loop at the moment to do good benchmarking
+
+# https://github.com/jtsiomb/kdtree (2017.20.12)
+
+implemented
+
+# https://github.com/ferreiradaselva/mathc (2017.20.12)
+
+Example code in readme doesn't work out of the box
+
+Implemented, but way to tight loop at the moment to do good benchmarking
