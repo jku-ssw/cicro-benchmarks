@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp dcjones-hat-trie fabianishere-brainfuck josephg-librope lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp dcjones-hat-trie fabianishere-brainfuck jtsiomb-kdtree josephg-librope lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt zhemao-libds
 
 # Global commands
 
@@ -51,6 +51,11 @@ bashrc-libdeep_$(TEST_SUFFIX): bashrc-libdeep bashrc-libdeep_test.c $(HARNESS_C)
 
 camgunz-cmp_$(TEST_SUFFIX): camgunz-cmp camgunz-cmp_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) camgunz-cmp_test.c camgunz-cmp/cmp.c -o "$(TEST_DIR)/camgunz-cmp_$(TEST_SUFFIX)"
+
+########## https://github.com/jtsiomb/kdtree
+
+jtsiomb-kdtree_$(TEST_SUFFIX): jtsiomb-kdtree jtsiomb-kdtree_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) jtsiomb-kdtree_test.c jtsiomb-kdtree/kdtree.c -o "$(TEST_DIR)/jtsiomb-kdtree_$(TEST_SUFFIX)"
 
 ########## https://github.com/josephg/librope
 
