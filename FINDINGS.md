@@ -430,3 +430,7 @@ implemented
 Example code in readme doesn't work out of the box
 
 Implemented, but way to tight loop at the moment to do good benchmarking
+
+# https://github.com/ctz/cifra (2017.20.12)
+
+Implement SHA3 Benchmark
