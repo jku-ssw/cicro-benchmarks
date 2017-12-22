@@ -458,3 +458,7 @@ Implemented
 # https://github.com/RoaringBitmap/CRoaring (2017.22.12)
 
 Implemented
+
+# https://github.com/Themaister/libfmsynth (2017.22.12)
+
+Implemented

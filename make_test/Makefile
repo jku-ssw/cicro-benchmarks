@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds
 
 # Global commands
 
@@ -121,6 +121,11 @@ snowballstem-snowball_$(TEST_SUFFIX): snowballstem-snowball snowballstem-snowbal
 
 swenson-sort_$(TEST_SUFFIX): swenson-sort swenson-sort_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) swenson-sort_test.c -o "$(TEST_DIR)/swenson-sort_$(TEST_SUFFIX)"
+
+########## https://github.com/Themaister/libfmsynth
+
+Themaister-libfmsynth_$(TEST_SUFFIX): Themaister-libfmsynth Themaister-libfmsynth_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) Themaister-libfmsynth_test.c Themaister-libfmsynth/src/fmsynth.c -o "$(TEST_DIR)/Themaister-libfmsynth_$(TEST_SUFFIX)" -lm -I Themaister-libfmsynth/include
 
 ########## https://github.com/troydhanson/tpl
 
