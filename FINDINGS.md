@@ -454,3 +454,7 @@ Implemented
 # https://github.com/faragon/libsrt (2017.22.12)
 
 Implemented
+
+# https://github.com/RoaringBitmap/CRoaring (2017.22.12)
+
+Implemented

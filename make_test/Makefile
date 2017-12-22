@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds
 
 # Global commands
 
@@ -106,6 +106,11 @@ josephg-librope_$(TEST_SUFFIX): josephg-librope josephg-librope_test.c $(HARNESS
 
 lucasb-eyer-heatmap_$(TEST_SUFFIX): lucasb-eyer-heatmap lucasb-eyer-heatmap_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) lucasb-eyer-heatmap_test.c lucasb-eyer-heatmap/heatmap.c -o "$(TEST_DIR)/lucasb-eyer-heatmap_$(TEST_SUFFIX)" -lm
+
+########## https://github.com/RoaringBitmap/CRoaring
+
+RoaringBitmap-CRoaring_$(TEST_SUFFIX): RoaringBitmap-CRoaring RoaringBitmap-CRoaring_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) RoaringBitmap-CRoaring_test.c RoaringBitmap-CRoaring/src/*.c RoaringBitmap-CRoaring/src/containers/*.c -o "$(TEST_DIR)/RoaringBitmap-CRoaring_$(TEST_SUFFIX)" -I RoaringBitmap-CRoaring/include/
 
 ########## https://github.com/snowballstem/snowball
 
