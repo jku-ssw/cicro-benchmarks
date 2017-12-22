@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds
 
 # Global commands
 
@@ -119,7 +119,7 @@ troydhanson-tpl_$(TEST_SUFFIX): troydhanson-tpl troydhanson-tpl_test.c $(HARNESS
 
 ########## https://github.com/veorq/SipHash
 
-veorq-SipHash_$(TEST_SUFFIX):veorq-SipHash veorq-SipHash_test.c $(HARNESS_C)
+veorq-SipHash_$(TEST_SUFFIX): veorq-SipHash veorq-SipHash_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) veorq-SipHash_test.c -o "$(TEST_DIR)/veorq-SipHash_$(TEST_SUFFIX)"
 
 ########## https://github.com/wbhart/bsdnt
@@ -134,6 +134,11 @@ ifneq ("$(wildcard ./wbhart-bsdnt/Makefile)","")
 	(cd ./wbhart-bsdnt; make distclean; rm -f Makefile)
 endif
 	rm -f "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)"
+
+########## https://github.com/websnarf/bstrlib
+
+websnarf-bstrlib_$(TEST_SUFFIX): websnarf-bstrlib websnarf-bstrlib_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) websnarf-bstrlib_test.c websnarf-bstrlib/bstraux.c websnarf-bstrlib/bstrlib.c -o "$(TEST_DIR)/websnarf-bstrlib_$(TEST_SUFFIX)"
 
 ########## https://github.com/zhemao/libds
 
