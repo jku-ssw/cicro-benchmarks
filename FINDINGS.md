@@ -466,3 +466,14 @@ Implemented
 # https://github.com/chrismoos/hash-ring (2017.22.12)
 
 Implemented
+
+# https://github.com/zserge/partcl (2017.22.12)
+
+Implemented
+
+this testcase caused a segfault:
+```tcl
+set i 0; while {< $i 20} {if {== [- $i [* [/ $i 2] 2]] 0} {set i [+ $i 1]} {set i [+ $i 1]}; puts $i}
+```
+
+

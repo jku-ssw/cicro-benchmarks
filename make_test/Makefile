@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds zserge-partcl
 
 # Global commands
 
@@ -164,3 +164,8 @@ websnarf-bstrlib_$(TEST_SUFFIX): websnarf-bstrlib websnarf-bstrlib_test.c $(HARN
 
 zhemao-libds_$(TEST_SUFFIX): zhemao-libds zhemao-libds_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) zhemao-libds_test.c zhemao-libds/vector.c -o "$(TEST_DIR)/zhemao-libds_$(TEST_SUFFIX)"
+
+########## https://github.com/zserge/partcl
+
+zserge-partcl_$(TEST_SUFFIX): zserge-partcl zserge-partcl_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) zserge-partcl_test.c -o "$(TEST_DIR)/zserge-partcl_$(TEST_SUFFIX)"
