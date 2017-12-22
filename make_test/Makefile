@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds
 
 # Global commands
 
@@ -51,6 +51,11 @@ bashrc-libdeep_$(TEST_SUFFIX): bashrc-libdeep bashrc-libdeep_test.c $(HARNESS_C)
 
 camgunz-cmp_$(TEST_SUFFIX): camgunz-cmp camgunz-cmp_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) camgunz-cmp_test.c camgunz-cmp/cmp.c -o "$(TEST_DIR)/camgunz-cmp_$(TEST_SUFFIX)"
+
+########## https://github.com/chrismoos/hash-ring
+
+chrismoos-hash-ring_$(TEST_SUFFIX): chrismoos-hash-ring chrismoos-hash-ring_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) chrismoos-hash-ring_test.c chrismoos-hash-ring/hash_ring.c chrismoos-hash-ring/md5.c chrismoos-hash-ring/sha1.c -o "$(TEST_DIR)/chrismoos-hash-ring_$(TEST_SUFFIX)"
 
 ########## https://github.com/codeplea/genann
 

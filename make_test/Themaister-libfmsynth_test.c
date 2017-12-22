@@ -32,7 +32,7 @@ int __attribute__ ((noinline)) test_harness(void) {
     }
 
     fmsynth_free(fm);
-    
+
     return 0;
 }
 

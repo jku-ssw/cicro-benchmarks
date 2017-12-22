@@ -462,3 +462,7 @@ Implemented
 # https://github.com/Themaister/libfmsynth (2017.22.12)
 
 Implemented
+
+# https://github.com/chrismoos/hash-ring (2017.22.12)
+
+Implemented
