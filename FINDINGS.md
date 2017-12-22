@@ -450,3 +450,7 @@ Dropped because of cmake dependency and we cannot compile without it
 # https://github.com/websnarf/bstrlib (2017.21.12)
 
 Implemented
+
+# https://github.com/faragon/libsrt (2017.22.12)
+
+Implemented

@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap snowballstem-snowball swenson-sort troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds
 
 # Global commands
 
@@ -67,6 +67,16 @@ ctz-cifra_$(TEST_SUFFIX): ctz-cifra ctz-cifra_test.c $(HARNESS_C)
 dcjones-hat-trie_$(TEST_SUFFIX): dcjones-hat-trie dcjones-hat-trie_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) dcjones-hat-trie_test.c dcjones-hat-trie/src/*.c -o "$(TEST_DIR)/dcjones-hat-trie_$(TEST_SUFFIX)"
 
+########## https://github.com/fabianishere/brainfuck
+
+fabianishere-brainfuck_$(TEST_SUFFIX): fabianishere-brainfuck fabianishere-brainfuck_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) fabianishere-brainfuck_test.c fabianishere-brainfuck/src/brainfuck.c -I fabianishere-brainfuck/include/ -o "$(TEST_DIR)/fabianishere-brainfuck_$(TEST_SUFFIX)"
+
+########## https://github.com/faragon/libsrt
+
+faragon-libsrt_$(TEST_SUFFIX): faragon-libsrt faragon-libsrt_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) faragon-libsrt_test.c faragon-libsrt/src/*.c  faragon-libsrt/src/saux/*.c -o "$(TEST_DIR)/faragon-libsrt_$(TEST_SUFFIX)"
+
 ########## https://github.com/ferreiradaselva/mathc
 
 ferreiradaselva-mathc_$(TEST_SUFFIX): ferreiradaselva-mathc ferreiradaselva-mathc_test.c $(HARNESS_C)
@@ -96,11 +106,6 @@ josephg-librope_$(TEST_SUFFIX): josephg-librope josephg-librope_test.c $(HARNESS
 
 lucasb-eyer-heatmap_$(TEST_SUFFIX): lucasb-eyer-heatmap lucasb-eyer-heatmap_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) lucasb-eyer-heatmap_test.c lucasb-eyer-heatmap/heatmap.c -o "$(TEST_DIR)/lucasb-eyer-heatmap_$(TEST_SUFFIX)" -lm
-
-########## https://github.com/dcjones/hat-trie
-
-fabianishere-brainfuck_$(TEST_SUFFIX): fabianishere-brainfuck fabianishere-brainfuck_test.c $(HARNESS_C)
-	$(CC) $(HARNESS_C) fabianishere-brainfuck_test.c fabianishere-brainfuck/src/brainfuck.c -I fabianishere-brainfuck/include/ -o "$(TEST_DIR)/fabianishere-brainfuck_$(TEST_SUFFIX)"
 
 ########## https://github.com/snowballstem/snowball
 
