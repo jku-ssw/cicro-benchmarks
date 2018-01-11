@@ -488,6 +488,19 @@ Contains fortran code, is not easy to include
 
 Implemented
 
-# https://github.com/liteserver/binn
+# https://github.com/liteserver/binn (2018.01.11)
 
 Implemented
+
+# https://github.com/chrisjmccormick/word2vec_commented (2018.01.11)
+# https://github.com/tmikolov/word2vec (2018.01.11)
+
+Dropped, because constructed of main functions
+
+# https://github.com/gingerBill/Odin (2018.01.11)
+
+Dependency on LLVM and clang
+
+# https://github.com/openSUSE/libsolv (2018.01.11)
+
+complexity of the the projects make it hard to write tests
