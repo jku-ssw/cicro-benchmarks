@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds zserge-partcl
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope liteserver-binn khovratovich-Argon2 kylophone-spectrophoto lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds zserge-partcl
 
 # Global commands
 
@@ -91,6 +91,11 @@ ferreiradaselva-mathc_$(TEST_SUFFIX): ferreiradaselva-mathc ferreiradaselva-math
 
 jtsiomb-kdtree_$(TEST_SUFFIX): jtsiomb-kdtree jtsiomb-kdtree_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) jtsiomb-kdtree_test.c jtsiomb-kdtree/kdtree.c -o "$(TEST_DIR)/jtsiomb-kdtree_$(TEST_SUFFIX)"
+
+########## https://github.com/liteserver/binn
+
+liteserver-binn_$(TEST_SUFFIX): liteserver-binn liteserver-binn_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) liteserver-binn_test.c liteserver-binn/src/binn.c -o "$(TEST_DIR)/liteserver-binn_$(TEST_SUFFIX)"
 
 ########## https://github.com/khovratovich/Argon2
 

@@ -487,3 +487,7 @@ Contains fortran code, is not easy to include
 # https://github.com/kylophone/spectrophoto (2018.01.11)
 
 Implemented
+
+# https://github.com/liteserver/binn
+
+Implemented
