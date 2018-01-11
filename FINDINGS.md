@@ -476,4 +476,14 @@ this testcase caused a segfault:
 set i 0; while {< $i 20} {if {== [- $i [* [/ $i 2] 2]] 0} {set i [+ $i 1]} {set i [+ $i 1]}; puts $i}
 ```
 
+# https://github.com/sahaRatul/sela (2017.22.12)
 
+Code seems to be mainly constructed of main functions
+
+# https://github.com/hfp/libxsmm (2018.01.11)
+
+Contains fortran code, is not easy to include
+
+# https://github.com/kylophone/spectrophoto (2018.01.11)
+
+Implemented

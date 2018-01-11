@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds zserge-partcl
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds zserge-partcl
 
 # Global commands
 
@@ -101,6 +101,11 @@ khovratovich-Argon2_$(TEST_SUFFIX): khovratovich-Argon2 khovratovich-Argon2_test
 	 khovratovich-Argon2/Source/C99/Argon2/kat.c \
 	 khovratovich-Argon2/Source/C99/Blake2/blake2b-ref.c \
 	 -o "$(TEST_DIR)/khovratovich-Argon2_$(TEST_SUFFIX)" -I khovratovich-Argon2/Source/C99/Common -pthread
+
+########## https://github.com/kylophone/spectrophoto
+
+kylophone-spectrophoto_$(TEST_SUFFIX): kylophone-spectrophoto kylophone-spectrophoto_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) kylophone-spectrophoto_test.c -o "$(TEST_DIR)/kylophone-spectrophoto_$(TEST_SUFFIX)" -lm
 
 ########## https://github.com/josephg/librope
 
