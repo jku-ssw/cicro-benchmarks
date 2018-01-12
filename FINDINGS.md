@@ -518,3 +518,9 @@ Implemented
 sarray.h seems to have quite some problems with the qsort_r implementation
 
 bstree.h is now implemented
+
+# https://github.com/yosefk/checkedthreads (2018.01.12)
+
+Implemented
+
+Note: There is a memleak when ct_init() and ct_fini() are called again
