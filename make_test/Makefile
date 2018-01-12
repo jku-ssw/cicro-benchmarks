@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lemire-simdcomp liteserver-binn lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds zserge-partcl
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lemire-simdcomp liteserver-binn lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zedshaw-liblcthw zhemao-libds zserge-partcl
 
 # Global commands
 
@@ -174,6 +174,11 @@ endif
 
 websnarf-bstrlib_$(TEST_SUFFIX): websnarf-bstrlib websnarf-bstrlib_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) websnarf-bstrlib_test.c websnarf-bstrlib/bstraux.c websnarf-bstrlib/bstrlib.c -o "$(TEST_DIR)/websnarf-bstrlib_$(TEST_SUFFIX)"
+
+########## https://github.com/zedshaw/liblcthw
+
+zedshaw-liblcthw_$(TEST_SUFFIX): zedshaw-liblcthw zedshaw-liblcthw_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) zedshaw-liblcthw_test.c zedshaw-liblcthw/src/lcthw/bstree.c zedshaw-liblcthw/src/lcthw/bstrlib.c -o "$(TEST_DIR)/zedshaw-liblcthw_$(TEST_SUFFIX)" -I zedshaw-liblcthw/src
 
 ########## https://github.com/zhemao/libds
 

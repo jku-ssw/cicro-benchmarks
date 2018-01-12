@@ -512,3 +512,9 @@ Project is broken for now: https://github.com/watmough/jwHash/pull/6
 # https://github.com/lemire/simdcomp (2018.01.12)
 
 Implemented
+
+# https://github.com/zedshaw/liblcthw (2018.01.12)
+
+sarray.h seems to have quite some problems with the qsort_r implementation
+
+bstree.h is now implemented
