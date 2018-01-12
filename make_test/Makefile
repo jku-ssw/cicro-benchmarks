@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope liteserver-binn khovratovich-Argon2 kylophone-spectrophoto lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds zserge-partcl
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lemire-simdcomp liteserver-binn lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib zhemao-libds zserge-partcl
 
 # Global commands
 
@@ -92,10 +92,10 @@ ferreiradaselva-mathc_$(TEST_SUFFIX): ferreiradaselva-mathc ferreiradaselva-math
 jtsiomb-kdtree_$(TEST_SUFFIX): jtsiomb-kdtree jtsiomb-kdtree_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) jtsiomb-kdtree_test.c jtsiomb-kdtree/kdtree.c -o "$(TEST_DIR)/jtsiomb-kdtree_$(TEST_SUFFIX)"
 
-########## https://github.com/liteserver/binn
+########## https://github.com/josephg/librope
 
-liteserver-binn_$(TEST_SUFFIX): liteserver-binn liteserver-binn_test.c $(HARNESS_C)
-	$(CC) $(HARNESS_C) liteserver-binn_test.c liteserver-binn/src/binn.c -o "$(TEST_DIR)/liteserver-binn_$(TEST_SUFFIX)"
+josephg-librope_$(TEST_SUFFIX): josephg-librope josephg-librope_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) josephg-librope_test.c josephg-librope/rope.c -o "$(TEST_DIR)/josephg-librope_$(TEST_SUFFIX)"
 
 ########## https://github.com/khovratovich/Argon2
 
@@ -112,10 +112,15 @@ khovratovich-Argon2_$(TEST_SUFFIX): khovratovich-Argon2 khovratovich-Argon2_test
 kylophone-spectrophoto_$(TEST_SUFFIX): kylophone-spectrophoto kylophone-spectrophoto_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) kylophone-spectrophoto_test.c -o "$(TEST_DIR)/kylophone-spectrophoto_$(TEST_SUFFIX)" -lm
 
-########## https://github.com/josephg/librope
+########## https://github.com/lemire/simdcomp
 
-josephg-librope_$(TEST_SUFFIX): josephg-librope josephg-librope_test.c $(HARNESS_C)
-	$(CC) $(HARNESS_C) josephg-librope_test.c josephg-librope/rope.c -o "$(TEST_DIR)/josephg-librope_$(TEST_SUFFIX)"
+lemire-simdcomp_$(TEST_SUFFIX): lemire-simdcomp lemire-simdcomp_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) lemire-simdcomp_test.c lemire-simdcomp/src/*.c -o "$(TEST_DIR)/lemire-simdcomp_$(TEST_SUFFIX)" -I lemire-simdcomp/include
+
+########## https://github.com/liteserver/binn
+
+liteserver-binn_$(TEST_SUFFIX): liteserver-binn liteserver-binn_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) liteserver-binn_test.c liteserver-binn/src/binn.c -o "$(TEST_DIR)/liteserver-binn_$(TEST_SUFFIX)"
 
 ########## https://github.com/lucasb-eyer/heatmap
 

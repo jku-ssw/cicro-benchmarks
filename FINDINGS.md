@@ -504,3 +504,11 @@ Dependency on LLVM and clang
 # https://github.com/openSUSE/libsolv (2018.01.11)
 
 complexity of the the projects make it hard to write tests
+
+# https://github.com/watmough/jwHash (2018.01.12)
+
+Project is broken for now: https://github.com/watmough/jwHash/pull/6
+
+# https://github.com/lemire/simdcomp (2018.01.12)
+
+Implemented
