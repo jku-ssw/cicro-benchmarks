@@ -14,7 +14,7 @@ HARNESS_C=harness.c
 
 PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra\
 		   dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope\
-		   khovratovich-Argon2 kylophone-spectrophoto lemire-simdcomp liteserver-binn lucasb-eyer-heatmap\
+		   khovratovich-Argon2 kylophone-spectrophoto lemire-simdcomp liteserver-binn lucasb-eyer-heatmap msteinbeck-tinyspline\
 		   RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
 		   veorq-SipHash wbhart-bsdnt websnarf-bstrlib yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
@@ -130,6 +130,11 @@ liteserver-binn_$(TEST_SUFFIX): liteserver-binn liteserver-binn_test.c $(HARNESS
 
 lucasb-eyer-heatmap_$(TEST_SUFFIX): lucasb-eyer-heatmap lucasb-eyer-heatmap_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) lucasb-eyer-heatmap_test.c lucasb-eyer-heatmap/heatmap.c -o "$(TEST_DIR)/lucasb-eyer-heatmap_$(TEST_SUFFIX)" -lm
+
+########## https://github.com/msteinbeck/tinyspline
+
+msteinbeck-tinyspline_$(TEST_SUFFIX): msteinbeck-tinyspline msteinbeck-tinyspline_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) msteinbeck-tinyspline_test.c msteinbeck-tinyspline/library/tinyspline.c -o "$(TEST_DIR)/msteinbeck-tinyspline_$(TEST_SUFFIX)" -lm -I msteinbeck-tinyspline/library
 
 ########## https://github.com/RoaringBitmap/CRoaring
 

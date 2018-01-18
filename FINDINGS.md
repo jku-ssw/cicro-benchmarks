@@ -532,3 +532,25 @@ Dropped, Dependency on tcutil.h
 # https://github.com/tkengo/highway (2018.01.18)
 
 Implemented test on dependency library
+
+# https://github.com/parallella/pal (2018.01.18)
+
+Code does not really compile:
+
+```
+configure: error: source directory already configured; run "make distclean" there first
+configure: error:  failed for /usr/bin
+make: *** [Makefile:5130: config.status] Fehler 1
+```
+
+```
+parallella-pal/src/base/p_broadcast.c:7:9: error: conflicting types for 'p_broadcast'
+ssize_t p_broadcast(p_mem_t *mlist[], void *src, size_t nsrc, size_t ndst,
+        ^
+parallella-pal/include/pal_base.h:211:9: note: previous declaration is here
+ssize_t p_broadcast(p_mem_t **mlist[], int mcount, void *src, size_t nb,
+```
+
+# https://github.com/msteinbeck/tinyspline (2018.01.18)
+
+Implemented
