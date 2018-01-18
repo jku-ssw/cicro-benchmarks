@@ -12,7 +12,11 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lemire-simdcomp liteserver-binn lucasb-eyer-heatmap RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
+PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra\
+		   dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope\
+		   khovratovich-Argon2 kylophone-spectrophoto lemire-simdcomp liteserver-binn lucasb-eyer-heatmap\
+		   RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
+		   veorq-SipHash wbhart-bsdnt websnarf-bstrlib yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
 # Global commands
 
@@ -146,6 +150,11 @@ swenson-sort_$(TEST_SUFFIX): swenson-sort swenson-sort_test.c $(HARNESS_C)
 
 Themaister-libfmsynth_$(TEST_SUFFIX): Themaister-libfmsynth Themaister-libfmsynth_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) Themaister-libfmsynth_test.c Themaister-libfmsynth/src/fmsynth.c -o "$(TEST_DIR)/Themaister-libfmsynth_$(TEST_SUFFIX)" -lm -I Themaister-libfmsynth/include
+
+########## https://github.com/tkengo/highway
+
+tkengo-highway_$(TEST_SUFFIX): tkengo-highway tkengo-highway_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) tkengo-highway_test.c tkengo-highway/vendor/onigmo/*.c tkengo-highway/vendor/onigmo/*/*.c -o "$(TEST_DIR)/tkengo-highway_$(TEST_SUFFIX)" -I tkengo-highway/vendor/onigmo/
 
 ########## https://github.com/troydhanson/tpl
 

@@ -524,3 +524,11 @@ bstree.h is now implemented
 Implemented
 
 Note: There is a memleak when ct_init() and ct_fini() are called again
+
+# https://github.com/jordansissel/grok (2018.01.12)
+
+Dropped, Dependency on tcutil.h
+
+# https://github.com/tkengo/highway (2018.01.18)
+
+Implemented test on dependency library
