@@ -554,3 +554,17 @@ ssize_t p_broadcast(p_mem_t **mlist[], int mcount, void *src, size_t nb,
 # https://github.com/msteinbeck/tinyspline (2018.01.18)
 
 Implemented
+
+# https://github.com/tboox/vm86 (2018.01.18)
+
+Dropped: 32bit only, long chain of prefix.h and unclear working of internals
+(libc replacement with different method names but same file names, unclear include structure,...)
+
+```
+tboox-vm86_$(TEST_SUFFIX): tboox-vm86 tboox-vm86_test.c $(HARNESS_C)
+	$(CC)  -m32 $(HARNESS_C) tboox-vm86_test.c tboox-vm86/src/vm86/*.c -o "$(TEST_DIR)/tboox-vm86_$(TEST_SUFFIX)" -I tboox-vm86/src/vm86 -I includes/tboox-vm86 -I tboox-vm86/pkg/tbox.pkg/inc -I tboox-vm86/pkg/tbox.pkg/inc/linux
+```
+
+# https://github.com/lacker/ikalman (2018.01.18)
+
+Implemented

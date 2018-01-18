@@ -14,7 +14,7 @@ HARNESS_C=harness.c
 
 PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra\
 		   dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope\
-		   khovratovich-Argon2 kylophone-spectrophoto lemire-simdcomp liteserver-binn lucasb-eyer-heatmap msteinbeck-tinyspline\
+		   khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn lucasb-eyer-heatmap msteinbeck-tinyspline\
 		   RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
 		   veorq-SipHash wbhart-bsdnt websnarf-bstrlib yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
@@ -115,6 +115,11 @@ khovratovich-Argon2_$(TEST_SUFFIX): khovratovich-Argon2 khovratovich-Argon2_test
 
 kylophone-spectrophoto_$(TEST_SUFFIX): kylophone-spectrophoto kylophone-spectrophoto_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) kylophone-spectrophoto_test.c -o "$(TEST_DIR)/kylophone-spectrophoto_$(TEST_SUFFIX)" -lm
+
+########## https://github.com/lacker/ikalman
+
+lacker-ikalman_$(TEST_SUFFIX): lacker-ikalman lacker-ikalman_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) lacker-ikalman_test.c lacker-ikalman/gps.c lacker-ikalman/kalman.c lacker-ikalman/matrix.c -o "$(TEST_DIR)/lacker-ikalman_$(TEST_SUFFIX)" -lm
 
 ########## https://github.com/lemire/simdcomp
 
