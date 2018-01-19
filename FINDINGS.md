@@ -576,3 +576,18 @@ Implemented
 # https://github.com/quartzjer/js0n (2018.01.19)
 
 Implemented
+
+# https://github.com/chameco/Solid (2018.01.19)
+
+Dropped, has dependency on flex
+
+# https://github.com/chameco/Solid (2018.01.19)
+
+Implemented
+
+It's required to use -O2 to force the compiler to inline, otherwise we get an undefined reference in clang
+
+https://stackoverflow.com/questions/25602813/force-a-function-to-be-inline-in-clang-llvm
+https://clang.llvm.org/compatibility.html#inline
+
+It looks like gcc had a wrong implementation in the past which clang adopted. But gcc is now fixed

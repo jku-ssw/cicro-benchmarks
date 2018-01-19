@@ -15,7 +15,7 @@ HARNESS_C=harness.c
 PROJECTS = andikleen-snappy-c antirez-otree antirez-rax bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra\
 		   dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope\
 		   khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn lucasb-eyer-heatmap msteinbeck-tinyspline\
-		   quartzjer-js0n RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
+		   prideout-heman quartzjer-js0n RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
 		   veorq-SipHash wbhart-bsdnt websnarf-bstrlib yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
 # Global commands
@@ -145,6 +145,12 @@ lucasb-eyer-heatmap_$(TEST_SUFFIX): lucasb-eyer-heatmap lucasb-eyer-heatmap_test
 
 msteinbeck-tinyspline_$(TEST_SUFFIX): msteinbeck-tinyspline msteinbeck-tinyspline_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) msteinbeck-tinyspline_test.c msteinbeck-tinyspline/library/tinyspline.c -o "$(TEST_DIR)/msteinbeck-tinyspline_$(TEST_SUFFIX)" -lm -I msteinbeck-tinyspline/library
+
+########## https://github.com/prideout/heman
+
+prideout-heman_$(TEST_SUFFIX): prideout-heman prideout-heman_test.c $(HARNESS_C)
+	# -O2 because we need an always-inline pass in clang in order to compile
+	$(CC) -O2 $(HARNESS_C) prideout-heman_test.c prideout-heman/src/*.c prideout-heman/kazmath/*.c -o "$(TEST_DIR)/prideout-heman_$(TEST_SUFFIX)" -lm -I prideout-heman -I prideout-heman/include
 
 ########## https://github.com/quartzjer/js0n
 
