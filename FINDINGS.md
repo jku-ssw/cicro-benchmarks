@@ -568,3 +568,11 @@ tboox-vm86_$(TEST_SUFFIX): tboox-vm86 tboox-vm86_test.c $(HARNESS_C)
 # https://github.com/lacker/ikalman (2018.01.18)
 
 Implemented
+
+# https://github.com/antirez/rax (2018.01.19)
+
+Implemented
+
+# https://github.com/quartzjer/js0n (2018.01.19)
+
+Implemented

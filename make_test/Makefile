@@ -12,10 +12,10 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra\
+PROJECTS = andikleen-snappy-c antirez-otree antirez-rax bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra\
 		   dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope\
 		   khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn lucasb-eyer-heatmap msteinbeck-tinyspline\
-		   RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
+		   quartzjer-js0n RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
 		   veorq-SipHash wbhart-bsdnt websnarf-bstrlib yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
 # Global commands
@@ -45,6 +45,11 @@ andikleen-snappy-c_$(TEST_SUFFIX): andikleen-snappy-c andikleen-snappy-c_test.c 
 
 antirez-otree_$(TEST_SUFFIX): antirez-otree antirez-otree_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) antirez-otree_test.c antirez-otree/btree.c -o "$(TEST_DIR)/antirez-otree_$(TEST_SUFFIX)"
+
+########## https://github.com/antirez/rax
+
+antirez-rax_$(TEST_SUFFIX):antirez-rax antirez-rax_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) antirez-rax_test.c antirez-rax/rax.c -o "$(TEST_DIR)/antirez-rax_$(TEST_SUFFIX)" -lm
 
 ########## https://github.com/bashrc/libdeep
 
@@ -140,6 +145,11 @@ lucasb-eyer-heatmap_$(TEST_SUFFIX): lucasb-eyer-heatmap lucasb-eyer-heatmap_test
 
 msteinbeck-tinyspline_$(TEST_SUFFIX): msteinbeck-tinyspline msteinbeck-tinyspline_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) msteinbeck-tinyspline_test.c msteinbeck-tinyspline/library/tinyspline.c -o "$(TEST_DIR)/msteinbeck-tinyspline_$(TEST_SUFFIX)" -lm -I msteinbeck-tinyspline/library
+
+########## https://github.com/quartzjer/js0n
+
+quartzjer-js0n_$(TEST_SUFFIX): quartzjer-js0n quartzjer-js0n_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) quartzjer-js0n_test.c quartzjer-js0n/src/*c -o "$(TEST_DIR)/quartzjer-js0n_$(TEST_SUFFIX)"
 
 ########## https://github.com/RoaringBitmap/CRoaring
 
