@@ -591,3 +591,9 @@ https://stackoverflow.com/questions/25602813/force-a-function-to-be-inline-in-cl
 https://clang.llvm.org/compatibility.html#inline
 
 It looks like gcc had a wrong implementation in the past which clang adopted. But gcc is now fixed
+
+# https://github.com/codeplea/tinyexpr (2018.01.19)
+
+Implemented
+
+Currently there is a very tight loop which does the evaluation, which is not so good

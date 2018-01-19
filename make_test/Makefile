@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree antirez-rax bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann ctz-cifra\
+PROJECTS = andikleen-snappy-c antirez-otree antirez-rax bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann codeplea-tinyexpr ctz-cifra\
 		   dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc jtsiomb-kdtree josephg-librope\
 		   khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn lucasb-eyer-heatmap msteinbeck-tinyspline\
 		   prideout-heman quartzjer-js0n RoaringBitmap-CRoaring snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
@@ -70,6 +70,11 @@ chrismoos-hash-ring_$(TEST_SUFFIX): chrismoos-hash-ring chrismoos-hash-ring_test
 
 codeplea-genann_$(TEST_SUFFIX): codeplea-genann codeplea-genann_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) codeplea-genann_test.c codeplea-genann/genann.c -o "$(TEST_DIR)/codeplea-genann_$(TEST_SUFFIX)" -lm
+
+########## https://github.com/codeplea/tinyexpr
+
+codeplea-tinyexpr_$(TEST_SUFFIX): codeplea-tinyexpr codeplea-tinyexpr_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) codeplea-tinyexpr_test.c codeplea-tinyexpr/tinyexpr.c -o "$(TEST_DIR)/codeplea-tinyexpr_$(TEST_SUFFIX)" -lm
 
 ########## https://github.com/ctz/cifra
 
