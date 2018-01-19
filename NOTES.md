@@ -65,3 +65,6 @@ int main() {
 	return 0;
 }
 ```
+
+2018.01.18
+./fetch_github/fetch_github/fetch_github.py "language:c stars:250..300" --clone-repo-dir ./projects/
