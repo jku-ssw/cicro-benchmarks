@@ -597,3 +597,9 @@ It looks like gcc had a wrong implementation in the past which clang adopted. Bu
 Implemented
 
 Currently there is a very tight loop which does the evaluation, which is not so good
+
+# https://github.com/skeeto/branchless-utf8 (2018.01.25)
+
+Implemented
+
+main time consuming part is building the testset, not the execution of utf8_decode itself
