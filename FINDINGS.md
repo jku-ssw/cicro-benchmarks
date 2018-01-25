@@ -603,3 +603,7 @@ Currently there is a very tight loop which does the evaluation, which is not so 
 Implemented
 
 main time consuming part is building the testset, not the execution of utf8_decode itself
+
+# https://github.com/cloudwu/cstring (2018.01.25)
+
+Implemented

@@ -12,7 +12,7 @@ HARNESS_C=harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree antirez-rax bashrc-libdeep camgunz-cmp chrismoos-hash-ring codeplea-genann\
+PROJECTS = andikleen-snappy-c antirez-otree antirez-rax bashrc-libdeep camgunz-cmp chrismoos-hash-ring cloudwu-cstring codeplea-genann\
 		   codeplea-tinyexpr ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc\
 		   jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp\
 		   liteserver-binn lucasb-eyer-heatmap msteinbeck-tinyspline prideout-heman quartzjer-js0n RoaringBitmap-CRoaring\
@@ -66,6 +66,11 @@ camgunz-cmp_$(TEST_SUFFIX): camgunz-cmp camgunz-cmp_test.c $(HARNESS_C)
 
 chrismoos-hash-ring_$(TEST_SUFFIX): chrismoos-hash-ring chrismoos-hash-ring_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) chrismoos-hash-ring_test.c chrismoos-hash-ring/hash_ring.c chrismoos-hash-ring/md5.c chrismoos-hash-ring/sha1.c -o "$(TEST_DIR)/chrismoos-hash-ring_$(TEST_SUFFIX)"
+
+########## https://github.com/cloudwu/cstring
+
+cloudwu-cstring_$(TEST_SUFFIX): cloudwu-cstring cloudwu-cstring_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) cloudwu-cstring_test.c cloudwu-cstring/cstring.c -o "$(TEST_DIR)/cloudwu-cstring_$(TEST_SUFFIX)"
 
 ########## https://github.com/codeplea/genann
 
