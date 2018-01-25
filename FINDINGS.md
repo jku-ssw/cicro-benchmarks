@@ -611,3 +611,7 @@ Implemented
 # https://github.com/mongodb/libbson (2018.01.25)
 
 Implemented
+
+# https://github.com/flame/blis (2018.01.25)
+
+Implemented

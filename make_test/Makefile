@@ -13,7 +13,7 @@ HARNESS_C=harness.c
 # Projects to build
 
 PROJECTS = andikleen-snappy-c antirez-otree antirez-rax bashrc-libdeep camgunz-cmp chrismoos-hash-ring cloudwu-cstring codeplea-genann\
-		   codeplea-tinyexpr ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc\
+		   codeplea-tinyexpr ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
 		   jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp\
 		   liteserver-binn lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline prideout-heman quartzjer-js0n RoaringBitmap-CRoaring\
 		   skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
@@ -106,6 +106,16 @@ faragon-libsrt_$(TEST_SUFFIX): faragon-libsrt faragon-libsrt_test.c $(HARNESS_C)
 
 ferreiradaselva-mathc_$(TEST_SUFFIX): ferreiradaselva-mathc ferreiradaselva-mathc_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) ferreiradaselva-mathc_test.c ferreiradaselva-mathc/mathc.c -o "$(TEST_DIR)/ferreiradaselva-mathc_$(TEST_SUFFIX)" -lm
+
+########## https://github.com/flame/blis
+FLAME-BLIS_INC = flame-blis flame-blis/config/generic $(sort $(dir $(wildcard flame-blis/frame/*/))) $(sort $(dir $(wildcard flame-blis/frame/*/*/))) $(sort $(dir $(wildcard flame-blis/frame/*/*/*/)))
+# flame-blis flame-blis/frame/base flame-blis/frame/include flame-blis/frame/thread
+FLAME-BLIS_INC_PARAMS = $(foreach d, $(FLAME-BLIS_INC), -I$d)
+
+flame-blis_$(TEST_SUFFIX): flame-blis flame-blis_test.c $(HARNESS_C)
+	#(cd flame-blis && ./configure generic)
+	(cd flame-blis && make)
+	$(CC) $(HARNESS_C) flame-blis_test.c -o "$(TEST_DIR)/flame-blis_$(TEST_SUFFIX)" ${FLAME-BLIS_INC_PARAMS} -lm -lpthread ./flame-blis/lib/generic/libblis.a
 
 ########## https://github.com/jtsiomb/kdtree
 
@@ -216,13 +226,13 @@ veorq-SipHash_$(TEST_SUFFIX): veorq-SipHash veorq-SipHash_test.c $(HARNESS_C)
 ########## https://github.com/wbhart/bsdnt
 
 wbhart-bsdnt_$(TEST_SUFFIX): wbhart-bsdnt wbhart-bsdnt_test.c $(HARNESS_C)
-	(cd ./wbhart-bsdnt; ./configure)
-	(cd ./wbhart-bsdnt; make AS=$(AS) CC=$(CC))
+	(cd ./wbhart-bsdnt && ./configure)
+	(cd ./wbhart-bsdnt &&  make AS=$(AS) CC=$(CC))
 	$(CC) $(HARNESS_C) wbhart-bsdnt_test.c -o "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)" -lm ./wbhart-bsdnt/libbsdnt.a
 
 wbhart-bsdnt_clean:
 ifneq ("$(wildcard ./wbhart-bsdnt/Makefile)","")
-	(cd ./wbhart-bsdnt; make distclean; rm -f Makefile)
+	(cd ./wbhart-bsdnt && make distclean && rm -f Makefile)
 endif
 	rm -f "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)"
 
@@ -234,7 +244,7 @@ websnarf-bstrlib_$(TEST_SUFFIX): websnarf-bstrlib websnarf-bstrlib_test.c $(HARN
 ########## https://github.com/yosefk/checkedthreads
 
 yosefk-checkedthreads_$(TEST_SUFFIX): yosefk-checkedthreads yosefk-checkedthreads_test.c $(HARNESS_C)
-	(cd ./yosefk-checkedthreads; python2 ./configure)
+	(cd ./yosefk-checkedthreads && python2 ./configure)
 	$(CC) $(HARNESS_C) yosefk-checkedthreads_test.c yosefk-checkedthreads/src/*.c -o "$(TEST_DIR)/yosefk-checkedthreads_$(TEST_SUFFIX)" -lpthread -I yosefk-checkedthreads/include
 
 ########## https://github.com/zedshaw/liblcthw
