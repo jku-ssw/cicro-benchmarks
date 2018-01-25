@@ -607,3 +607,7 @@ main time consuming part is building the testset, not the execution of utf8_deco
 # https://github.com/cloudwu/cstring (2018.01.25)
 
 Implemented
+
+# https://github.com/mongodb/libbson (2018.01.25)
+
+Implemented

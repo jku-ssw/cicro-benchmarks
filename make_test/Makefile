@@ -15,7 +15,7 @@ HARNESS_C=harness.c
 PROJECTS = andikleen-snappy-c antirez-otree antirez-rax bashrc-libdeep camgunz-cmp chrismoos-hash-ring cloudwu-cstring codeplea-genann\
 		   codeplea-tinyexpr ctz-cifra dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc\
 		   jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp\
-		   liteserver-binn lucasb-eyer-heatmap msteinbeck-tinyspline prideout-heman quartzjer-js0n RoaringBitmap-CRoaring\
+		   liteserver-binn lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline prideout-heman quartzjer-js0n RoaringBitmap-CRoaring\
 		   skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
 		   veorq-SipHash wbhart-bsdnt websnarf-bstrlib yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
@@ -151,6 +151,11 @@ liteserver-binn_$(TEST_SUFFIX): liteserver-binn liteserver-binn_test.c $(HARNESS
 
 lucasb-eyer-heatmap_$(TEST_SUFFIX): lucasb-eyer-heatmap lucasb-eyer-heatmap_test.c $(HARNESS_C)
 	$(CC) $(HARNESS_C) lucasb-eyer-heatmap_test.c lucasb-eyer-heatmap/heatmap.c -o "$(TEST_DIR)/lucasb-eyer-heatmap_$(TEST_SUFFIX)" -lm
+
+########## https://github.com/mongodb/libbson
+
+mongodb-libbson_$(TEST_SUFFIX): mongodb-libbson mongodb-libbson_test.c $(HARNESS_C)
+	$(CC) $(HARNESS_C) mongodb-libbson_test.c mongodb-libbson/src/bson/*.c mongodb-libbson/src/jsonsl/*.c -o "$(TEST_DIR)/mongodb-libbson_$(TEST_SUFFIX)" -I mongodb-libbson/src -I mongodb-libbson/src/bson -I includes/mongodb-libbson -D BSON_COMPILATION -lpthread
 
 ########## https://github.com/msteinbeck/tinyspline
 
