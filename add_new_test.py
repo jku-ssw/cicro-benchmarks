@@ -29,7 +29,7 @@ def create_makefile_text(url, name):
     print("########## {url}".format(url=url))
     print()
     print("{name}_$(TEST_SUFFIX): {name} {name}_test.c $(HARNESS_C)".format(name=name))
-    print("	$(CC) $(HARNESS_C) {name}_test.c -o \"$(TEST_DIR)/{name}_$(TEST_SUFFIX)\"".format(name=name))
+    print("	$(CC) $(CFLAGS) $(HARNESS_C) {name}_test.c -o \"$(TEST_DIR)/{name}_$(TEST_SUFFIX)\" $(LDFLAGS)".format(name=name))
     print()
 
 
