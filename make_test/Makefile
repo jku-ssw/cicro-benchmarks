@@ -18,7 +18,7 @@ HARNESS_C = harness.c
 PROJECTS = andikleen-snappy-c antirez-otree antirez-rax bashrc-libdeep camgunz-cmp chrismoos-hash-ring cloudwu-cstring codeplea-genann\
 		   codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
 		   jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp\
-		   liteserver-binn lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline prideout-heman quartzjer-js0n RoaringBitmap-CRoaring\
+		   liteserver-binn lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline prideout-heman quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring\
 		   skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
 		   veorq-SipHash wbhart-bsdnt websnarf-bstrlib yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
@@ -190,6 +190,11 @@ prideout-heman_$(TEST_SUFFIX): prideout-heman prideout-heman_test.c $(HARNESS_C)
 
 quartzjer-js0n_$(TEST_SUFFIX): quartzjer-js0n quartzjer-js0n_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) quartzjer-js0n_test.c quartzjer-js0n/src/*c -o "$(TEST_DIR)/quartzjer-js0n_$(TEST_SUFFIX)" $(LDFLAGS)
+
+########## https://github.com/richgel999/miniz
+
+richgel999-miniz_$(TEST_SUFFIX): richgel999-miniz richgel999-miniz_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) richgel999-miniz_test.c richgel999-miniz/*.c -o "$(TEST_DIR)/richgel999-miniz_$(TEST_SUFFIX)" $(LDFLAGS)
 
 ########## https://github.com/RoaringBitmap/CRoaring
 

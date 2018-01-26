@@ -621,3 +621,7 @@ Implemented
 Implemented
 
 seems to have some memleaks (but still reachable)
+
+# https://github.com/richgel999/miniz (2018.01.26)
+
+Implemented
