@@ -615,3 +615,9 @@ Implemented
 # https://github.com/flame/blis (2018.01.25)
 
 Implemented
+
+# https://github.com/dbalmain/ferret (2018.01.25)
+
+Implemented
+
+seems to have some memleaks (but still reachable)
