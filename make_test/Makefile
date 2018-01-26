@@ -15,7 +15,7 @@ HARNESS_C = harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree antirez-rax bashrc-libdeep camgunz-cmp chrismoos-hash-ring cloudwu-cstring codeplea-genann\
+PROJECTS = andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep camgunz-cmp chrismoos-hash-ring cloudwu-cstring codeplea-genann\
 		   codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
 		   jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp\
 		   liteserver-binn lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline prideout-heman quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring\
@@ -54,6 +54,11 @@ antirez-otree_$(TEST_SUFFIX): antirez-otree antirez-otree_test.c $(HARNESS_C)
 
 antirez-rax_$(TEST_SUFFIX):antirez-rax antirez-rax_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) antirez-rax_test.c antirez-rax/rax.c -o "$(TEST_DIR)/antirez-rax_$(TEST_SUFFIX)" $(LDFLAGS) -lm
+
+########## https://github.com/armon/libart
+
+armon-libart_$(TEST_SUFFIX): armon-libart armon-libart_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) armon-libart_test.c armon-libart/src/art.c -o "$(TEST_DIR)/armon-libart_$(TEST_SUFFIX)" $(LDFLAGS)
 
 ########## https://github.com/bashrc/libdeep
 
