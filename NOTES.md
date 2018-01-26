@@ -66,5 +66,8 @@ int main() {
 }
 ```
 
-2018.01.18
+# 2018.01.18
 ./fetch_github/fetch_github/fetch_github.py "language:c stars:250..300" --clone-repo-dir ./projects/
+
+# 2018.01.26
+./fetch_github/fetch_github/fetch_github.py "language:c stars:300..350" --clone-repo-dir ./projects/
