@@ -71,3 +71,6 @@ int main() {
 
 # 2018.01.26
 ./fetch_github/fetch_github/fetch_github.py "language:c stars:300..350" --clone-repo-dir ./projects/
+
+# 2018.02.01
+./fetch_github/fetch_github/fetch_github.py "language:c stars:350..400" --clone-repo-dir ./projects/
