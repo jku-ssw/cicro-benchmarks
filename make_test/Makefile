@@ -15,7 +15,7 @@ HARNESS_C = harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep camgunz-cmp chrismoos-hash-ring cloudwu-cstring codeplea-genann\
+PROJECTS = andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep camgunz-cmp chokkan-liblbfgs chrismoos-hash-ring cloudwu-cstring codeplea-genann\
 		   codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
 		   jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp\
 		   liteserver-binn lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline prideout-heman quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring\
@@ -69,6 +69,11 @@ bashrc-libdeep_$(TEST_SUFFIX): bashrc-libdeep bashrc-libdeep_test.c $(HARNESS_C)
 
 camgunz-cmp_$(TEST_SUFFIX): camgunz-cmp camgunz-cmp_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) camgunz-cmp_test.c camgunz-cmp/cmp.c -o "$(TEST_DIR)/camgunz-cmp_$(TEST_SUFFIX)" $(LDFLAGS)
+
+########## https://github.com/chokkan/liblbfgs
+
+chokkan-liblbfgs_$(TEST_SUFFIX): chokkan-liblbfgs chokkan-liblbfgs_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) chokkan-liblbfgs_test.c chokkan-liblbfgs/lib/lbfgs.c -o "$(TEST_DIR)/chokkan-liblbfgs_$(TEST_SUFFIX)" $(LDFLAGS) -lm -I chokkan-liblbfgs/include/
 
 ########## https://github.com/chrismoos/hash-ring
 
