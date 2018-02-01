@@ -641,3 +641,7 @@ Implemented
 # https://github.com/flori/amatch (2018.01.27)
 
 Dropped, is a ruby extension
+
+# https://github.com/wolkykim/qlibc (2018.01.27)
+
+Implemented

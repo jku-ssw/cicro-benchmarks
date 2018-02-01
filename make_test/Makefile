@@ -20,7 +20,7 @@ PROJECTS = andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libd
 		   jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp\
 		   liteserver-binn lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline prideout-heman quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring\
 		   skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
-		   veorq-SipHash wbhart-bsdnt websnarf-bstrlib yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
+		   veorq-SipHash wbhart-bsdnt websnarf-bstrlib wolkykim-qlibc yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
 # Global commands
 
@@ -257,6 +257,13 @@ endif
 
 websnarf-bstrlib_$(TEST_SUFFIX): websnarf-bstrlib websnarf-bstrlib_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) websnarf-bstrlib_test.c websnarf-bstrlib/bstraux.c websnarf-bstrlib/bstrlib.c -o "$(TEST_DIR)/websnarf-bstrlib_$(TEST_SUFFIX)" $(LDFLAGS)
+
+########## https://github.com/wolkykim/qlibc
+
+wolkykim-qlibc_$(TEST_SUFFIX): wolkykim-qlibc wolkykim-qlibc_test.c $(HARNESS_C)
+	(cd ./wolkykim-qlibc && ./configure)
+	(cd ./wolkykim-qlibc &&  make)
+	$(CC) $(CFLAGS) $(HARNESS_C) wolkykim-qlibc_test.c -o "$(TEST_DIR)/wolkykim-qlibc_$(TEST_SUFFIX)" $(LDFLAGS) -lpthread wolkykim-qlibc/lib/libqlibc.a
 
 ########## https://github.com/yosefk/checkedthreads
 
