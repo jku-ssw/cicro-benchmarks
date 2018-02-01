@@ -629,3 +629,15 @@ Implemented
 # https://github.com/armon/libart (2018.01.26)
 
 Implemented
+
+# https://github.com/richgel999/miniz (2018.01.26)
+
+Implemented
+
+# https://github.com/armon/libart (2018.01.26)
+
+Implemented
+
+# https://github.com/flori/amatch (2018.01.27)
+
+Dropped, is a ruby extension

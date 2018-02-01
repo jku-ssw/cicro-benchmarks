@@ -122,7 +122,6 @@ ferreiradaselva-mathc_$(TEST_SUFFIX): ferreiradaselva-mathc ferreiradaselva-math
 
 ########## https://github.com/flame/blis
 FLAME-BLIS_INC = flame-blis flame-blis/config/generic $(sort $(dir $(wildcard flame-blis/frame/*/))) $(sort $(dir $(wildcard flame-blis/frame/*/*/))) $(sort $(dir $(wildcard flame-blis/frame/*/*/*/)))
-# flame-blis flame-blis/frame/base flame-blis/frame/include flame-blis/frame/thread
 FLAME-BLIS_INC_PARAMS = $(foreach d, $(FLAME-BLIS_INC), -I$d)
 
 flame-blis_$(TEST_SUFFIX): flame-blis flame-blis_test.c $(HARNESS_C)
