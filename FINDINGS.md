@@ -649,3 +649,7 @@ Implemented
 # https://github.com/chokkan/liblbfgs (2018.02.01)
 
 Implemented
+
+# https://github.com/ndevilla/iniparser (2018.02.01)
+
+Implemented

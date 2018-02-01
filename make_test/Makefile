@@ -18,7 +18,7 @@ HARNESS_C = harness.c
 PROJECTS = andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep camgunz-cmp chokkan-liblbfgs chrismoos-hash-ring cloudwu-cstring codeplea-genann\
 		   codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
 		   jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp\
-		   liteserver-binn lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline prideout-heman quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring\
+		   liteserver-binn lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline ndevilla-iniparser prideout-heman quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring\
 		   skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
 		   veorq-SipHash wbhart-bsdnt websnarf-bstrlib wolkykim-qlibc yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
@@ -188,6 +188,11 @@ mongodb-libbson_$(TEST_SUFFIX): mongodb-libbson mongodb-libbson_test.c $(HARNESS
 
 msteinbeck-tinyspline_$(TEST_SUFFIX): msteinbeck-tinyspline msteinbeck-tinyspline_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) msteinbeck-tinyspline_test.c msteinbeck-tinyspline/library/tinyspline.c -o "$(TEST_DIR)/msteinbeck-tinyspline_$(TEST_SUFFIX)" $(LDFLAGS) -lm -I msteinbeck-tinyspline/library
+
+########## https://github.com/ndevilla/iniparser
+
+ndevilla-iniparser_$(TEST_SUFFIX): ndevilla-iniparser ndevilla-iniparser_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) ndevilla-iniparser_test.c ndevilla-iniparser/src/*.c -o "$(TEST_DIR)/ndevilla-iniparser_$(TEST_SUFFIX)" $(LDFLAGS)
 
 ########## https://github.com/prideout/heman
 
