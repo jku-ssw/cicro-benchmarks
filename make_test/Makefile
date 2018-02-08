@@ -19,7 +19,7 @@ PROJECTS = 100-Cranium andikleen-snappy-c antirez-otree antirez-rax armon-libart
 		   chrismoos-hash-ring cloudwu-cstring codeplea-genann codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie\
 		   fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis jtsiomb-kdtree josephg-librope Kazade-kazmath\
 		   kbranigan-cJSON khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn\
-		   lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline ndevilla-iniparser prideout-heman quartzjer-js0n\
+		   lucasb-eyer-heatmap mbrossard-threadpool mongodb-libbson msteinbeck-tinyspline ndevilla-iniparser prideout-heman quartzjer-js0n\
 		   richgel999-miniz RoaringBitmap-CRoaring skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth\
 		   tkengo-highway troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib wolkykim-qlibc yosefk-checkedthreads\
 		   zedshaw-liblcthw zhemao-libds zserge-partcl
@@ -195,6 +195,11 @@ liteserver-binn_$(TEST_SUFFIX): liteserver-binn liteserver-binn_test.c $(HARNESS
 
 lucasb-eyer-heatmap_$(TEST_SUFFIX): lucasb-eyer-heatmap lucasb-eyer-heatmap_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) lucasb-eyer-heatmap_test.c lucasb-eyer-heatmap/heatmap.c -o "$(TEST_DIR)/lucasb-eyer-heatmap_$(TEST_SUFFIX)" $(LDFLAGS) -lm
+
+########## https://github.com/mbrossard/threadpool
+
+mbrossard-threadpool_$(TEST_SUFFIX): mbrossard-threadpool mbrossard-threadpool_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) mbrossard-threadpool_test.c mbrossard-threadpool/src/threadpool.c -o "$(TEST_DIR)/mbrossard-threadpool_$(TEST_SUFFIX)" $(LDFLAGS) -lpthread
 
 ########## https://github.com/mongodb/libbson
 
