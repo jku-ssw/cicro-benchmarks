@@ -657,3 +657,7 @@ Implemented
 # https://github.com/Kazade/kazmath (2018.02.08)
 
 Implemented, currently has a tight inner loop
+
+# https://github.com/kbranigan/cJSON (2018.02.08)
+
+Implemented
