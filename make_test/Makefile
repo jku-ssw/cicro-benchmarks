@@ -15,12 +15,14 @@ HARNESS_C = harness.c
 
 # Projects to build
 
-PROJECTS = andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep camgunz-cmp chokkan-liblbfgs chrismoos-hash-ring cloudwu-cstring codeplea-genann\
-		   codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
-		   jtsiomb-kdtree josephg-librope Kazade-kazmath kbranigan-cJSON khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp\
-		   liteserver-binn lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline ndevilla-iniparser prideout-heman quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring\
-		   skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
-		   veorq-SipHash wbhart-bsdnt websnarf-bstrlib wolkykim-qlibc yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
+PROJECTS = 100-Cranium andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep camgunz-cmp chokkan-liblbfgs\
+		   chrismoos-hash-ring cloudwu-cstring codeplea-genann codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie\
+		   fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis jtsiomb-kdtree josephg-librope Kazade-kazmath\
+		   kbranigan-cJSON khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn\
+		   lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline ndevilla-iniparser prideout-heman quartzjer-js0n\
+		   richgel999-miniz RoaringBitmap-CRoaring skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth\
+		   tkengo-highway troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib wolkykim-qlibc yosefk-checkedthreads\
+		   zedshaw-liblcthw zhemao-libds zserge-partcl
 
 # Global commands
 
@@ -39,6 +41,11 @@ test: $(addprefix exec_, $(PROJECTS:=_$(TEST_SUFFIX)))
 exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 	./$<
 
+
+########## https://github.com/100/Cranium
+
+100-Cranium_$(TEST_SUFFIX): 100-Cranium 100-Cranium_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) 100-Cranium_test.c -o "$(TEST_DIR)/100-Cranium_$(TEST_SUFFIX)" $(LDFLAGS) -lm
 
 ########## https://github.com/andikleen/snappy-c
 

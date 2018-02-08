@@ -661,3 +661,7 @@ Implemented, currently has a tight inner loop
 # https://github.com/kbranigan/cJSON (2018.02.08)
 
 Implemented
+
+# https://github.com/100/Cranium (2018.02.08)
+
+Implemented
