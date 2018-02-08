@@ -653,3 +653,7 @@ Implemented
 # https://github.com/ndevilla/iniparser (2018.02.01)
 
 Implemented
+
+# https://github.com/Kazade/kazmath (2018.02.08)
+
+Implemented, currently has a tight inner loop

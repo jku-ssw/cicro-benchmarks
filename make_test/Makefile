@@ -17,7 +17,7 @@ HARNESS_C = harness.c
 
 PROJECTS = andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep camgunz-cmp chokkan-liblbfgs chrismoos-hash-ring cloudwu-cstring codeplea-genann\
 		   codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
-		   jtsiomb-kdtree josephg-librope khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp\
+		   jtsiomb-kdtree josephg-librope Kazade-kazmath khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp\
 		   liteserver-binn lucasb-eyer-heatmap mongodb-libbson msteinbeck-tinyspline ndevilla-iniparser prideout-heman quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring\
 		   skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl\
 		   veorq-SipHash wbhart-bsdnt websnarf-bstrlib wolkykim-qlibc yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
@@ -143,6 +143,11 @@ jtsiomb-kdtree_$(TEST_SUFFIX): jtsiomb-kdtree jtsiomb-kdtree_test.c $(HARNESS_C)
 
 josephg-librope_$(TEST_SUFFIX): josephg-librope josephg-librope_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) josephg-librope_test.c josephg-librope/rope.c -o "$(TEST_DIR)/josephg-librope_$(TEST_SUFFIX)" $(LDFLAGS)
+
+########## https://github.com/Kazade/kazmath
+
+Kazade-kazmath_$(TEST_SUFFIX): Kazade-kazmath Kazade-kazmath_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) Kazade-kazmath_test.c Kazade-kazmath/kazmath/*.c -o "$(TEST_DIR)/Kazade-kazmath_$(TEST_SUFFIX)" $(LDFLAGS) -lm
 
 ########## https://github.com/khovratovich/Argon2
 
