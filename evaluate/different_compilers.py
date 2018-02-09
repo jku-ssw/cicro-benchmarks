@@ -6,7 +6,7 @@ import re
 import signal
 import sqlite3
 import subprocess
-
+import time
 
 DATABASE_FILE = "evaluation.db"
 
@@ -23,6 +23,7 @@ def timeout_handling(process):
     return None
 
 def run_benchmark(workdir, file):
+    time.sleep(1)
     process = subprocess.Popen(["./{}".format(file)], cwd=workdir, stdout=subprocess.PIPE)
     stdout, _ = process.communicate(timeout=60)
 
@@ -53,6 +54,7 @@ def run_sulong_benchmark(workdir, file):
     process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
     process_bc.wait(timeout=10)
 
+    time.sleep(1)
     process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_TIMEOUT), "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
     try:
         stdout, _ = process.communicate(timeout=SULONG_TIMEOUT+5)
@@ -68,6 +70,7 @@ def run_sulong_benchmark(workdir, file):
 def run_sulong_jdk_1000_benchmark(workdir, file):
     print("    ...run test with full compilation")
 
+    time.sleep(1)
     process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_1000_TIMEOUT), "--jdk", "jvmci", "--dynamicimports=/compiler",
                                 "lli",  "{}.bc".format(file), "-w=101",
                                 "-Dgraal.TruffleCompilationThreshold=10"], cwd=workdir, stdout=subprocess.PIPE)
@@ -91,6 +94,7 @@ def run_sulong_jdk_benchmark(workdir, file):
     process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
     process_bc.wait(timeout=10)
 
+    time.sleep(1)
     process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_TIMEOUT), "--jdk", "jvmci", "--dynamicimports=/compiler", "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
     try:
         stdout, _ = process.communicate(timeout=SULONG_TIMEOUT+5)
