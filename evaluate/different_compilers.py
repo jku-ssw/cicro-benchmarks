@@ -3,6 +3,7 @@
 import argparse
 import os
 import re
+import signal
 import sqlite3
 import subprocess
 
@@ -13,6 +14,13 @@ DATABASE_FILE = "evaluation.db"
 def parse_exec_output(stdout):
     return float(re.findall(r"execution time: ([0-9\.]+)ms", str(stdout))[0])
 
+
+def timeout_handling(process):
+    print("    TIMEOUT")
+    process.send_signal(signal.SIGKILL)
+    process.terminate()
+    process.wait()
+    return None
 
 def run_benchmark(workdir, file):
     process = subprocess.Popen(["./{}".format(file)], cwd=workdir, stdout=subprocess.PIPE)
@@ -38,15 +46,33 @@ def run_lli_benchmark(workdir, file):
 
 
 SULONG_EXEC_DIR = '/home/thomas/JKU/java-llvm-ir-builder-dev/sulong'
-
+SULONG_TIMEOUT = 20*10
+SULONG_1000_TIMEOUT = (100+10)*10
 
 def run_sulong_benchmark(workdir, file):
     process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
     process_bc.wait(timeout=10)
 
-    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
+    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_TIMEOUT), "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
     try:
-        stdout, _ = process.communicate(timeout=60)
+        stdout, _ = process.communicate(timeout=SULONG_TIMEOUT+5)
+    except subprocess.TimeoutExpired:
+        return timeout_handling(process)
+
+    if process.returncode != 0:
+        return None
+
+    return parse_exec_output(stdout)
+
+
+def run_sulong_jdk_1000_benchmark(workdir, file):
+    print("    ...run test with full compilation")
+
+    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_1000_TIMEOUT), "--jdk", "jvmci", "--dynamicimports=/compiler",
+                                "lli",  "{}.bc".format(file), "-w=101",
+                                "-Dgraal.TruffleCompilationThreshold=10"], cwd=workdir, stdout=subprocess.PIPE)
+    try:
+        stdout, _ = process.communicate(timeout=SULONG_1000_TIMEOUT+5)
     except subprocess.TimeoutExpired:
         print("    TIMEOUT")
         process.terminate()
@@ -55,16 +81,19 @@ def run_sulong_benchmark(workdir, file):
     if process.returncode != 0:
         return None
 
-    return parse_exec_output(stdout)
+    fast_exec_time = parse_exec_output(stdout)
+    print("    full evalulation finished: {}s", fast_exec_time)
+
+    db.add_entry("{}-100".format(compiler), testcase, fast_exec_time)
 
 
 def run_sulong_jdk_benchmark(workdir, file):
     process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
     process_bc.wait(timeout=10)
 
-    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--jdk", "jvmci", "--dynamicimports=/compiler", "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
+    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_TIMEOUT), "--jdk", "jvmci", "--dynamicimports=/compiler", "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
     try:
-        stdout, _ = process.communicate(timeout=60)
+        stdout, _ = process.communicate(timeout=SULONG_TIMEOUT+5)
     except subprocess.TimeoutExpired:
         print("    TIMEOUT")
         process.terminate()
@@ -73,7 +102,14 @@ def run_sulong_jdk_benchmark(workdir, file):
     if process.returncode != 0:
         return None
 
-    return parse_exec_output(stdout)
+    normal_exec_time = parse_exec_output(stdout)
+
+    try:
+        run_sulong_jdk_1000_benchmark(workdir, file)
+    except:
+        pass
+
+    return normal_exec_time
 
 
 COMPILERS = {
@@ -81,8 +117,7 @@ COMPILERS = {
     #"clang" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
     #"lli" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_lli_benchmark},
     #"sulong" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_benchmark},
-    "sulong-1000" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_benchmark},
-    #"sulong-jdk" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
+    "sulong-jdk" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
 }
 
 class EvaluationDb(object):
