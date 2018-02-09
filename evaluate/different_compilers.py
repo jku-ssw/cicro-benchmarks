@@ -16,7 +16,7 @@ def parse_exec_output(stdout):
 
 def run_benchmark(workdir, file):
     process = subprocess.Popen(["./{}".format(file)], cwd=workdir, stdout=subprocess.PIPE)
-    stdout, _ = process.communicate(timeout=60*1000)
+    stdout, _ = process.communicate(timeout=60)
 
     if process.returncode != 0:
         return None
@@ -26,24 +26,49 @@ def run_benchmark(workdir, file):
 
 def run_lli_benchmark(workdir, file):
     process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
-    process_bc.wait(timeout=10*1000)
+    process_bc.wait(timeout=10)
 
     process = subprocess.Popen(["lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
-    stdout, _ = process.communicate(timeout=60*1000)
+    stdout, _ = process.communicate(timeout=60)
 
     if process.returncode != 0:
         return None
 
     return parse_exec_output(stdout)
 
+
 SULONG_EXEC_DIR = '/home/thomas/JKU/java-llvm-ir-builder-dev/sulong'
+
 
 def run_sulong_benchmark(workdir, file):
     process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
-    process_bc.wait(timeout=10*1000)
+    process_bc.wait(timeout=10)
+
+    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
+    try:
+        stdout, _ = process.communicate(timeout=60)
+    except subprocess.TimeoutExpired:
+        print("    TIMEOUT")
+        process.terminate()
+        return None
+
+    if process.returncode != 0:
+        return None
+
+    return parse_exec_output(stdout)
+
+
+def run_sulong_jdk_benchmark(workdir, file):
+    process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
+    process_bc.wait(timeout=10)
 
     process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--jdk", "jvmci", "--dynamicimports=/compiler", "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
-    stdout, _ = process.communicate(timeout=60*1000)
+    try:
+        stdout, _ = process.communicate(timeout=60)
+    except subprocess.TimeoutExpired:
+        print("    TIMEOUT")
+        process.terminate()
+        return None
 
     if process.returncode != 0:
         return None
@@ -55,7 +80,9 @@ COMPILERS = {
     #"gcc" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "", "LDFLAGS": ""}},
     #"clang" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
     #"lli" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_lli_benchmark},
-    "sulong" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_benchmark},
+    #"sulong" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_benchmark},
+    "sulong-1000" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_benchmark},
+    #"sulong-jdk" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
 }
 
 class EvaluationDb(object):
@@ -129,7 +156,7 @@ if __name__ == "__main__":
         process.communicate()
 
         # execute all tests
-        for testcase in os.listdir(args.testdir):
+        for testcase in sorted(os.listdir(args.testdir)):
             if not testcase.endswith("_test"):
                 continue
 
@@ -138,9 +165,9 @@ if __name__ == "__main__":
                 bench_func = COMPILERS[compiler].get('exec', run_benchmark)
                 exec_time = bench_func(args.testdir, testcase)
                 if exec_time is not None:
-                    print("   Finished: {}ms".format(exec_time))
+                    print("   Finished: {}s".format(exec_time))
                     db.add_entry(compiler, testcase, exec_time)
                 else:
                     print("   EXIT CODE != 0")
-            except:
+            except RuntimeError:
                 print("   FAILED!")
