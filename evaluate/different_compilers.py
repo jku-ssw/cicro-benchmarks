@@ -36,12 +36,13 @@ def run_lli_benchmark(workdir, file):
 
     return parse_exec_output(stdout)
 
+SULONG_EXEC_DIR = '/home/thomas/JKU/java-llvm-ir-builder-dev/sulong'
 
 def run_sulong_benchmark(workdir, file):
     process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
     process_bc.wait(timeout=10*1000)
 
-    process = subprocess.Popen(["mx", "--jdk", "jvmci", "--dynamicimports=/compiler", "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
+    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--jdk", "jvmci", "--dynamicimports=/compiler", "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
     stdout, _ = process.communicate(timeout=60*1000)
 
     if process.returncode != 0:
