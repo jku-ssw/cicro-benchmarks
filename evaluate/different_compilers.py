@@ -9,10 +9,52 @@ import subprocess
 
 DATABASE_FILE = "evaluation.db"
 
+
+def parse_exec_output(stdout):
+    return float(re.findall(r"execution time: ([0-9\.]+)ms", str(stdout))[0])
+
+
+def run_benchmark(workdir, file):
+    process = subprocess.Popen(["./{}".format(file)], cwd=workdir, stdout=subprocess.PIPE)
+    stdout, _ = process.communicate(timeout=60*1000)
+
+    if process.returncode != 0:
+        return None
+
+    return parse_exec_output(stdout)
+
+
+def run_lli_benchmark(workdir, file):
+    process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
+    process_bc.wait(timeout=10*1000)
+
+    process = subprocess.Popen(["lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
+    stdout, _ = process.communicate(timeout=60*1000)
+
+    if process.returncode != 0:
+        return None
+
+    return parse_exec_output(stdout)
+
+
+def run_sulong_benchmark(workdir, file):
+    process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
+    process_bc.wait(timeout=10*1000)
+
+    process = subprocess.Popen(["mx", "--jdk", "jvmci", "--dynamicimports=/compiler", "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
+    stdout, _ = process.communicate(timeout=60*1000)
+
+    if process.returncode != 0:
+        return None
+
+    return parse_exec_output(stdout)
+
+
 COMPILERS = {
-    "gcc" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "", "LDFLAGS": ""}},
-    "clang" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
-    #"valgrind" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}, "exec": "valgrind"}
+    #"gcc" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "", "LDFLAGS": ""}},
+    #"clang" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
+    #"lli" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_lli_benchmark},
+    "sulong" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_benchmark},
 }
 
 class EvaluationDb(object):
@@ -57,18 +99,6 @@ class EvaluationDb(object):
             print(e)
 
 
-def run_benchmark(workdir, file, exec=None):
-    print(" * Run Benchmark for: {}".format(file))
-    process = subprocess.Popen(["./{}".format(file)], cwd=workdir, stdout=subprocess.PIPE)
-    stdout, _ = process.communicate()
-
-    exec_time = float(re.findall(r"execution time: ([0-9\.]+)ms", str(stdout))[0])
-
-    print("   Finished: {}ms".format(exec_time))
-
-    return exec_time
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Execute tests for all given compilers with their parameters')
     parser.add_argument('testdir', type=str, help='directory where the tests and the Makefile is contained', action='store')
@@ -86,8 +116,8 @@ if __name__ == "__main__":
         params = COMPILERS[compiler].get('make', {})
 
         # clean directory
-        process = subprocess.Popen(['make', 'clean'], cwd=args.testdir, stdout=subprocess.DEVNULL)
-        process.communicate()
+        #process = subprocess.Popen(['make', 'clean'], cwd=args.testdir, stdout=subprocess.DEVNULL)
+        #process.communicate()
 
         make_params = []
         for key  in params:
@@ -101,6 +131,15 @@ if __name__ == "__main__":
         for testcase in os.listdir(args.testdir):
             if not testcase.endswith("_test"):
                 continue
-            exec_time = run_benchmark(args.testdir, testcase, COMPILERS[compiler].get('exec', None))
 
-            db.add_entry(compiler, testcase, exec_time)
+            print(" * Run Benchmark for: {}".format(testcase))
+            try:
+                bench_func = COMPILERS[compiler].get('exec', run_benchmark)
+                exec_time = bench_func(args.testdir, testcase)
+                if exec_time is not None:
+                    print("   Finished: {}ms".format(exec_time))
+                    db.add_entry(compiler, testcase, exec_time)
+                else:
+                    print("   EXIT CODE != 0")
+            except:
+                print("   FAILED!")

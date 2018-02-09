@@ -169,7 +169,7 @@ khovratovich-Argon2_$(TEST_SUFFIX): khovratovich-Argon2 khovratovich-Argon2_test
 	 khovratovich-Argon2/Source/C99/Argon2/argon2-ref-core.c \
 	 khovratovich-Argon2/Source/C99/Argon2/kat.c \
 	 khovratovich-Argon2/Source/C99/Blake2/blake2b-ref.c \
-	 -o "$(TEST_DIR)/khovratovich-Argon2_$(TEST_SUFFIX)" $(LDFLAGS) -I khovratovich-Argon2/Source/C99/Common -pthread
+	 -o "$(TEST_DIR)/khovratovich-Argon2_$(TEST_SUFFIX)" $(LDFLAGS) -I khovratovich-Argon2/Source/C99/Common -lpthread
 
 ########## https://github.com/kylophone/spectrophoto
 

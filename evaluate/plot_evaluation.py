@@ -29,8 +29,14 @@ def get_datanase_content():
 if __name__ == "__main__":
     bench_results = get_datanase_content()
 
-    y = {'clang': [], 'gcc': []}
+    y = {}
     x = []
+
+    # init list of compilers
+    for key, value in sorted(bench_results.items()):
+        for compiler in sorted(value):
+            if compiler not in y:
+                y[compiler] = []
 
     for key, value in sorted(bench_results.items()):
         normalize_val = value.get('clang')
@@ -42,11 +48,8 @@ if __name__ == "__main__":
         for compiler in y:
             y[compiler].append(value.get(compiler, 0) / normalize_val)
 
-    print(x)
-    print(y)
-
     ind = np.arange(len(x))
-    width = 0.35  # the width of the bars
+    width = 0.90/len(y)  # the width of the bars
 
     fig, ax = plt.subplots()
     i=0
@@ -57,7 +60,7 @@ if __name__ == "__main__":
 
     ax.legend((0, 0), ('Men', 'Women'))
 
-    ax.set_xticks(ind + width / 2)
+    ax.set_xticks(ind + width * (len(y)-1) / 2)
     ax.set_xticklabels(x, rotation=45, ha='right')
 
     ref_tupel = []
