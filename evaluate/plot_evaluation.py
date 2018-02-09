@@ -38,7 +38,7 @@ if __name__ == "__main__":
             print('ignore  benchmark!!!')
             continue # Ignore benchmark
 
-        x.append(key)
+        x.append(key.replace('_test', ''))
         for compiler in y:
             y[compiler].append(value.get(compiler, 0) / normalize_val)
 
@@ -58,7 +58,7 @@ if __name__ == "__main__":
     ax.legend((0, 0), ('Men', 'Women'))
 
     ax.set_xticks(ind + width / 2)
-    ax.set_xticklabels(x, rotation=60)
+    ax.set_xticklabels(x, rotation=45, ha='right')
 
     ref_tupel = []
     name_tupel = []
@@ -66,5 +66,8 @@ if __name__ == "__main__":
         ref_tupel.append(rects[compiler])
         name_tupel.append(compiler)
     ax.legend(ref_tupel, name_tupel)
+
+    fig = plt.gcf()
+    fig.subplots_adjust(bottom=0.15)
 
     plt.show()

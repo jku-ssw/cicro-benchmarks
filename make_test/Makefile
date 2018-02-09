@@ -276,7 +276,7 @@ veorq-SipHash_$(TEST_SUFFIX): veorq-SipHash veorq-SipHash_test.c $(HARNESS_C)
 
 wbhart-bsdnt_$(TEST_SUFFIX): wbhart-bsdnt wbhart-bsdnt_test.c $(HARNESS_C)
 	(cd ./wbhart-bsdnt && ./configure)
-	(cd ./wbhart-bsdnt &&  make AS=$(AS) CC=$(CC))
+	(cd ./wbhart-bsdnt &&  make AS=$(AS) CC=$(CC) CFLAGS='$(CFLAGS) -fPIC')
 	$(CC) $(CFLAGS) $(HARNESS_C) wbhart-bsdnt_test.c -o "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)" $(LDFLAGS) -lm ./wbhart-bsdnt/libbsdnt.a
 
 wbhart-bsdnt_clean:
