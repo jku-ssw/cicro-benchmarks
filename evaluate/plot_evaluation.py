@@ -39,7 +39,7 @@ if __name__ == "__main__":
                 y[compiler] = []
 
     for key, value in sorted(bench_results.items()):
-        normalize_val = value.get('clang')
+        normalize_val = value.get('sulong-jdk')
         if normalize_val is None:
             print('ignore  benchmark!!!')
             continue # Ignore benchmark

@@ -85,7 +85,7 @@ def run_sulong_jdk_1000_benchmark(workdir, file):
         return None
 
     fast_exec_time = parse_exec_output(stdout)
-    print("    full evalulation finished: {}s", fast_exec_time)
+    print("    full evalulation finished: {}s".format(fast_exec_time))
 
     db.add_entry("{}-100".format(compiler), testcase, fast_exec_time)
 
