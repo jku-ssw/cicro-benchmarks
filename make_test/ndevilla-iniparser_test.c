@@ -51,15 +51,16 @@ int __attribute__ ((noinline)) test_harness(void) {
     dic = dictionary_new(DICTMINSZ);
 
     /* Makes the dictionary grow */
-    for (i = 1 ; i < 100001; ++i) {
+    for (i = 1 ; i < 5001; ++i) {
         sprintf(sec_name, "sec%d", i);
         for (j = 1 ; j < 11; ++j) {
             sprintf(key_name, "%s:key%d", sec_name, j);
+            dictionary_set(dic, sec_name, key_name);
         }
     }
 
     /* Shrink the dictionary */
-    for (i = 100000 ; i > 0; --i) {
+    for (i = 1000 ; i > 0; --i) {
         sprintf(sec_name, "sec%d", i);
         for (j = 10 ; j > 0; --j) {
             sprintf(key_name, "%s:key%d", sec_name, j);
@@ -77,7 +78,7 @@ int main(int argc, char* argv[]) {
         .name="ndevilla-iniparser",
         .description="ini file parser",
         .test_harness=*test_harness,
-        .expected_runtime=560L
+        .expected_runtime=580L
     };
     return _execute_harness(argc, argv, harness);
 }

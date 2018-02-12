@@ -10,7 +10,7 @@ int __attribute__ ((noinline)) test_harness(void) {
     int count = 200000;
     uint64_t ptr;
 
-    bt = btree_open(NULL, "./btree.db", BTREE_CREAT);
+    bt = btree_open(NULL, "./btree.db", BTREE_CREAT); // TODO: store in tmp directory
     btree_clear_flags(bt,BTREE_FLAG_USE_WRITE_BARRIER);
     if (bt == NULL) {
         perror("btree_open");
