@@ -117,11 +117,11 @@ def run_sulong_jdk_benchmark(workdir, file):
 
 
 COMPILERS = {
-    #"gcc" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "", "LDFLAGS": ""}},
-    #"clang" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
-    #"lli" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_lli_benchmark},
+    "gcc" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "", "LDFLAGS": ""}},
+    "clang" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
+    "lli" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_lli_benchmark},
     #"sulong" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_benchmark},
-    "sulong-jdk" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
+    #"sulong-jdk" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
 }
 
 class EvaluationDb(object):
@@ -183,8 +183,8 @@ if __name__ == "__main__":
         params = COMPILERS[compiler].get('make', {})
 
         # clean directory
-        #process = subprocess.Popen(['make', 'clean'], cwd=args.testdir, stdout=subprocess.DEVNULL)
-        #process.communicate()
+        process = subprocess.Popen(['make', 'clean'], cwd=args.testdir, stdout=subprocess.DEVNULL)
+        process.communicate()
 
         make_params = []
         for key  in params:
