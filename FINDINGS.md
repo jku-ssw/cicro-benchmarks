@@ -669,3 +669,47 @@ Implemented
 # https://github.com/mbrossard/threadpool (2018.02.08)
 
 Implemented
+
+
+# 2018.02.12 Valgrind problems found:
+
+valgrind ./andikleen-snappy-c_test -d -w=1 -m=1
+==29432== Conditional jump or move depends on uninitialised value(s)
+==29432==    at 0x10B537: decompress_all_tags (snappy.c:1168)
+==29432==    by 0x109F61: internal_uncompress (snappy.c:1294)
+==29432==    by 0x109EA6: snappy_uncompress (snappy.c:1542)
+==29432==    by 0x1096E1: test_harness (andikleen-snappy-c_test.c:34)
+==29432==    by 0x1093BC: do_benchmark (harness.c:116)
+==29432==    by 0x109086: _execute_harness (harness.c:84)
+==29432==    by 0x109796: main (andikleen-snappy-c_test.c:52)
+
+valgrind ./bashrc-libdeep_test -d -w=1 -m=1
+==29476==    definitely lost: 4,608 bytes in 8 blocks
+
+valgrind ./chrismoos-hash-ring_test -d -w=1 -m=1
+==29530==    definitely lost: 2,462,208 bytes in 131,072 blocks
+
+valgrind ./dcjones-hat-trie_test -d -w=1 -m=1
+==29654==    definitely lost: 32 bytes in 2 blocks
+==29654==    indirectly lost: 10,798,676 bytes in 7,500 blocks
+==29654==      possibly lost: 2,802 bytes in 2 blocks
+
+valgrind ./liteserver-binn_test -d -w=1 -m=1
+==31083== Warning: set address range perms: large range [0x151f6028, 0x251f6058) (noaccess)
+==31083== Warning: set address range perms: large range [0x79e43040, 0x99e43040) (undefined)
+
+valgrind ./RoaringBitmap-CRoaring_test -d -w=1 -m=1
+==31568== Invalid write of size 4
+==31568==    at 0x1098A5: test_harness (RoaringBitmap-CRoaring_test.c:13)
+==31568==    by 0x10959C: do_benchmark (harness.c:116)
+==31568==    by 0x109266: _execute_harness (harness.c:84)
+==31568==    by 0x1099F6: main (RoaringBitmap-CRoaring_test.c:44)
+==31568==  Address 0x1ffe85f14c is on thread 1's stack
+==31568==  in frame #0, created by test_harness (RoaringBitmap-CRoaring_test.c:9)
+
+valgrind ./troydhanson-tpl_test -d -w=1 -m=1
+==31690== Warning: set address range perms: large range [0x59e43040, 0x89d9527a) (undefined)
+==31690== Warning: set address range perms: large range [0x59e43028, 0x89d95292) (noaccess)
+
+valgrind ./yosefk-checkedthreads_test -d -w=1 -m=1
+==31735==     in use at exit: 40 bytes in 1 blocks
