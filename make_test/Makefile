@@ -19,7 +19,7 @@ PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antir
 		   chrismoos-hash-ring cloudwu-cstring codeplea-genann codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie\
 		   fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis imneme-pcg-c-basic jtsiomb-kdtree josephg-librope Kazade-kazmath\
 		   kbranigan-cJSON khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn\
-		   lucasb-eyer-heatmap mbrossard-threadpool mongodb-libbson msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman quartzjer-js0n\
+		   lucasb-eyer-heatmap mbrossard-threadpool mongodb-libbson mrubyc-mrubyc msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman quartzjer-js0n\
 		   richgel999-miniz RoaringBitmap-CRoaring skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth\
 		   tkengo-highway troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib wolkykim-qlibc yosefk-checkedthreads\
 		   zedshaw-liblcthw zhemao-libds zserge-partcl
@@ -215,6 +215,11 @@ mbrossard-threadpool_$(TEST_SUFFIX): mbrossard-threadpool mbrossard-threadpool_t
 
 mongodb-libbson_$(TEST_SUFFIX): mongodb-libbson mongodb-libbson_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) mongodb-libbson_test.c mongodb-libbson/src/bson/*.c mongodb-libbson/src/jsonsl/*.c -o "$(TEST_DIR)/mongodb-libbson_$(TEST_SUFFIX)" $(LDFLAGS) -I mongodb-libbson/src -I mongodb-libbson/src/bson -I includes/mongodb-libbson -D BSON_COMPILATION -lpthread
+
+########## https://github.com/mrubyc/mrubyc
+
+mrubyc-mrubyc_$(TEST_SUFFIX): mrubyc-mrubyc mrubyc-mrubyc_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) mrubyc-mrubyc_test.c mrubyc-mrubyc/src/*.c mrubyc-mrubyc/src/hal_posix/hal.c -o "$(TEST_DIR)/mrubyc-mrubyc_$(TEST_SUFFIX)" $(LDFLAGS) -I includes/mrubyc-mrubyc
 
 ########## https://github.com/msteinbeck/tinyspline
 

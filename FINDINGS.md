@@ -726,3 +726,11 @@ Implemented
 # https://github.com/imneme/pcg-c-basic (2018.02.14)
 
 Implemented
+
+# https://github.com/dinhviethoa/kvdb (2018.02.14)
+
+Dropped, has dependency to lz4
+
+# https://github.com/mrubyc/mrubyc (2018.02.14)
+
+Implemented
