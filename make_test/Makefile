@@ -15,7 +15,7 @@ HARNESS_C = harness.c
 
 # Projects to build
 
-PROJECTS = 100-Cranium andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep camgunz-cmp chokkan-liblbfgs\
+PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep camgunz-cmp chokkan-liblbfgs\
 		   chrismoos-hash-ring cloudwu-cstring codeplea-genann codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie\
 		   fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis jtsiomb-kdtree josephg-librope Kazade-kazmath\
 		   kbranigan-cJSON khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn\
@@ -46,6 +46,11 @@ exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 
 100-Cranium_$(TEST_SUFFIX): 100-Cranium 100-Cranium_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) 100-Cranium_test.c -o "$(TEST_DIR)/100-Cranium_$(TEST_SUFFIX)" $(LDFLAGS) -lm
+
+########## https://github.com/adamdunkels/ubasic
+
+adamdunkels-ubasic_$(TEST_SUFFIX): adamdunkels-ubasic adamdunkels-ubasic_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) adamdunkels-ubasic_test.c adamdunkels-ubasic/ubasic.c adamdunkels-ubasic/tokenizer.c -o "$(TEST_DIR)/adamdunkels-ubasic_$(TEST_SUFFIX)" $(LDFLAGS)
 
 ########## https://github.com/andikleen/snappy-c
 

@@ -713,3 +713,12 @@ valgrind ./troydhanson-tpl_test -d -w=1 -m=1
 
 valgrind ./yosefk-checkedthreads_test -d -w=1 -m=1
 ==31735==     in use at exit: 40 bytes in 1 blocks
+
+
+# https://github.com/paladin-t/my_basic (2018.02.14)
+
+Implemented
+
+# https://github.com/adamdunkels/ubasic (2018.02.14)
+
+Implemented
