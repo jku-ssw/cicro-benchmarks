@@ -17,7 +17,7 @@ HARNESS_C = harness.c
 
 PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep camgunz-cmp chokkan-liblbfgs\
 		   chrismoos-hash-ring cloudwu-cstring codeplea-genann codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie\
-		   fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis jtsiomb-kdtree josephg-librope Kazade-kazmath\
+		   fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis imneme-pcg-c-basic jtsiomb-kdtree josephg-librope Kazade-kazmath\
 		   kbranigan-cJSON khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn\
 		   lucasb-eyer-heatmap mbrossard-threadpool mongodb-libbson msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman quartzjer-js0n\
 		   richgel999-miniz RoaringBitmap-CRoaring skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth\
@@ -145,6 +145,11 @@ flame-blis_$(TEST_SUFFIX): flame-blis flame-blis_test.c $(HARNESS_C)
 	#(cd flame-blis && ./configure generic)
 	(cd flame-blis && make)
 	$(CC) $(CFLAGS) $(HARNESS_C) flame-blis_test.c -o "$(TEST_DIR)/flame-blis_$(TEST_SUFFIX)" $(LDFLAGS) ${FLAME-BLIS_INC_PARAMS} -lm -lpthread ./flame-blis/lib/generic/libblis.a
+
+########## https://github.com/imneme/pcg-c-basic
+
+imneme-pcg-c-basic_$(TEST_SUFFIX): imneme-pcg-c-basic imneme-pcg-c-basic_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) imneme-pcg-c-basic_test.c imneme-pcg-c-basic/pcg_basic.c -o "$(TEST_DIR)/imneme-pcg-c-basic_$(TEST_SUFFIX)" $(LDFLAGS)
 
 ########## https://github.com/jtsiomb/kdtree
 
