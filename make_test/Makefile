@@ -19,7 +19,7 @@ PROJECTS = 100-Cranium andikleen-snappy-c antirez-otree antirez-rax armon-libart
 		   chrismoos-hash-ring cloudwu-cstring codeplea-genann codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie\
 		   fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis jtsiomb-kdtree josephg-librope Kazade-kazmath\
 		   kbranigan-cJSON khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn\
-		   lucasb-eyer-heatmap mbrossard-threadpool mongodb-libbson msteinbeck-tinyspline ndevilla-iniparser prideout-heman quartzjer-js0n\
+		   lucasb-eyer-heatmap mbrossard-threadpool mongodb-libbson msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman quartzjer-js0n\
 		   richgel999-miniz RoaringBitmap-CRoaring skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth\
 		   tkengo-highway troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib wolkykim-qlibc yosefk-checkedthreads\
 		   zedshaw-liblcthw zhemao-libds zserge-partcl
@@ -215,6 +215,11 @@ msteinbeck-tinyspline_$(TEST_SUFFIX): msteinbeck-tinyspline msteinbeck-tinysplin
 
 ndevilla-iniparser_$(TEST_SUFFIX): ndevilla-iniparser ndevilla-iniparser_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) ndevilla-iniparser_test.c ndevilla-iniparser/src/*.c -o "$(TEST_DIR)/ndevilla-iniparser_$(TEST_SUFFIX)" $(LDFLAGS)
+
+########## https://github.com/paladin-t/my_basic
+
+paladin-t-my_basic_$(TEST_SUFFIX): paladin-t-my_basic paladin-t-my_basic_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) paladin-t-my_basic_test.c paladin-t-my_basic/core/my_basic.c -o "$(TEST_DIR)/paladin-t-my_basic_$(TEST_SUFFIX)" $(LDFLAGS) -lm
 
 ########## https://github.com/prideout/heman
 
