@@ -746,3 +746,11 @@ Implemented
 # https://github.com/orangeduck/tgc (2018.02.15)
 
 Implemented, very unstable -> not really usefull for benchmarking. I was not able to make it deterministic
+
+# https://github.com/XadillaX/byakuren (2018.02.15)
+
+Dropped, has dependency to xmempool
+
+# https://github.com/rxi/vec (2018.02.15)
+
+Implemented

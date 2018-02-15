@@ -15,14 +15,15 @@ HARNESS_C = harness.c
 
 # Projects to build
 
-PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep camgunz-cmp chokkan-liblbfgs\
-		   chrismoos-hash-ring cloudwu-cstring codeplea-genann codeplea-tinyexpr ctz-cifra dbalmain-ferret dcjones-hat-trie\
-		   fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis imneme-pcg-c-basic jtsiomb-kdtree josephg-librope Kazade-kazmath\
-		   kbranigan-cJSON khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn\
-		   lucasb-eyer-heatmap mbrossard-threadpool mongodb-libbson mrubyc-mrubyc msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman quartzjer-js0n\
-		   richgel999-miniz RoaringBitmap-CRoaring skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth\
-		   tkengo-highway troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib wolkykim-qlibc xamarin-flex yosefk-checkedthreads\
-		   zedshaw-liblcthw zhemao-libds zserge-partcl
+PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep\
+		   camgunz-cmp chokkan-liblbfgs chrismoos-hash-ring cloudwu-cstring codeplea-genann codeplea-tinyexpr ctz-cifra\
+		   dbalmain-ferret dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
+		   imneme-pcg-c-basic jtsiomb-kdtree josephg-librope Kazade-kazmath kbranigan-cJSON khovratovich-Argon2\
+		   kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn lucasb-eyer-heatmap mbrossard-threadpool\
+		   mongodb-libbson mrubyc-mrubyc msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman\
+		   quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring rxi-vec skeeto-branchless-utf8 snowballstem-snowball\
+		   swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib\
+		   wolkykim-qlibc xamarin-flex yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
 # Projects not to build by default
 
@@ -265,6 +266,11 @@ richgel999-miniz_$(TEST_SUFFIX): richgel999-miniz richgel999-miniz_test.c $(HARN
 
 RoaringBitmap-CRoaring_$(TEST_SUFFIX): RoaringBitmap-CRoaring RoaringBitmap-CRoaring_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) RoaringBitmap-CRoaring_test.c RoaringBitmap-CRoaring/src/*.c RoaringBitmap-CRoaring/src/containers/*.c -o "$(TEST_DIR)/RoaringBitmap-CRoaring_$(TEST_SUFFIX)" $(LDFLAGS) -I RoaringBitmap-CRoaring/include/
+
+########## https://github.com/rxi/vec
+
+rxi-vec_$(TEST_SUFFIX): rxi-vec rxi-vec_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) rxi-vec_test.c rxi-vec/src/vec.c -o "$(TEST_DIR)/rxi-vec_$(TEST_SUFFIX)" $(LDFLAGS)
 
 ########## https://github.com/skeeto/branchless-utf8
 
