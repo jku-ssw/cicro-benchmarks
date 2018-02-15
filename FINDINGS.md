@@ -754,3 +754,11 @@ Dropped, has dependency to xmempool
 # https://github.com/rxi/vec (2018.02.15)
 
 Implemented
+
+# https://github.com/iagox86/hash_extender (2018.02.15)
+
+Dropped, dependency on OpenSSL
+
+# https://github.com/dhess/c-ringbuf (2018.02.15)
+
+Implemented, has a very tight loop!

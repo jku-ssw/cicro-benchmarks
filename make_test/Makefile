@@ -17,7 +17,7 @@ HARNESS_C = harness.c
 
 PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep\
 		   camgunz-cmp chokkan-liblbfgs chrismoos-hash-ring cloudwu-cstring codeplea-genann codeplea-tinyexpr ctz-cifra\
-		   dbalmain-ferret dcjones-hat-trie fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
+		   dbalmain-ferret dcjones-hat-trie dhess-c-ringbuf fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
 		   imneme-pcg-c-basic jtsiomb-kdtree josephg-librope Kazade-kazmath kbranigan-cJSON khovratovich-Argon2\
 		   kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn lucasb-eyer-heatmap mbrossard-threadpool\
 		   mongodb-libbson mrubyc-mrubyc msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman\
@@ -126,6 +126,11 @@ dbalmain-ferret_$(TEST_SUFFIX): dbalmain-ferret dbalmain-ferret_test.c $(HARNESS
 
 dcjones-hat-trie_$(TEST_SUFFIX): dcjones-hat-trie dcjones-hat-trie_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) dcjones-hat-trie_test.c dcjones-hat-trie/src/*.c -o "$(TEST_DIR)/dcjones-hat-trie_$(TEST_SUFFIX)" $(LDFLAGS)
+
+########## https://github.com/dhess/c-ringbuf
+
+dhess-c-ringbuf_$(TEST_SUFFIX): dhess-c-ringbuf dhess-c-ringbuf_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) dhess-c-ringbuf_test.c dhess-c-ringbuf/ringbuf.c -o "$(TEST_DIR)/dhess-c-ringbuf_$(TEST_SUFFIX)" $(LDFLAGS)
 
 ########## https://github.com/fabianishere/brainfuck
 
