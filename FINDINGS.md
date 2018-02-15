@@ -734,3 +734,11 @@ Dropped, has dependency to lz4
 # https://github.com/mrubyc/mrubyc (2018.02.14)
 
 Implemented
+
+# https://github.com/najoshi/sickle (2018.02.15)
+
+Dropped, has dependency to zlib
+
+# https://github.com/xamarin/flex (2018.02.15)
+
+Implemented

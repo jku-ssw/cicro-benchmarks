@@ -21,7 +21,7 @@ PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antir
 		   kbranigan-cJSON khovratovich-Argon2 kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn\
 		   lucasb-eyer-heatmap mbrossard-threadpool mongodb-libbson mrubyc-mrubyc msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman quartzjer-js0n\
 		   richgel999-miniz RoaringBitmap-CRoaring skeeto-branchless-utf8 snowballstem-snowball swenson-sort Themaister-libfmsynth\
-		   tkengo-highway troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib wolkykim-qlibc yosefk-checkedthreads\
+		   tkengo-highway troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib wolkykim-qlibc xamarin-flex yosefk-checkedthreads\
 		   zedshaw-liblcthw zhemao-libds zserge-partcl
 
 # Global commands
@@ -316,6 +316,11 @@ wolkykim-qlibc_$(TEST_SUFFIX): wolkykim-qlibc wolkykim-qlibc_test.c $(HARNESS_C)
 	(cd ./wolkykim-qlibc && ./configure)
 	(cd ./wolkykim-qlibc &&  make)
 	$(CC) $(CFLAGS) $(HARNESS_C) wolkykim-qlibc_test.c -o "$(TEST_DIR)/wolkykim-qlibc_$(TEST_SUFFIX)" $(LDFLAGS) -lpthread wolkykim-qlibc/lib/libqlibc.a
+
+########## https://github.com/xamarin/flex
+
+xamarin-flex_$(TEST_SUFFIX): xamarin-flex xamarin-flex_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) xamarin-flex_test.c xamarin-flex/flex.c -o "$(TEST_DIR)/xamarin-flex_$(TEST_SUFFIX)" $(LDFLAGS)
 
 ########## https://github.com/yosefk/checkedthreads
 
