@@ -24,6 +24,10 @@ PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antir
 		   tkengo-highway troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib wolkykim-qlibc xamarin-flex yosefk-checkedthreads\
 		   zedshaw-liblcthw zhemao-libds zserge-partcl
 
+# Projects not to build by default
+
+PROJECTS_UNSTABLE = orangeduck-tgc
+
 # Global commands
 
 all: $(PROJECTS:=_$(TEST_SUFFIX))
@@ -230,6 +234,11 @@ msteinbeck-tinyspline_$(TEST_SUFFIX): msteinbeck-tinyspline msteinbeck-tinysplin
 
 ndevilla-iniparser_$(TEST_SUFFIX): ndevilla-iniparser ndevilla-iniparser_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) ndevilla-iniparser_test.c ndevilla-iniparser/src/*.c -o "$(TEST_DIR)/ndevilla-iniparser_$(TEST_SUFFIX)" $(LDFLAGS)
+
+########## https://github.com/orangeduck/tgc
+
+orangeduck-tgc_$(TEST_SUFFIX): orangeduck-tgc orangeduck-tgc_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) orangeduck-tgc_test.c orangeduck-tgc/tgc.c -o "$(TEST_DIR)/orangeduck-tgc_$(TEST_SUFFIX)" $(LDFLAGS)
 
 ########## https://github.com/paladin-t/my_basic
 
