@@ -18,7 +18,7 @@ HARNESS_C = harness.c
 PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep\
 		   camgunz-cmp chokkan-liblbfgs chrismoos-hash-ring cloudwu-cstring codeplea-genann codeplea-tinyexpr ctz-cifra\
 		   dbalmain-ferret dcjones-hat-trie dhess-c-ringbuf fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
-		   imneme-pcg-c-basic jtsiomb-kdtree josephg-librope Kazade-kazmath kbranigan-cJSON khovratovich-Argon2\
+		   imneme-pcg-c-basic jtsiomb-kdtree josephg-librope Kazade-kazmath kbranigan-cJSON khovratovich-Argon2 kuba---zip\
 		   kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn lucasb-eyer-heatmap mbrossard-threadpool\
 		   mongodb-libbson mrubyc-mrubyc msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman\
 		   quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring rxi-vec skeeto-branchless-utf8 snowballstem-snowball\
@@ -190,6 +190,11 @@ khovratovich-Argon2_$(TEST_SUFFIX): khovratovich-Argon2 khovratovich-Argon2_test
 	 khovratovich-Argon2/Source/C99/Argon2/kat.c \
 	 khovratovich-Argon2/Source/C99/Blake2/blake2b-ref.c \
 	 -o "$(TEST_DIR)/khovratovich-Argon2_$(TEST_SUFFIX)" $(LDFLAGS) -I khovratovich-Argon2/Source/C99/Common -lpthread
+
+########## https://github.com/kuba--/zip
+
+kuba---zip_$(TEST_SUFFIX): kuba---zip kuba---zip_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) kuba---zip_test.c kuba---zip/src/zip.c -o "$(TEST_DIR)/kuba---zip_$(TEST_SUFFIX)" $(LDFLAGS)
 
 ########## https://github.com/kylophone/spectrophoto
 

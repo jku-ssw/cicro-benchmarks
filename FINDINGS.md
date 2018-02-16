@@ -770,3 +770,7 @@ Implemented, has a very tight loop!
 # https://github.com/PaulBatchelor/Sporth (2018.02.15)
 
 Dropped, dependency to libsoundpipe
+
+# https://github.com/kuba--/zip (2018.02.16)
+
+Implemented
