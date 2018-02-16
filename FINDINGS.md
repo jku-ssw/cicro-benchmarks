@@ -778,3 +778,7 @@ Implemented
 # https://github.com/ludocode/mpack (2018.02.16)
 
 Implemented
+
+# https://github.com/Juniper/libxo (2018.02.16)
+
+Dropped, dependency to libdl
