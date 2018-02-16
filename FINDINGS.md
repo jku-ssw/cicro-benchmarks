@@ -774,3 +774,7 @@ Dropped, dependency to libsoundpipe
 # https://github.com/kuba--/zip (2018.02.16)
 
 Implemented
+
+# https://github.com/ludocode/mpack (2018.02.16)
+
+Implemented

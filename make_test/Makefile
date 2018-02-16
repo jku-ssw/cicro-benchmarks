@@ -19,7 +19,7 @@ PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antir
 		   camgunz-cmp chokkan-liblbfgs chrismoos-hash-ring cloudwu-cstring codeplea-genann codeplea-tinyexpr ctz-cifra\
 		   dbalmain-ferret dcjones-hat-trie dhess-c-ringbuf fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
 		   imneme-pcg-c-basic jtsiomb-kdtree josephg-librope Kazade-kazmath kbranigan-cJSON khovratovich-Argon2 kuba---zip\
-		   kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn lucasb-eyer-heatmap mbrossard-threadpool\
+		   kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn lucasb-eyer-heatmap ludocode-mpack mbrossard-threadpool\
 		   mongodb-libbson mrubyc-mrubyc msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman\
 		   quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring rxi-vec skeeto-branchless-utf8 snowballstem-snowball\
 		   swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib\
@@ -220,6 +220,11 @@ liteserver-binn_$(TEST_SUFFIX): liteserver-binn liteserver-binn_test.c $(HARNESS
 
 lucasb-eyer-heatmap_$(TEST_SUFFIX): lucasb-eyer-heatmap lucasb-eyer-heatmap_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) lucasb-eyer-heatmap_test.c lucasb-eyer-heatmap/heatmap.c -o "$(TEST_DIR)/lucasb-eyer-heatmap_$(TEST_SUFFIX)" $(LDFLAGS) -lm
+
+########## https://github.com/ludocode/mpack
+
+ludocode-mpack_$(TEST_SUFFIX): ludocode-mpack ludocode-mpack_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) ludocode-mpack_test.c ludocode-mpack/src/mpack/*.c -o "$(TEST_DIR)/ludocode-mpack_$(TEST_SUFFIX)" $(LDFLAGS) -I ludocode-mpack/src
 
 ########## https://github.com/mbrossard/threadpool
 
