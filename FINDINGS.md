@@ -296,6 +296,11 @@ time mx --jdk jvmci --dynamicimports=/compiler lli btree_example.bc allocfree 10
 sudo pacman -S erlang  # for test script (didn't worked)
 ```
 
+valgrind ./chrismoos-hash-ring_test -d -w=1 -m=1
+==29530==    definitely lost: 2,462,208 bytes in 131,072 blocks
+
+Reported: [](https://github.com/chrismoos/hash-ring/issues/19)
+
 # zhemao/libds (2017.30.11)
 
 ```
@@ -474,7 +479,14 @@ Implemented
 this testcase caused a segfault:
 ```tcl
 set i 0; while {< $i 20} {if {== [- $i [* [/ $i 2] 2]] 0} {set i [+ $i 1]} {set i [+ $i 1]}; puts $i}
+```tcl
+
+minimized:
 ```
+set i 0; while {< $i 1} {if {== [- $i] -1} {} {set i [+ $i 1]}}
+```
+
+Reported: [](https://github.com/zserge/partcl/issues/6)
 
 # https://github.com/sahaRatul/sela (2017.22.12)
 
@@ -507,7 +519,7 @@ complexity of the the projects make it hard to write tests
 
 # https://github.com/watmough/jwHash (2018.01.12)
 
-Project is broken for now: https://github.com/watmough/jwHash/pull/6
+Project is broken for now: [](https://github.com/watmough/jwHash/pull/6)
 
 # https://github.com/lemire/simdcomp (2018.01.12)
 
@@ -686,14 +698,6 @@ valgrind ./andikleen-snappy-c_test -d -w=1 -m=1
 valgrind ./bashrc-libdeep_test -d -w=1 -m=1
 ==29476==    definitely lost: 4,608 bytes in 8 blocks
 
-valgrind ./chrismoos-hash-ring_test -d -w=1 -m=1
-==29530==    definitely lost: 2,462,208 bytes in 131,072 blocks
-
-valgrind ./dcjones-hat-trie_test -d -w=1 -m=1
-==29654==    definitely lost: 32 bytes in 2 blocks
-==29654==    indirectly lost: 10,798,676 bytes in 7,500 blocks
-==29654==      possibly lost: 2,802 bytes in 2 blocks
-
 valgrind ./liteserver-binn_test -d -w=1 -m=1
 ==31083== Warning: set address range perms: large range [0x151f6028, 0x251f6058) (noaccess)
 ==31083== Warning: set address range perms: large range [0x79e43040, 0x99e43040) (undefined)
@@ -762,3 +766,7 @@ Dropped, dependency on OpenSSL
 # https://github.com/dhess/c-ringbuf (2018.02.15)
 
 Implemented, has a very tight loop!
+
+# https://github.com/PaulBatchelor/Sporth (2018.02.15)
+
+Dropped, dependency to libsoundpipe

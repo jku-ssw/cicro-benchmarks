@@ -40,6 +40,8 @@ int __attribute__ ((noinline)) test_harness(void) {
         hattrie_iter_free(it);
     }
 
+    hattrie_free(T);
+
     return 0;
 }
 

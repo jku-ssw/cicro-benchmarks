@@ -6,6 +6,7 @@
 #include "zserge-partcl/tcl.c"
 
 #define TCL_BENCH "set i 0; while {< $i 20000} {if {== [- $i [* [/ $i 2] 2]] 0} {set i [+ $i 2]} {}; set i [+ $i 1]}"
+
 int __attribute__ ((noinline)) test_harness(void) {
     struct tcl tcl;
     tcl_init(&tcl);
