@@ -782,3 +782,7 @@ Implemented
 # https://github.com/Juniper/libxo (2018.02.16)
 
 Dropped, dependency to libdl
+
+# https://github.com/yinqiwen/geohash-int (2018.02.16)
+
+Implemented

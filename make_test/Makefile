@@ -23,7 +23,7 @@ PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antir
 		   mongodb-libbson mrubyc-mrubyc msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman\
 		   quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring rxi-vec skeeto-branchless-utf8 snowballstem-snowball\
 		   swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib\
-		   wolkykim-qlibc xamarin-flex yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
+		   wolkykim-qlibc xamarin-flex yinqiwen-geohash-int yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
 # Projects not to build by default
 
@@ -351,6 +351,11 @@ wolkykim-qlibc_$(TEST_SUFFIX): wolkykim-qlibc wolkykim-qlibc_test.c $(HARNESS_C)
 
 xamarin-flex_$(TEST_SUFFIX): xamarin-flex xamarin-flex_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) xamarin-flex_test.c xamarin-flex/flex.c -o "$(TEST_DIR)/xamarin-flex_$(TEST_SUFFIX)" $(LDFLAGS)
+
+########## https://github.com/yinqiwen/geohash-int
+
+yinqiwen-geohash-int_$(TEST_SUFFIX): yinqiwen-geohash-int yinqiwen-geohash-int_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) yinqiwen-geohash-int_test.c yinqiwen-geohash-int/geohash.c -o "$(TEST_DIR)/yinqiwen-geohash-int_$(TEST_SUFFIX)" $(LDFLAGS)
 
 ########## https://github.com/yosefk/checkedthreads
 
