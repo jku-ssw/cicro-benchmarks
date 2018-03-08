@@ -22,7 +22,7 @@ PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antir
 		   kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn lucasb-eyer-heatmap ludocode-mpack mbrossard-threadpool\
 		   mongodb-libbson mrubyc-mrubyc msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman\
 		   quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring rxi-vec skeeto-branchless-utf8 snowballstem-snowball\
-		   swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl veorq-SipHash wbhart-bsdnt websnarf-bstrlib\
+		   swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl veorq-SipHash vmg-crustache wbhart-bsdnt websnarf-bstrlib\
 		   wolkykim-qlibc xamarin-flex yinqiwen-geohash-int yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
 # Projects not to build by default
@@ -148,6 +148,7 @@ ferreiradaselva-mathc_$(TEST_SUFFIX): ferreiradaselva-mathc ferreiradaselva-math
 	$(CC) $(CFLAGS) $(HARNESS_C) ferreiradaselva-mathc_test.c ferreiradaselva-mathc/mathc.c -o "$(TEST_DIR)/ferreiradaselva-mathc_$(TEST_SUFFIX)" $(LDFLAGS) -lm
 
 ########## https://github.com/flame/blis
+
 FLAME-BLIS_INC = flame-blis flame-blis/config/generic $(sort $(dir $(wildcard flame-blis/frame/*/))) $(sort $(dir $(wildcard flame-blis/frame/*/*/))) $(sort $(dir $(wildcard flame-blis/frame/*/*/*/)))
 FLAME-BLIS_INC_PARAMS = $(foreach d, $(FLAME-BLIS_INC), -I$d)
 
@@ -321,6 +322,11 @@ troydhanson-tpl_$(TEST_SUFFIX): troydhanson-tpl troydhanson-tpl_test.c $(HARNESS
 
 veorq-SipHash_$(TEST_SUFFIX): veorq-SipHash veorq-SipHash_test.c $(HARNESS_C)
 	$(CC) $(CFLAGS) $(HARNESS_C) veorq-SipHash_test.c -o "$(TEST_DIR)/veorq-SipHash_$(TEST_SUFFIX)" $(LDFLAGS)
+
+########## https://github.com/vmg/crustache
+
+vmg-crustache_$(TEST_SUFFIX): vmg-crustache vmg-crustache_test.c $(HARNESS_C)
+	$(CC) $(CFLAGS) $(HARNESS_C) vmg-crustache_test.c vmg-crustache/src/*.c -o "$(TEST_DIR)/vmg-crustache_$(TEST_SUFFIX)" $(LDFLAGS)
 
 ########## https://github.com/wbhart/bsdnt
 
