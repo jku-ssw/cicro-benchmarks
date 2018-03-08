@@ -786,3 +786,7 @@ Dropped, dependency to libdl
 # https://github.com/yinqiwen/geohash-int (2018.02.16)
 
 Implemented
+
+# https://github.com/vmg/crustache (2018.03.08)
+
+Backlog for now, branch exists with current work, no documentation and no trivial instrumentation
