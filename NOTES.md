@@ -77,3 +77,11 @@ int main() {
 
 # 2018.02.13
 ./fetch_github/fetch_github/fetch_github.py "language:c stars:100..150" --clone-repo-dir ./projects/
+
+# 2018-03.15
+
+* Benchmark runner: export more metrics and all measurement points, similar to Hayai (https://bruun.co/2012/02/07/easy-cpp-benchmarking/)
+* Decrase number of iterations per run, and overal runtime to allow more runs
+* Add setup function
+* calculate standard derivation to find out if a benchmark is really suitable
+
