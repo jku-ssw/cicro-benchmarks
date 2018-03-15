@@ -13,6 +13,10 @@ TEST_DIR = .
 
 HARNESS_C = harness.c
 
+C_HAYAI_DIR = ../C-Hayai/src
+C_HAYAI_LDFLAGS = -I $(C_HAYAI_DIR) -lm
+C_HAYAI_CFLAGS = $(C_HAYAI_DIR)/libchayai.a
+
 # Projects to build
 
 PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep\
@@ -49,33 +53,39 @@ exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 
 ########## https://github.com/100/Cranium
 
-100-Cranium_$(TEST_SUFFIX): 100-Cranium 100-Cranium_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) 100-Cranium_test.c -o "$(TEST_DIR)/100-Cranium_$(TEST_SUFFIX)" $(LDFLAGS) -lm
+100-Cranium_$(TEST_SUFFIX): 100-Cranium 100-Cranium_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) 100-Cranium_test.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/100-Cranium_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm -lbenchmark -lpthread
 
 ########## https://github.com/adamdunkels/ubasic
 
-adamdunkels-ubasic_$(TEST_SUFFIX): adamdunkels-ubasic adamdunkels-ubasic_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) adamdunkels-ubasic_test.c adamdunkels-ubasic/ubasic.c adamdunkels-ubasic/tokenizer.c -o "$(TEST_DIR)/adamdunkels-ubasic_$(TEST_SUFFIX)" $(LDFLAGS)
+adamdunkels-ubasic_$(TEST_SUFFIX): adamdunkels-ubasic adamdunkels-ubasic_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) adamdunkels-ubasic_test.c adamdunkels-ubasic/ubasic.c adamdunkels-ubasic/tokenizer.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/adamdunkels-ubasic_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 ########## https://github.com/andikleen/snappy-c
 
-andikleen-snappy-c_$(TEST_SUFFIX): andikleen-snappy-c andikleen-snappy-c_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) andikleen-snappy-c_test.c andikleen-snappy-c/snappy.c -o "$(TEST_DIR)/andikleen-snappy-c_$(TEST_SUFFIX)" $(LDFLAGS)
+andikleen-snappy-c_$(TEST_SUFFIX): andikleen-snappy-c andikleen-snappy-c_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) andikleen-snappy-c_test.c andikleen-snappy-c/snappy.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/andikleen-snappy-c_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 ########## https://github.com/antirez/otree
 
-antirez-otree_$(TEST_SUFFIX): antirez-otree antirez-otree_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) antirez-otree_test.c antirez-otree/btree.c -o "$(TEST_DIR)/antirez-otree_$(TEST_SUFFIX)" $(LDFLAGS)
+antirez-otree_$(TEST_SUFFIX): antirez-otree antirez-otree_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) antirez-otree_test.c antirez-otree/btree.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/antirez-otree_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 ########## https://github.com/antirez/rax
 
-antirez-rax_$(TEST_SUFFIX):antirez-rax antirez-rax_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) antirez-rax_test.c antirez-rax/rax.c -o "$(TEST_DIR)/antirez-rax_$(TEST_SUFFIX)" $(LDFLAGS) -lm
+antirez-rax_$(TEST_SUFFIX):antirez-rax antirez-rax_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) antirez-rax_test.c antirez-rax/rax.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/antirez-rax_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm
 
 ########## https://github.com/armon/libart
 
-armon-libart_$(TEST_SUFFIX): armon-libart armon-libart_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) armon-libart_test.c armon-libart/src/art.c -o "$(TEST_DIR)/armon-libart_$(TEST_SUFFIX)" $(LDFLAGS)
+armon-libart_$(TEST_SUFFIX): armon-libart armon-libart_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) armon-libart_test.c armon-libart/src/art.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/armon-libart_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 ########## https://github.com/bashrc/libdeep
 

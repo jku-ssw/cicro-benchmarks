@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "antirez-rax/rax.h"
 
@@ -11,7 +11,7 @@ static size_t int2key(char *s, size_t maxlen, uint32_t i) {
         return r;
 }
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(rax, tree, 10, 1) {
     rax *t = raxNew();
     /* Insert element */
     for (int i = 0; i < 100000; i++) {
@@ -43,16 +43,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     }
 
     raxFree(t);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="antirez-rax",
-        .description="radix tree implementation",
-        .test_harness=*test_harness,
-        .expected_runtime=180L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(rax, tree); // radix tree implementation
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }
