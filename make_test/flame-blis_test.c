@@ -1,9 +1,9 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include <unistd.h>
 #include "blis.h"
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(flame, blis, 100, 10) {
     // based on test/test_hemm.c
     obj_t a, b, c;
     obj_t c_save;
@@ -100,16 +100,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     }
 
     //bli_finalize();
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="flame-blis",
-        .description="high-performance dense linear algebra",
-        .test_harness=*test_harness,
-        .expected_runtime=550L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(flame, blis); // high-performance dense linear algebra
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

@@ -27,7 +27,7 @@ static lbfgsfloatval_t evaluate(
     return fx;
 }
 
-BENCHMARK(liblbfgs, evaluate, 10, 10) {
+BENCHMARK(liblbfgs, evaluate, 100, 5) {
     int i, ret = 0;
     lbfgsfloatval_t fx;
     lbfgsfloatval_t *x = lbfgs_malloc(N);

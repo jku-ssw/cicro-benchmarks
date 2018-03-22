@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "codeplea-genann/genann.h"
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(codeplea, genann, 10, 1) {
     // based on example1.c
 
     /* Input and expected out data */
@@ -32,16 +32,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     }
 
     genann_free(ann);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="codeplea-genann",
-        .description="simple neural network library in ANSI C",
-        .test_harness=*test_harness,
-        .expected_runtime=670L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(codeplea, genann); // simple neural network library in ANSI C
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

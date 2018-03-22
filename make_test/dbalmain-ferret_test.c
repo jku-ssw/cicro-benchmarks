@@ -1,4 +1,4 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include "index.h"
 #include "store.h"
@@ -7,6 +7,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+
+// override printf function, because Cranium outputs by default to it
+int printf(const char * format, ...) {
+    return 0;
+}
 
 void create_index(FrtStore *store, FrtConfig config)
 {
@@ -38,7 +43,7 @@ void create_index(FrtStore *store, FrtConfig config)
     frt_iw_close(iw);
 }
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(dbalmain, ferret, 10, 1) {
     FrtConfig config = frt_default_config;
     FrtStore *store = frt_open_fs_store("./tmp/dbalmain-ferret/"); // TODO: a few blocks are not free at the end?
     FrtSearcher *searcher;
@@ -72,16 +77,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     frt_q_deref(q);
     frt_sort_destroy(sort);
     frt_store_deref(store);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="dbalmain-ferret",
-        .description="extensible information retrieval library",
-        .test_harness=*test_harness,
-        .expected_runtime=1700L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(dbalmain, ferret); // extensible information retrieval library
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

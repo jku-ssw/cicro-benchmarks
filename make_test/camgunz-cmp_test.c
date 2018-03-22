@@ -26,7 +26,7 @@ static size_t file_writer(cmp_ctx_t *ctx, const void *data, size_t count) {
     return count;
 }
 
-BENCHMARK(cmp, serialize, 10, 10) {
+BENCHMARK(cmp, serialize, 100, 10) {
 
     cmp_ctx_t cmp;
     cmp_init(&cmp, NULL, file_reader, file_skipper, file_writer);

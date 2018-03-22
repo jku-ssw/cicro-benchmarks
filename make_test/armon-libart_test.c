@@ -9,14 +9,14 @@
 #define LOREM_IPSUM10 LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 
-BENCHMARK(libart, tree, 10, 1) {
+BENCHMARK(libart, tree, 100, 10) {
     art_tree t;
     art_tree_init(&t);
 
     char* text = LOREM_IPSUM100;
     int max_len = strlen(text);
 
-    for(int i = 0; i < max_len; i+=10) {
+    for(int i = 0; i < max_len; i+=100) {
         char *key = text+i;
         art_insert(&t, (unsigned char *) key, max_len - i + 1, NULL);
     }

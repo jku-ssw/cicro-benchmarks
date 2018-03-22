@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "chrismoos-hash-ring/hash_ring.h"
 
@@ -31,11 +31,11 @@ void generateKeys(uint8_t *keys, int numKeys, int keySize) {
 }
 
 #define NUM_REPLICAS 512
-#define NUM_NODES 128
+#define NUM_NODES 64
 #define NUM_KEYS 1000
 #define KEY_SIZE 16
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(chrismoos, hash_ring, 100, 1) {
     hash_ring_t *ring = hash_ring_create(NUM_REPLICAS, HASH_FUNCTION_SHA1);
 
     addNodes(ring, NUM_NODES);
@@ -43,24 +43,21 @@ int __attribute__ ((noinline)) test_harness(void) {
     uint8_t *keys = (uint8_t*)malloc(KEY_SIZE * NUM_KEYS);
     generateKeys(keys, NUM_KEYS, KEY_SIZE);
 
-    for(int y = 0; y < 100; y++) {
+    //for(int y = 0; y < 100; y++) {
         for(int x = 0; x < NUM_KEYS; x++) {
             hash_ring_find_node(ring, keys + (KEY_SIZE * x), KEY_SIZE);
         }
-    }
+    //}
 
     free(keys);
     hash_ring_free(ring);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="chrismoos-hash-ring",
-        .description="hash ring library",
-        .test_harness=*test_harness,
-        .expected_runtime=580L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(chrismoos, hash_ring); // hash ring library
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

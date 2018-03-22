@@ -4,10 +4,15 @@
 
 #include "antirez-otree/btree.h"
 
-BENCHMARK(otree, alloc_free, 10, 1) {
+// override printf function, because Cranium outputs by default to it
+int printf(const char * format, ...) {
+    return 0;
+}
+
+BENCHMARK(otree, alloc_free, 100, 10) {
     struct btree *bt;
     int arg = 1410065408; // TODO: value
-    int count = 200000;
+    int count = 2000;
     uint64_t ptr;
 
     bt = btree_open(NULL, "./btree.db", BTREE_CREAT); // TODO: store in tmp directory or even in RAM

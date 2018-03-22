@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "dcjones-hat-trie/src/hat-trie.h"
 
@@ -13,7 +13,7 @@ void randstr(char* x, size_t len)
     }
 }
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(dcjones, hat_trie, 100, 1) {
     hattrie_t* T = hattrie_create();
     const size_t n = 10000;  // how many strings
     const size_t m_low  = 50;  // minimum length of each string
@@ -29,7 +29,7 @@ int __attribute__ ((noinline)) test_harness(void) {
 
     hattrie_iter_t* it;
     clock_t t0, t;
-    const size_t repetitions = 512;
+    const size_t repetitions = 16;
     size_t r;
 
     for (r = 0; r < repetitions; ++r) {
@@ -41,16 +41,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     }
 
     hattrie_free(T);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="dcjones-hat-trie",
-        .description="An efficient trie implementation",
-        .test_harness=*test_harness,
-        .expected_runtime=370L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(dcjones, hat_trie); // An efficient trie implementation
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

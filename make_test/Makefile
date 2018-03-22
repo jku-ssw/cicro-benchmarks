@@ -107,68 +107,82 @@ chokkan-liblbfgs_$(TEST_SUFFIX): chokkan-liblbfgs chokkan-liblbfgs_test.c $(C_HA
 
 ########## https://github.com/chrismoos/hash-ring
 
-chrismoos-hash-ring_$(TEST_SUFFIX): chrismoos-hash-ring chrismoos-hash-ring_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) chrismoos-hash-ring_test.c chrismoos-hash-ring/hash_ring.c chrismoos-hash-ring/md5.c chrismoos-hash-ring/sha1.c -o "$(TEST_DIR)/chrismoos-hash-ring_$(TEST_SUFFIX)" $(LDFLAGS)
+chrismoos-hash-ring_$(TEST_SUFFIX): chrismoos-hash-ring chrismoos-hash-ring_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) chrismoos-hash-ring_test.c chrismoos-hash-ring/hash_ring.c chrismoos-hash-ring/md5.c chrismoos-hash-ring/sha1.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/chrismoos-hash-ring_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 ########## https://github.com/cloudwu/cstring
 
-cloudwu-cstring_$(TEST_SUFFIX): cloudwu-cstring cloudwu-cstring_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) cloudwu-cstring_test.c cloudwu-cstring/cstring.c -o "$(TEST_DIR)/cloudwu-cstring_$(TEST_SUFFIX)" $(LDFLAGS)
+cloudwu-cstring_$(TEST_SUFFIX): cloudwu-cstring cloudwu-cstring_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) cloudwu-cstring_test.c cloudwu-cstring/cstring.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/cloudwu-cstring_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 ########## https://github.com/codeplea/genann
 
-codeplea-genann_$(TEST_SUFFIX): codeplea-genann codeplea-genann_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) codeplea-genann_test.c codeplea-genann/genann.c -o "$(TEST_DIR)/codeplea-genann_$(TEST_SUFFIX)" $(LDFLAGS) -lm
+codeplea-genann_$(TEST_SUFFIX): codeplea-genann codeplea-genann_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) codeplea-genann_test.c codeplea-genann/genann.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/codeplea-genann_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm
 
 ########## https://github.com/codeplea/tinyexpr
 
-codeplea-tinyexpr_$(TEST_SUFFIX): codeplea-tinyexpr codeplea-tinyexpr_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) codeplea-tinyexpr_test.c codeplea-tinyexpr/tinyexpr.c -o "$(TEST_DIR)/codeplea-tinyexpr_$(TEST_SUFFIX)" $(LDFLAGS) -lm
+codeplea-tinyexpr_$(TEST_SUFFIX): codeplea-tinyexpr codeplea-tinyexpr_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) codeplea-tinyexpr_test.c codeplea-tinyexpr/tinyexpr.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/codeplea-tinyexpr_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm
 
 ########## https://github.com/ctz/cifra
 
-ctz-cifra_$(TEST_SUFFIX): ctz-cifra ctz-cifra_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) ctz-cifra_test.c ctz-cifra/src/blockwise.c ctz-cifra/src/chash.c ctz-cifra/src/sha3.c -o "$(TEST_DIR)/ctz-cifra_$(TEST_SUFFIX)" $(LDFLAGS) -I ctz-cifra/src/ext
+ctz-cifra_$(TEST_SUFFIX): ctz-cifra ctz-cifra_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) ctz-cifra_test.c ctz-cifra/src/blockwise.c ctz-cifra/src/chash.c ctz-cifra/src/sha3.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/ctz-cifra_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -I ctz-cifra/src/ext
 
 ########## https://github.com/dbalmain/ferret
 
-dbalmain-ferret_$(TEST_SUFFIX): dbalmain-ferret dbalmain-ferret_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) dbalmain-ferret_test.c dbalmain-ferret/c/src/*c dbalmain-ferret/c/lib/bzlib/*.c dbalmain-ferret/c/lib/libstemmer_c/libstemmer/libstemmer.c dbalmain-ferret/c/lib/libstemmer_c/src_c/*.c dbalmain-ferret/c/lib/libstemmer_c/runtime/*.c -o "$(TEST_DIR)/dbalmain-ferret_$(TEST_SUFFIX)" $(LDFLAGS) -lm -lpthread -I dbalmain-ferret/c/include
+dbalmain-ferret_$(TEST_SUFFIX): dbalmain-ferret dbalmain-ferret_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) dbalmain-ferret_test.c dbalmain-ferret/c/src/*c dbalmain-ferret/c/lib/bzlib/*.c \
+	 dbalmain-ferret/c/lib/libstemmer_c/libstemmer/libstemmer.c dbalmain-ferret/c/lib/libstemmer_c/src_c/*.c \
+	 dbalmain-ferret/c/lib/libstemmer_c/runtime/*.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/dbalmain-ferret_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm -lpthread -I dbalmain-ferret/c/include
 
 ########## https://github.com/dcjones/hat-trie
 
-dcjones-hat-trie_$(TEST_SUFFIX): dcjones-hat-trie dcjones-hat-trie_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) dcjones-hat-trie_test.c dcjones-hat-trie/src/*.c -o "$(TEST_DIR)/dcjones-hat-trie_$(TEST_SUFFIX)" $(LDFLAGS)
+dcjones-hat-trie_$(TEST_SUFFIX): dcjones-hat-trie dcjones-hat-trie_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) dcjones-hat-trie_test.c dcjones-hat-trie/src/*.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/dcjones-hat-trie_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 ########## https://github.com/dhess/c-ringbuf
 
-dhess-c-ringbuf_$(TEST_SUFFIX): dhess-c-ringbuf dhess-c-ringbuf_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) dhess-c-ringbuf_test.c dhess-c-ringbuf/ringbuf.c -o "$(TEST_DIR)/dhess-c-ringbuf_$(TEST_SUFFIX)" $(LDFLAGS)
+dhess-c-ringbuf_$(TEST_SUFFIX): dhess-c-ringbuf dhess-c-ringbuf_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) dhess-c-ringbuf_test.c dhess-c-ringbuf/ringbuf.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/dhess-c-ringbuf_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 ########## https://github.com/fabianishere/brainfuck
 
-fabianishere-brainfuck_$(TEST_SUFFIX): fabianishere-brainfuck fabianishere-brainfuck_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) fabianishere-brainfuck_test.c fabianishere-brainfuck/src/brainfuck.c -I fabianishere-brainfuck/include/ -o "$(TEST_DIR)/fabianishere-brainfuck_$(TEST_SUFFIX)" $(LDFLAGS)
+fabianishere-brainfuck_$(TEST_SUFFIX): fabianishere-brainfuck fabianishere-brainfuck_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) fabianishere-brainfuck_test.c fabianishere-brainfuck/src/brainfuck.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/fabianishere-brainfuck_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -I fabianishere-brainfuck/include/
 
 ########## https://github.com/faragon/libsrt
 
-faragon-libsrt_$(TEST_SUFFIX): faragon-libsrt faragon-libsrt_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) faragon-libsrt_test.c faragon-libsrt/src/*.c  faragon-libsrt/src/saux/*.c -o "$(TEST_DIR)/faragon-libsrt_$(TEST_SUFFIX)" $(LDFLAGS)
+faragon-libsrt_$(TEST_SUFFIX): faragon-libsrt faragon-libsrt_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) faragon-libsrt_test.c faragon-libsrt/src/*.c  faragon-libsrt/src/saux/*.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/faragon-libsrt_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 ########## https://github.com/ferreiradaselva/mathc
 
-ferreiradaselva-mathc_$(TEST_SUFFIX): ferreiradaselva-mathc ferreiradaselva-mathc_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) ferreiradaselva-mathc_test.c ferreiradaselva-mathc/mathc.c -o "$(TEST_DIR)/ferreiradaselva-mathc_$(TEST_SUFFIX)" $(LDFLAGS) -lm
+ferreiradaselva-mathc_$(TEST_SUFFIX): ferreiradaselva-mathc ferreiradaselva-mathc_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) ferreiradaselva-mathc_test.c ferreiradaselva-mathc/mathc.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/ferreiradaselva-mathc_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm
 
 ########## https://github.com/flame/blis
 
 FLAME-BLIS_INC = flame-blis flame-blis/config/generic $(sort $(dir $(wildcard flame-blis/frame/*/))) $(sort $(dir $(wildcard flame-blis/frame/*/*/))) $(sort $(dir $(wildcard flame-blis/frame/*/*/*/)))
 FLAME-BLIS_INC_PARAMS = $(foreach d, $(FLAME-BLIS_INC), -I$d)
 
-flame-blis_$(TEST_SUFFIX): flame-blis flame-blis_test.c $(HARNESS_C)
+flame-blis_$(TEST_SUFFIX): flame-blis flame-blis_test.c $(C_HAYAI_DIR)
 	#(cd flame-blis && ./configure generic)
 	(cd flame-blis && make)
-	$(CC) $(CFLAGS) $(HARNESS_C) flame-blis_test.c -o "$(TEST_DIR)/flame-blis_$(TEST_SUFFIX)" $(LDFLAGS) ${FLAME-BLIS_INC_PARAMS} -lm -lpthread ./flame-blis/lib/generic/libblis.a
+	$(CC) $(CFLAGS) flame-blis_test.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/flame-blis_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) ${FLAME-BLIS_INC_PARAMS} -lm -lpthread ./flame-blis/lib/generic/libblis.a
 
 ########## https://github.com/imneme/pcg-c-basic
 
