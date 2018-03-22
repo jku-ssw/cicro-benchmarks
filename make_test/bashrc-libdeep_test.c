@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "bashrc-libdeep/src/globals.h"
 #include "bashrc-libdeep/src/deeplearn.h"
@@ -11,7 +11,7 @@
 #define TITLE     "Concrete Slump Training"
 #define DATA_FILE "bashrc-libdeep/examples/concreteslump/slump_test.data"
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(libdeep, learn, 10, 1) {
     int no_of_outputs = 4;
     int output_field_index[] = { 7,8,9,10 };
     float error_threshold_percent[] = { 0.6f, 4.5f };
@@ -39,16 +39,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     while (deeplearndata_training(&learner) != 0);
 
     deeplearn_free(&learner);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="bashrc-libdeep",
-        .description="A deep learning library for C/C++",
-        .test_harness=*test_harness,
-        .expected_runtime=3500L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(libdeep, learn); // A deep learning library for C/C++
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

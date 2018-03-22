@@ -7,7 +7,7 @@ int printf(const char * format, ...) {
     return 0;
 }
 
-BENCHMARK(Cranium, train, 10, 10) {
+BENCHMARK(Cranium, train, 100, 10) {
     int i;
     float **data = (float **) malloc(sizeof(float *) * 4);
     for (i = 0; i < 4; i++) {

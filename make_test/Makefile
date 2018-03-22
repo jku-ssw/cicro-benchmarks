@@ -89,18 +89,21 @@ armon-libart_$(TEST_SUFFIX): armon-libart armon-libart_test.c $(C_HAYAI_DIR)
 
 ########## https://github.com/bashrc/libdeep
 
-bashrc-libdeep_$(TEST_SUFFIX): bashrc-libdeep bashrc-libdeep_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) bashrc-libdeep_test.c bashrc-libdeep/src/*.c -o "$(TEST_DIR)/bashrc-libdeep_$(TEST_SUFFIX)" $(LDFLAGS) -lm
+bashrc-libdeep_$(TEST_SUFFIX): bashrc-libdeep bashrc-libdeep_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) bashrc-libdeep_test.c bashrc-libdeep/src/*.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/bashrc-libdeep_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm
 
 ########## https://github.com/camgunz/cmp
 
-camgunz-cmp_$(TEST_SUFFIX): camgunz-cmp camgunz-cmp_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) camgunz-cmp_test.c camgunz-cmp/cmp.c -o "$(TEST_DIR)/camgunz-cmp_$(TEST_SUFFIX)" $(LDFLAGS)
+camgunz-cmp_$(TEST_SUFFIX): camgunz-cmp camgunz-cmp_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) camgunz-cmp_test.c camgunz-cmp/cmp.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/camgunz-cmp_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 ########## https://github.com/chokkan/liblbfgs
 
-chokkan-liblbfgs_$(TEST_SUFFIX): chokkan-liblbfgs chokkan-liblbfgs_test.c $(HARNESS_C)
-	$(CC) $(CFLAGS) $(HARNESS_C) chokkan-liblbfgs_test.c chokkan-liblbfgs/lib/lbfgs.c -o "$(TEST_DIR)/chokkan-liblbfgs_$(TEST_SUFFIX)" $(LDFLAGS) -lm -I chokkan-liblbfgs/include/
+chokkan-liblbfgs_$(TEST_SUFFIX): chokkan-liblbfgs chokkan-liblbfgs_test.c $(C_HAYAI_DIR)
+	$(CC) $(CFLAGS) chokkan-liblbfgs_test.c chokkan-liblbfgs/lib/lbfgs.c $(C_HAYAI_CFLAGS) \
+	 -o "$(TEST_DIR)/chokkan-liblbfgs_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm -I chokkan-liblbfgs/include/
 
 ########## https://github.com/chrismoos/hash-ring
 

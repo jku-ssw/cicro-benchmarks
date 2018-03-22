@@ -126,7 +126,7 @@ static double do_benchmark(_test_harness test_harness, int min_iterations, doubl
 }
 
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
-    struct arguments *arguments = state->input;
+    struct arguments *arguments = (struct arguments *) state->input;
     switch (key) {
         case 'w':
             return read_unsigned_int_arg(&(arguments->warmup_it), arg);

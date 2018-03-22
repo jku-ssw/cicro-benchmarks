@@ -1,10 +1,10 @@
 #include <stdio.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "lbfgs.h"
 
-#define N 100000
+#define N 10000
 
 static lbfgsfloatval_t evaluate(
         void *instance,
@@ -27,13 +27,12 @@ static lbfgsfloatval_t evaluate(
     return fx;
 }
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(liblbfgs, evaluate, 10, 10) {
     int i, ret = 0;
     lbfgsfloatval_t fx;
     lbfgsfloatval_t *x = lbfgs_malloc(N);
     lbfgs_parameter_t param;
 
-    for(i = 0; i < 1000; i++) {
         /* Initialize the variables. */
         for (i = 0;i < N;i += 2) {
             x[i] = -1.2;
@@ -44,19 +43,15 @@ int __attribute__ ((noinline)) test_harness(void) {
 
 
         lbfgs(N, x, &fx, evaluate, NULL, NULL, &param);
-    }
 
     lbfgs_free(x);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="chokkan-liblbfgs",
-        .description="library of Limited-memory Broyden-Fletcher-Goldfarb-Shanno",
-        .test_harness=*test_harness,
-        .expected_runtime=440L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(liblbfgs, evaluate); // library of Limited-memory Broyden-Fletcher-Goldfarb-Shanno
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

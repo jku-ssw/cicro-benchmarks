@@ -12,7 +12,7 @@ static const char program[] = "\
 60 end                  \n\
 110 return              \n";
 
-BENCHMARK(ubasic, run, 10, 100) {
+BENCHMARK(ubasic, run, 100, 100) {
     ubasic_init(program);
 
     do {
