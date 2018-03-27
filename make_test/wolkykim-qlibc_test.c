@@ -2,11 +2,11 @@
 
 #include "wolkykim-qlibc/include/qlibc/qlibc.h"
 
-BENCHMARK(wolkykim, qlibc, 10, 100) {
+BENCHMARK(wolkykim, qlibc, 100, 10) {
     qhashtbl_t *tbl = qhashtbl(0, 0);
 
     int i;
-    for (i = 0; i < 100; i++) {
+    for (i = 0; i < 10000; i++) {
         char *key = qstrdupf("key%d%s", i, "foo");
         char *value = qstrdupf("value%d%s", i, "1a087a6982371bbfc9d4e14ae76e05ddd784a5d9c6b0fc9e6cd715baab66b90987b2ee054764e58fc04e449dfa060a68398601b64cf470cb6f0a260ec6539866");
 

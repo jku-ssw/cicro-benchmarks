@@ -82,7 +82,7 @@ buffer_fill(void *buf, size_t z)
     return p;
 }
 
-BENCHMARK(skeeto, branchless_utf8, 10, 100) {
+BENCHMARK(skeeto, branchless_utf8, 100, 1) {
     size_t z = BUFLEN * 1024L * 1024;
     unsigned char *buffer = malloc(z);
     unsigned char *end = buffer_fill(buffer, z - 4);

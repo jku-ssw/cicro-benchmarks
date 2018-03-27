@@ -5,10 +5,10 @@
 
 #include "jtsiomb-kdtree/kdtree.h"
 
-BENCHMARK(jtsiomb, kdtree, 10, 100) {
+BENCHMARK(jtsiomb, kdtree, 100, 1) {
     void *kd = kd_create(3);
 
-    for(int i=0; i<100; i++) {
+    for(int i=0; i<10000; i++) {
         float x, y, z;
         x = (i*479)%487;
         y = (i*433)%439;
@@ -17,7 +17,7 @@ BENCHMARK(jtsiomb, kdtree, 10, 100) {
         kd_insert3(kd, x, y, z, 0);
     }
 
-    for(int i=0; i<20; i+= 10) {
+    for(int i=0; i<20000; i+= 10) {
         float x, y, z;
         x = (i * 479) % 487 + (i % 11);
         y = (i * 433) % 439 - (i % 7);

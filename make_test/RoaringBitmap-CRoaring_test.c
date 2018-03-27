@@ -4,9 +4,9 @@
 
 #include "RoaringBitmap-CRoaring/include/roaring/roaring.h"
 
-#define NUMEL 1000
+#define NUMEL 1000*10
 
-BENCHMARK(RoaringBitmap, CRoaring, 10, 100) {
+BENCHMARK(RoaringBitmap, CRoaring, 100, 10) {
     uint32_t arr1[NUMEL] = {0};
     uint32_t arr2[NUMEL] = {0};
 

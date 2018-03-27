@@ -5,7 +5,7 @@
 
 #include "ferreiradaselva-mathc/mathc.h"
 
-BENCHMARK(ferreiradaselva, mathc, 100, 100) {
+BENCHMARK(ferreiradaselva, mathc, 100, 10) {
 
     /* Pass by value and return a value */
     struct mat mat1 = matrix_identity(), mat2 = matrix_zero();

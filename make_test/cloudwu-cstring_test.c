@@ -9,17 +9,16 @@
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
 
-BENCHMARK(cloudwu, cstring, 100, 10) {
+BENCHMARK(cloudwu, cstring, 100, 1) {
     CSTRING_BUFFER(a);
-    //for(int i = 0; i<10; i++) {
-        cstring_printf(a, "%s", LOREM_IPSUM1000);
-    //}
+
+    cstring_printf(a, "%s", LOREM_IPSUM1000);
+
     cstring_printf(a, "very long string %01024d",0);
 
     CSTRING_BUFFER(b);
-    //for(int i = 0; i<10; i++) {
-        cstring_printf(b, "%s", LOREM_IPSUM1000);
-    //}
+
+    cstring_printf(b, "%s", LOREM_IPSUM1000);
     cstring_equal(CSTRING(a), CSTRING(b));
 
     CSTRING_CLOSE(b);

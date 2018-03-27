@@ -16,10 +16,10 @@ static int free_node(BSTreeNode * node)
     return 0;
 }
 
-BENCHMARK(zedshaw, liblcthw, 10, 100) {
+BENCHMARK(zedshaw, liblcthw, 10, 1) {
     BSTree *map = BSTree_create(cmp_node);
 
-    for(int i = 0; i < 100; i++) {
+    for(int i = 0; i < 10000; i++) {
         int *key = malloc(sizeof(int));
         int *value = malloc(sizeof(int));
 

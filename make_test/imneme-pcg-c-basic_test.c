@@ -2,14 +2,14 @@
 
 #include "imneme-pcg-c-basic/pcg_basic.h"
 
-BENCHMARK(imneme, pcg_random, 10, 100) {
+BENCHMARK(imneme, pcg_random, 100, 10) {
     pcg32_random_t rng;
 
     pcg32_srandom_r(&rng, 42u, 54u);
 
     volatile uint32_t r;
 
-    for(int i = 0; i < 5000; i++) {
+    for(int i = 0; i < 50000; i++) {
         r = pcg32_random_r(&rng);
         r = pcg32_random_r(&rng);
         r = pcg32_random_r(&rng);

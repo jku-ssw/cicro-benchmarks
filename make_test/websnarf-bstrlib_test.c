@@ -12,7 +12,7 @@
 
 volatile long sum_length = 0;
 
-BENCHMARK(websnarf, bstrlib, 10, 100) {
+BENCHMARK(websnarf, bstrlib, 10, 1) {
 
     bstring bStr = bfromcstr(LOREM_IPSUM1000);
 

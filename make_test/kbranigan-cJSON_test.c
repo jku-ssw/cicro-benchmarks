@@ -93,7 +93,7 @@ void doit(char *text)
     free(out);
 }
 
-BENCHMARK(kbranigan, cJSON, 10, 100) {
+BENCHMARK(kbranigan, cJSON, 100, 100) {
 
     for(int i = 0; i < 20; i++) {
         doit(text1);

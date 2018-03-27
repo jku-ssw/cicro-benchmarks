@@ -4,9 +4,9 @@
 
 #include "lacker-ikalman/gps.h"
 
-BENCHMARK(lacker, ikalman, 10, 100) {
+BENCHMARK(lacker, ikalman, 100, 1) {
     KalmanFilter f = alloc_filter_velocity2d(1.0);
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 10000; ++i) {
         update_velocity2d(f, i*0.001, i*-0.0001, 1.0);
     }
 

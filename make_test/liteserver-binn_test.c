@@ -12,14 +12,14 @@
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
 
-BENCHMARK(liteserver, binn, 10, 100) {
+BENCHMARK(liteserver, binn, 100, 1) {
     binn *list;
 
     // create a new list
     list = binn_list();
 
     // add values to it
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 100; i++) {
         binn_list_add_int32(list, i);
         binn_list_add_str(list, LOREM_IPSUM1000);
     }

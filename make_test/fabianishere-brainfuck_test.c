@@ -5,10 +5,10 @@
 #include <stdio.h>
 #include <brainfuck.h>
 
-BENCHMARK(fabianishere, brainfuck, 100, 10) {
+BENCHMARK(fabianishere, brainfuck, 100, 1) {
     BrainfuckState *state = brainfuck_state();
     BrainfuckExecutionContext *context = brainfuck_context(BRAINFUCK_TAPE_SIZE);
-    BrainfuckInstruction *instruction = brainfuck_parse_string("+++[->-[->-[->-[-]<]<]<]");
+    BrainfuckInstruction *instruction = brainfuck_parse_string("+[->-[->-[->-[-]<]<]<]");
     brainfuck_add(state, instruction);
     brainfuck_execute(state->root, context);
     brainfuck_destroy_context(context);

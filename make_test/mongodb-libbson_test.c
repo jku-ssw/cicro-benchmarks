@@ -3,13 +3,13 @@
 #include <bson.h>
 #include <bcon.h>
 
-BENCHMARK(mongodb, libbson, 10, 100) {
+BENCHMARK(mongodb, libbson, 100, 10) {
     // From: examples/bcon-speed.c
     int bcon;
     bson_t bson, foo, bar, baz;
     bson_init (&bson);
 
-    for(int i = 0; i < 200; i ++) {
+    for(int i = 0; i < 2000; i ++) {
         BCON_APPEND(&bson,
                     "foo",
                     "{",

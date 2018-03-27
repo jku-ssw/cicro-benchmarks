@@ -22,14 +22,10 @@ PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antir
 		   dbalmain-ferret dcjones-hat-trie dhess-c-ringbuf fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
 		   imneme-pcg-c-basic jtsiomb-kdtree josephg-librope Kazade-kazmath kbranigan-cJSON khovratovich-Argon2 kuba---zip\
 		   kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn lucasb-eyer-heatmap ludocode-mpack mbrossard-threadpool\
-		   mongodb-libbson mrubyc-mrubyc msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman\
+		   mongodb-libbson mrubyc-mrubyc msteinbeck-tinyspline ndevilla-iniparser orangeduck-tgc               paladin-t-my_basic prideout-heman\
 		   quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring rxi-vec skeeto-branchless-utf8 snowballstem-snowball\
 		   swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl veorq-SipHash vmg-crustache wbhart-bsdnt websnarf-bstrlib\
 		   wolkykim-qlibc xamarin-flex yinqiwen-geohash-int yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
-
-# Projects not to build by default
-
-PROJECTS_UNSTABLE = orangeduck-tgc
 
 # Global commands
 

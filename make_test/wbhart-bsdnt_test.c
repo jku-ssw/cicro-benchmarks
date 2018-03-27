@@ -3,7 +3,7 @@
 #include "wbhart-bsdnt/nn.h"
 #include "wbhart-bsdnt/test.h"
 
-BENCHMARK(wbhart, bsdnt, 10, 100) {
+BENCHMARK(wbhart, bsdnt, 100, 1) {
     rand_t state;
     randinit(&state);
     int result = 1;
@@ -13,7 +13,7 @@ BENCHMARK(wbhart, bsdnt, 10, 100) {
    preinv1_t inv;
 
    /* test that a = q * d + r */
-   for(int i = 0; i < 100; i++){
+   for(int i = 0; i < 10000; i++){
       randoms_upto(100, ANY, state, &m, NULL);
 
       randoms_of_len(m, ANY, state, &r1, &a, &q, NULL);

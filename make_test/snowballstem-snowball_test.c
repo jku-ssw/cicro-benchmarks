@@ -6,7 +6,7 @@
 
 #include "snowballstem-snowball/include/libstemmer.h"
 
-BENCHMARK(snowballstem, snowball, 10, 100) {
+BENCHMARK(snowballstem, snowball, 100, 100) {
     struct sb_stemmer * stemmer;
     const char * language = "english";
     const char * charenc = NULL;

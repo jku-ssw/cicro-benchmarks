@@ -12,7 +12,7 @@
 
 volatile uint8_t *str;
 
-BENCHMARK(josephg, librope, 10, 100) {
+BENCHMARK(josephg, librope, 100, 10) {
     rope *r = rope_new();
 
     rope_insert(r, 0, (uint8_t*)LOREM_IPSUM1000);

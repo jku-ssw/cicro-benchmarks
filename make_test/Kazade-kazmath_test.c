@@ -5,7 +5,7 @@
 #include "Kazade-kazmath/kazmath/quaternion.h"
 
 
-BENCHMARK(Kazade, kazmath, 10, 100) {
+BENCHMARK(Kazade, kazmath, 100, 100) {
     for(int i = 0; i < 1000; i++) {
         struct kmVec3 v1;
         kmVec3Fill(&v1, 0, 1, 0);

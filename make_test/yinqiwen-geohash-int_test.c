@@ -2,7 +2,7 @@
 
 #include "yinqiwen-geohash-int/geohash.h"
 
-BENCHMARK(yinqiwen, geohash, 10, 100) {
+BENCHMARK(yinqiwen, geohash, 10, 1) {
     GeoHashBits hash, fast_hash;
 
     GeoHashRange lat_range, lon_range;

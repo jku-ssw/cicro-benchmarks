@@ -4,14 +4,14 @@
 
 #include "zhemao-libds/vector.h"
 
-BENCHMARK(zhemao, libds, 10, 100) {
+BENCHMARK(zhemao, libds, 100, 1) {
     vector_p vec = create_vector();
     vector_p subvec;
     int x;
     char *str = "hello, world";
     char *str2 = "goodbye, world";
 
-    for (x = 0; x < 1024; x++) {
+    for (x = 0; x < 1024*1024; x++) {
         vector_add(vec, (void *) str, strlen(str) + 1);
     }
 

@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include "blis.h"
 
-BENCHMARK(flame, blis, 100, 10) {
+BENCHMARK(flame, blis, 10, 1) {
     // based on test/test_hemm.c
     obj_t a, b, c;
     obj_t c_save;

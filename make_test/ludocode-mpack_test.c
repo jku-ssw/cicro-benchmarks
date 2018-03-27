@@ -7,12 +7,12 @@
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
 
-BENCHMARK(ludocode, mpack, 10, 100) {
+BENCHMARK(ludocode, mpack, 100, 10) {
     char buf[4096];
     mpack_writer_t writer;
     mpack_writer_init(&writer, buf, sizeof(buf));
 
-    for(int i=0; i < 4000; i++) {
+    for(int i=0; i < 40000; i++) {
         mpack_write_uint(&writer, 0x0f);
         mpack_write_float(&writer, 2.718f);
         mpack_write_double(&writer, 3.14159265);

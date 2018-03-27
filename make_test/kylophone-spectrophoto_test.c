@@ -11,7 +11,7 @@
 #define SIZE_X 2048
 #define SIZE_Y 2048
 
-BENCHMARK(kylophone, spectrophoto, 10, 10) {
+BENCHMARK(kylophone, spectrophoto, 100, 1) {
     int x, y, n;
     unsigned char *img = stbi_load("kylophone-spectrophoto/face.png", &x, &y, &n, 1);
 
