@@ -7,12 +7,14 @@ import signal
 import sqlite3
 import subprocess
 import time
+import json
 
 DATABASE_FILE = "evaluation.db"
 
 
 def parse_exec_output(stdout):
-    return float(re.findall(r"execution time: ([0-9\.]+)ms", str(stdout))[0])
+    return json.loads(stdout)
+    #return float(re.findall(r"execution time: ([0-9\.]+)ms", str(stdout))[0])
 
 
 def timeout_handling(process):
@@ -24,7 +26,7 @@ def timeout_handling(process):
 
 def run_benchmark(workdir, file):
     time.sleep(1)
-    process = subprocess.Popen(["./{}".format(file)], cwd=workdir, stdout=subprocess.PIPE)
+    process = subprocess.Popen(["./{}".format(file), '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
     stdout, _ = process.communicate(timeout=60)
 
     if process.returncode != 0:
@@ -37,7 +39,7 @@ def run_lli_benchmark(workdir, file):
     process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
     process_bc.wait(timeout=10)
 
-    process = subprocess.Popen(["lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
+    process = subprocess.Popen(["lli",  "{}.bc".format(file), '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
     stdout, _ = process.communicate(timeout=60)
 
     if process.returncode != 0:
@@ -55,7 +57,7 @@ def run_sulong_benchmark(workdir, file):
     process_bc.wait(timeout=10)
 
     time.sleep(1)
-    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_TIMEOUT), "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
+    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_TIMEOUT), "lli",  "{}.bc".format(file), '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
     try:
         stdout, _ = process.communicate(timeout=SULONG_TIMEOUT+5)
     except subprocess.TimeoutExpired:
@@ -72,7 +74,7 @@ def run_sulong_jdk_1000_benchmark(workdir, file):
 
     time.sleep(1)
     process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_1000_TIMEOUT), "--jdk", "jvmci", "--dynamicimports=/compiler",
-                                "lli",  "{}.bc".format(file), "-w=101",
+                                "lli",  "{}.bc".format(file), '--output=json', "-w=101",
                                 "-Dgraal.TruffleCompilationThreshold=10"], cwd=workdir, stdout=subprocess.PIPE)
     try:
         stdout, _ = process.communicate(timeout=SULONG_1000_TIMEOUT+5)
@@ -95,7 +97,7 @@ def run_sulong_jdk_benchmark(workdir, file):
     process_bc.wait(timeout=10)
 
     time.sleep(1)
-    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_TIMEOUT), "--jdk", "jvmci", "--dynamicimports=/compiler", "lli",  "{}.bc".format(file)], cwd=workdir, stdout=subprocess.PIPE)
+    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_TIMEOUT), "--jdk", "jvmci", "--dynamicimports=/compiler", "lli",  "{}.bc".format(file), '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
     try:
         stdout, _ = process.communicate(timeout=SULONG_TIMEOUT+5)
     except subprocess.TimeoutExpired:
@@ -138,18 +140,20 @@ class EvaluationDb(object):
             `NAME`	TEXT NOT NULL,
             `TESTCASE`	INTEGER NOT NULL,
             `EXECUTION_TIME_MS`	REAL NOT NULL,
+            `EXECUTION_SD_MS`	REAL NOT NULL,
             PRIMARY KEY(`NAME`,`TESTCASE`)
         );"""
         self.conn.execute(query)
 
-    def add_entry(self, name, testcase, execution_time):
+    def add_entry(self, name, testcase, execution_time, standard_derivation):
         query = """INSERT INTO EVALUATION_RAW (
             NAME,
             TESTCASE,
-            EXECUTION_TIME_MS
+            EXECUTION_TIME_MS,
+            EXECUTION_SD_MS
             )
 
-            VALUES(?, ?, ?);
+            VALUES(?, ?, ?, ?);
 
         """
 
@@ -166,6 +170,8 @@ class EvaluationDb(object):
             print(e)
 
 
+OUTPUT_FILE = 'compiler_evaluation.json'
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Execute tests for all given compilers with their parameters')
     parser.add_argument('testdir', type=str, help='directory where the tests and the Makefile is contained', action='store')
@@ -177,36 +183,56 @@ if __name__ == "__main__":
         print('"{0}" is not an existing directory!'.format(os.path.realpath(args.testdir)))
         exit(1)
 
-    db = EvaluationDb()
+    if os.path.isfile(OUTPUT_FILE):
+        print('"{0}" already exists!'.format(OUTPUT_FILE))
+        exit(1)
 
-    for compiler in COMPILERS:
-        params = COMPILERS[compiler].get('make', {})
+    #db = EvaluationDb()
 
-        # clean directory
-        process = subprocess.Popen(['make', 'clean'], cwd=args.testdir, stdout=subprocess.DEVNULL)
-        process.communicate()
+    data = {}
 
-        make_params = []
-        for key  in params:
-            make_params.append("{}={}".format(key, params[key]))
+    try:
+        for compiler in COMPILERS:
+            params = COMPILERS[compiler].get('make', {})
 
-        # build all tests
-        process = subprocess.Popen(['make'] + make_params, cwd=args.testdir)
-        process.communicate()
+            # clean directory
+            process = subprocess.Popen(['make', 'clean'], cwd=args.testdir, stdout=subprocess.DEVNULL)
+            process.communicate()
 
-        # execute all tests
-        for testcase in sorted(os.listdir(args.testdir)):
-            if not testcase.endswith("_test"):
-                continue
+            make_params = []
+            for key  in params:
+                make_params.append("{}={}".format(key, params[key]))
 
-            print(" * Run Benchmark for: {}".format(testcase))
-            try:
-                bench_func = COMPILERS[compiler].get('exec', run_benchmark)
-                exec_time = bench_func(args.testdir, testcase)
-                if exec_time is not None:
-                    print("   Finished: {}s".format(exec_time))
-                    db.add_entry(compiler, testcase, exec_time)
-                else:
-                    print("   EXIT CODE != 0")
-            except RuntimeError:
-                print("   FAILED!")
+            # build all tests
+            process = subprocess.Popen(['make'] + make_params, cwd=args.testdir)
+            process.communicate()
+
+            # execute all tests
+            for testcase in sorted(os.listdir(args.testdir)):
+                if not testcase.endswith("_test"):
+                    continue
+
+                print(" * Run Benchmark for: {}".format(testcase))
+                try:
+                    bench_func = COMPILERS[compiler].get('exec', run_benchmark)
+                    exec_output = bench_func(args.testdir, testcase)
+
+                    if testcase not in data:
+                        data[testcase] = {}
+
+                    data[testcase][compiler] = exec_output
+
+
+                    print(exec_output)
+                    #if exec_time is not None:
+                    #    print("   Finished: {}s".format(exec_time))
+                    #    db.add_entry(compiler, testcase, exec_time)
+                    #else:
+                    #    print("   EXIT CODE != 0")
+                except RuntimeError:
+                    print("   FAILED!")
+                except:
+                    print("   OTHER ERROR")  # TODO: trackback
+    finally:
+        with open(OUTPUT_FILE, 'w') as f:
+            f.write(json.dumps(data, indent=2))
