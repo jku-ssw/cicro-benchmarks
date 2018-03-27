@@ -1,4 +1,4 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include "kuba---zip/src/zip.h"
 
@@ -7,7 +7,7 @@
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(kuba, zip, 10, 1) {
     struct zip_t *zip = zip_open("foo.zip", ZIP_DEFAULT_COMPRESSION_LEVEL, 'w');
 
     zip_entry_open(zip, "foo-1.txt");
@@ -23,16 +23,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     zip_entry_close(zip);
 
     zip_close(zip);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="kuba---zip",
-        .description="simple zip library",
-        .test_harness=*test_harness,
-        .expected_runtime=260L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(kuba, zip); // simple zip library
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

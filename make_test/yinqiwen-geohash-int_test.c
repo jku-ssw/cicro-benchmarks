@@ -1,8 +1,8 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include "yinqiwen-geohash-int/geohash.h"
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(yinqiwen, geohash, 10, 100) {
     GeoHashBits hash, fast_hash;
 
     GeoHashRange lat_range, lon_range;
@@ -19,16 +19,13 @@ int __attribute__ ((noinline)) test_harness(void) {
             }
         }
     }
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="yinqiwen-geohash-int",
-        .description="calculate Geohash",
-        .test_harness=*test_harness,
-        .expected_runtime=350L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(yinqiwen, geohash); // calculate Geohash
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

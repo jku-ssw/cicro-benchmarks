@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "Themaister-libfmsynth/include/fmsynth.h"
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(Themaister, libfmsynth, 10, 1) {
     fmsynth_t *fm = fmsynth_new(44100.0f, 64);
 
     for (unsigned i = 0; i < 8; i++)
@@ -32,16 +32,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     }
 
     fmsynth_free(fm);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="Themaister-libfmsynth",
-        .description="FM synthesizer",
-        .test_harness=*test_harness,
-        .expected_runtime=580L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(Themaister, libfmsynth); // FM synthesizer
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

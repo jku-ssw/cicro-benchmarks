@@ -1,4 +1,4 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include "xamarin-flex/flex.h"
 
@@ -9,7 +9,7 @@ static inline struct flex_item* flex_item_with_size(float width, float height) {
     return item;
 }
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(xamarin, flex, 10, 1) {
     // from test_grow8
     struct flex_item *root = flex_item_with_size(100, 100);
 
@@ -33,16 +33,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     }
 
     flex_item_free(root);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="xamarin-flex",
-        .description="flexible box layout system",
-        .test_harness=*test_harness,
-        .expected_runtime=360L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(xamarin, flex); // flexible box layout system
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

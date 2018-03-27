@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "quartzjer-js0n/src/js0n.h"
 
@@ -25,22 +25,19 @@
 "    }                                      "\
 "}                                          "
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(quartzjer, js0n, 100, 100) {
     size_t len;
 
-    for(int i = 0; i < 200000; i++) {
+    for(int i = 0; i < 200; i++) {
         int rc = js0n("blabla", 1, JSON, strlen(JSON), &len);
     }
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="quartzjer-js0n",
-        .description="Zero-Footprint JSON Parser",
-        .test_harness=*test_harness,
-        .expected_runtime=470L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(quartzjer, js0n); // Zero-Footprint JSON Parser
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

@@ -1,9 +1,9 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include "wbhart-bsdnt/nn.h"
 #include "wbhart-bsdnt/test.h"
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(wbhart, bsdnt, 10, 100) {
     rand_t state;
     randinit(&state);
     int result = 1;
@@ -13,7 +13,7 @@ int __attribute__ ((noinline)) test_harness(void) {
    preinv1_t inv;
 
    /* test that a = q * d + r */
-   for(int i = 0; i < 100000; i++){
+   for(int i = 0; i < 100; i++){
       randoms_upto(100, ANY, state, &m, NULL);
 
       randoms_of_len(m, ANY, state, &r1, &a, &q, NULL);
@@ -30,15 +30,13 @@ int __attribute__ ((noinline)) test_harness(void) {
    }
    gc_cleanup(); // Run GC
    randclear(state);
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="wbhart-bsdnt",
-        .description="a bignum library",
-        .test_harness=*test_harness,
-        .expected_runtime=250L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(wbhart, bsdnt); // a bignum library
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

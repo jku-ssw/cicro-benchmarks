@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "mrubyc-mrubyc/src/mrubyc.h"
 
@@ -65,7 +65,7 @@ unsigned char mrubyc_mrubyc_mrb[] = {
 static uint8_t memory_pool[MEMORY_SIZE];
 static struct VM *vm;
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(mrubyc, mrubyc, 10, 1) {
     struct VM *vm;
 
     mrbc_init_alloc(memory_pool, MEMORY_SIZE);
@@ -75,12 +75,12 @@ int __attribute__ ((noinline)) test_harness(void) {
     vm = mrbc_vm_open(NULL);
     if (vm == NULL) {
         printf("VM open Error\n");
-        return 1;
+        abort();
     }
 
     if (mrbc_load_mrb(vm, mrubyc_mrubyc_mrb) != 0) {
         fprintf(stderr, "Error: Illegal bytecode.\n");
-        return 1;
+        abort();
     }
 
     mrbc_vm_begin(vm);
@@ -89,17 +89,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     mrbc_vm_close(vm);
 
     mrbc_free_all(vm);
-
-    return 0;
 }
 
-int main(int argc, char *argv[]) {
-    _test_harness harness = {
-            .name="mrubyc-mrubyc",
-            .description="some small mruby implementation",
-            .test_harness=*test_harness,
-            .expected_runtime=240L
-    };
+int main(int argc, char** argv) {
 
-    return _execute_harness(argc, argv, harness);
+    REGISTER_BENCHMARK(mrubyc, mrubyc); // some small mruby implementation
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

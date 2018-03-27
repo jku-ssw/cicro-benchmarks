@@ -1,4 +1,4 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include "richgel999-miniz/miniz.h"
 
@@ -7,7 +7,7 @@
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(richgel999, miniz, 10, 1) {
     size_t cmp_len = 0;
 
     const char *p = LOREM_IPSUM1000;
@@ -17,7 +17,7 @@ int __attribute__ ((noinline)) test_harness(void) {
         void *pComp_data = tdefl_compress_mem_to_heap(p, uncomp_len, &cmp_len, TDEFL_WRITE_ZLIB_HEADER);
         if (!pComp_data) {
             free(pComp_data);
-            return EXIT_FAILURE;
+            abort();
         }
 
         size_t decomp_len = 0;
@@ -27,16 +27,13 @@ int __attribute__ ((noinline)) test_harness(void) {
         free(pComp_data);
         free(pDecomp_data);
     }
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="richgel999-miniz",
-        .description="Single C source file zlib-replacement",
-        .test_harness=*test_harness,
-        .expected_runtime=450L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(richgel999, miniz); // Single C source file zlib-replacement
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

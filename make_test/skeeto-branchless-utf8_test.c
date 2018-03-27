@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "skeeto-branchless-utf8/utf8.h"
 
@@ -82,12 +82,12 @@ buffer_fill(void *buf, size_t z)
     return p;
 }
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(skeeto, branchless_utf8, 10, 100) {
     size_t z = BUFLEN * 1024L * 1024;
     unsigned char *buffer = malloc(z);
     unsigned char *end = buffer_fill(buffer, z - 4);
 
-    for(int i= 0; i < 1000000; i++) {
+    for(int i= 0; i < 1000; i++) {
         unsigned char *p = buffer;
         int e = 0;
         uint32_t c;
@@ -95,16 +95,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     }
 
     free(buffer);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="skeeto-branchless-utf8",
-        .description="Branchless UTF-8 decoder",
-        .test_harness=*test_harness,
-        .expected_runtime=670L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(skeeto, branchless_utf8); // Branchless UTF-8 decoder
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

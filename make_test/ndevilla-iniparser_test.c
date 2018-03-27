@@ -1,4 +1,4 @@
-#include "harness.h"
+#include "chayai.h"
 
 /* We need to directly insert the .c file in order to test the */
 /* static functions as well */
@@ -42,7 +42,7 @@ static char *get_dump(dictionary *d)
     return dump_buff;
 }
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(ndevilla, iniparser, 10, 1) {
     int i, j;
     char sec_name[32];
     char key_name[64];
@@ -70,15 +70,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     }
 
     dictionary_del(dic);
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="ndevilla-iniparser",
-        .description="ini file parser",
-        .test_harness=*test_harness,
-        .expected_runtime=580L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(ndevilla, iniparser); // ini file parser
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

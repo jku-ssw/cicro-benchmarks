@@ -1,12 +1,12 @@
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "tinyspline.h"
 
 
 CTRL_POINTS = 500;
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(msteinbeck, tinyspline, 10, 1) {
     tsBSpline spline;
 
     ts_bspline_new(
@@ -34,16 +34,13 @@ int __attribute__ ((noinline)) test_harness(void) {
         ts_deboornet_free(&net);
     }
     ts_bspline_free(&spline);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="msteinbeck-tinyspline",
-        .description="ANSI C library for NURBS, B-Splines, and Bézier curves",
-        .test_harness=*test_harness,
-        .expected_runtime=260L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(msteinbeck, tinyspline); // ANSI C library for NURBS, B-Splines, and Bézier curves
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

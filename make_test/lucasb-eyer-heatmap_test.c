@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "lucasb-eyer-heatmap/heatmap.h"
 
@@ -9,7 +9,7 @@ static const size_t MAPSIZE = 2048;
 static const size_t NPOINTS = 2048;
 static const size_t STAMP = 128;
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(lucasb, heatmap, 10, 1) {
     heatmap_stamp_t *stamp = heatmap_stamp_gen(STAMP);
     heatmap_t *hm = heatmap_new(MAPSIZE, MAPSIZE);
 
@@ -26,16 +26,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     free(imgbuf);
     heatmap_free(hm);
     heatmap_stamp_free(stamp);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="lucasb-eyer-heatmap",
-        .description="High performance C heatmap generation",
-        .test_harness=*test_harness,
-        .expected_runtime=560L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(lucasb, heatmap); // High performance C heatmap generation
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

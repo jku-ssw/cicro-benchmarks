@@ -1,15 +1,15 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include "imneme-pcg-c-basic/pcg_basic.h"
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(imneme, pcg_random, 10, 100) {
     pcg32_random_t rng;
 
     pcg32_srandom_r(&rng, 42u, 54u);
 
     volatile uint32_t r;
 
-    for(int i = 0; i < 5000000; i++) {
+    for(int i = 0; i < 5000; i++) {
         r = pcg32_random_r(&rng);
         r = pcg32_random_r(&rng);
         r = pcg32_random_r(&rng);
@@ -21,16 +21,13 @@ int __attribute__ ((noinline)) test_harness(void) {
         r = pcg32_random_r(&rng);
         r = pcg32_random_r(&rng);
     }
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="imneme-pcg-c-basic",
-        .description="PCG random number generator",
-        .test_harness=*test_harness,
-        .expected_runtime=270L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(imneme, pcg_random); // PCG random number generator
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

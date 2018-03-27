@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 
 #define SORT_NAME sorter
@@ -27,7 +27,7 @@ static void fill(int64_t *arr, const int size) {
     }
 }
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(swenson, sort, 10, 1) {
     int64_t arr[SIZE];
     int64_t dst[SIZE];
     srand48(SEED);
@@ -45,16 +45,13 @@ int __attribute__ ((noinline)) test_harness(void) {
 
         sorter_selection_sort(dst, SIZE);
     }
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="swenson-sort",
-        .description="Sorting routine implementations in \"template\" C",
-        .test_harness=*test_harness,
-        .expected_runtime=510L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(swenson, sort); // Sorting routine implementations in "template" C
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

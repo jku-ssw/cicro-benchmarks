@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "websnarf-bstrlib/bstraux.h"
 #include "websnarf-bstrlib/bstrlib.h"
@@ -12,7 +12,7 @@
 
 volatile long sum_length = 0;
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(websnarf, bstrlib, 10, 100) {
 
     bstring bStr = bfromcstr(LOREM_IPSUM1000);
 
@@ -29,16 +29,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     sum_length += blength(bStr);
 
     bdestroy (bStr);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="websnarf-bstrlib",
-        .description="The Better String Library",
-        .test_harness=*test_harness,
-        .expected_runtime=530L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(websnarf, bstrlib); // The Better String Library
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

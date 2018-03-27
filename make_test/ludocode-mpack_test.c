@@ -1,4 +1,4 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include "mpack/mpack.h"
 
@@ -7,12 +7,12 @@
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(ludocode, mpack, 10, 100) {
     char buf[4096];
     mpack_writer_t writer;
     mpack_writer_init(&writer, buf, sizeof(buf));
 
-    for(int i=0; i < 4000000; i++) {
+    for(int i=0; i < 4000; i++) {
         mpack_write_uint(&writer, 0x0f);
         mpack_write_float(&writer, 2.718f);
         mpack_write_double(&writer, 3.14159265);
@@ -21,16 +21,13 @@ int __attribute__ ((noinline)) test_harness(void) {
         mpack_write_str(&writer, utf8_valid, (uint32_t) sizeof(utf8_valid) - 1);
         mpack_write_str(&writer, LOREM_IPSUM100, (uint32_t) sizeof(LOREM_IPSUM100) - 1);
     }
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="ludocode-mpack",
-        .description="message pack serialisation format",
-        .test_harness=*test_harness,
-        .expected_runtime=340L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(ludocode, mpack); // message pack serialisation format
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

@@ -1,4 +1,4 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include "rxi-vec/src/vec.h"
 
@@ -7,7 +7,7 @@ int intptrcmp(const void *a_, const void *b_) {
     return *a < *b ? -1 : *a > *b;
 }
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(rxi, vec, 10, 100) {
     vec_int_t v;
     vec_init(&v);
 
@@ -30,15 +30,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     }
 
     vec_deinit(&v);
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="rxi-vec",
-        .description="dynamic array implementation",
-        .test_harness=*test_harness,
-        .expected_runtime=580L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(rxi, vec); // dynamic array implementation
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

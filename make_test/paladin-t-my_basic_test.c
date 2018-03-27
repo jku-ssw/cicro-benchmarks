@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "paladin-t-my_basic/core/my_basic.h"
 
@@ -16,7 +16,7 @@
 "   wend                                                \n"\
 "next n                                                 \n"
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(paladin, my_basic, 10, 1) {
     struct mb_interpreter_t* bas = NULL;
 	mb_init();
 	mb_open(&bas);
@@ -24,16 +24,13 @@ int __attribute__ ((noinline)) test_harness(void) {
 	mb_run(bas, true);
 	mb_close(&bas);
 	mb_dispose();
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="paladin-t-my_basic",
-        .description="Lightweight BASIC interpreter",
-        .test_harness=*test_harness,
-        .expected_runtime=450L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+	REGISTER_BENCHMARK(paladin, my_basic); // Lightweight BASIC interpreter
+
+	RUN_BENCHMARKS(argc, argv);
+
+	return 0;
 }

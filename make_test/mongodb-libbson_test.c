@@ -1,15 +1,15 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include <bson.h>
 #include <bcon.h>
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(mongodb, libbson, 10, 100) {
     // From: examples/bcon-speed.c
     int bcon;
     bson_t bson, foo, bar, baz;
     bson_init (&bson);
 
-    for(int i = 0; i < 200000; i ++) {
+    for(int i = 0; i < 200; i ++) {
         BCON_APPEND(&bson,
                     "foo",
                     "{",
@@ -39,16 +39,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     }
 
     bson_destroy (&bson);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="mongodb-libbson",
-        .description="building, parsing, and iterating BSON documents",
-        .test_harness=*test_harness,
-        .expected_runtime=300L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(mongodb, libbson); // building, parsing, and iterating BSON documents
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

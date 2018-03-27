@@ -1,4 +1,4 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include <pthread.h>
 #include "mbrossard-threadpool/src/threadpool.h"
@@ -18,7 +18,7 @@ void dummy_task(void *arg) {
     pthread_mutex_unlock(&lock);
 }
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(mbrossard, threadpool, 10, 1) {
     int i;
 
     pthread_mutex_init(&lock, NULL);
@@ -31,16 +31,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     threadpool_destroy(pool, threadpool_graceful);
 
     pthread_mutex_destroy(&lock);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="mbrossard-threadpool",
-        .description="Simple Thread pool implementation",
-        .test_harness=*test_harness,
-        .expected_runtime=220L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(mbrossard, threadpool); // Simple Thread pool implementation
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

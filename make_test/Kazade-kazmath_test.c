@@ -1,12 +1,12 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include "Kazade-kazmath/kazmath/vec3.h"
 #include "Kazade-kazmath/kazmath/mat4.h"
 #include "Kazade-kazmath/kazmath/quaternion.h"
 
 
-int __attribute__ ((noinline)) test_harness(void) {
-    for(int i = 0; i < 1000000; i++) {
+BENCHMARK(Kazade, kazmath, 10, 100) {
+    for(int i = 0; i < 1000; i++) {
         struct kmVec3 v1;
         kmVec3Fill(&v1, 0, 1, 0);
 
@@ -27,16 +27,13 @@ int __attribute__ ((noinline)) test_harness(void) {
         kmQuaternionRotationAxisAngle(&q, &KM_VEC3_POS_Y, kmDegreesToRadians(90));
         kmMat4RotationAxisAngle(&mat, &KM_VEC3_POS_Y, kmDegreesToRadians(90));
     }
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="Kazade-kazmath",
-        .description="C math library for games",
-        .test_harness=*test_harness,
-        .expected_runtime=340L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(Kazade, kazmath); // C math library for games
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "josephg-librope/rope.h"
 
@@ -12,12 +12,12 @@
 
 volatile uint8_t *str;
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(josephg, librope, 10, 100) {
     rope *r = rope_new();
 
     rope_insert(r, 0, (uint8_t*)LOREM_IPSUM1000);
 
-    for(int i = 0; i < 50000; i++) {
+    for(int i = 0; i < 50; i++) {
         rope_insert(r, 100+139*i+(997*i)%569, (uint8_t*)LOREM_IPSUM); // interleaved insertion of substrings
         rope_del(r, 100+139*i+(997*i)%569+20, (i*139)%137+1);
     }
@@ -27,16 +27,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     free((void*)str);
 
     rope_free(r);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="josephg-librope",
-        .description="rope library for C",
-        .test_harness=*test_harness,
-        .expected_runtime=500L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(josephg, librope); // rope library for C
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

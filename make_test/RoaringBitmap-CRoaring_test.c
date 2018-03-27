@@ -1,12 +1,12 @@
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "RoaringBitmap-CRoaring/include/roaring/roaring.h"
 
-#define NUMEL 1000000
+#define NUMEL 1000
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(RoaringBitmap, CRoaring, 10, 100) {
     uint32_t arr1[NUMEL] = {0};
     uint32_t arr2[NUMEL] = {0};
 
@@ -30,16 +30,13 @@ int __attribute__ ((noinline)) test_harness(void) {
 
     roaring_bitmap_free(bitmap2);
     roaring_bitmap_free(bitmap1);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="RoaringBitmap-CRoaring",
-        .description="Roaring bitmaps in C",
-        .test_harness=*test_harness,
-        .expected_runtime=430L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(RoaringBitmap, CRoaring); // Roaring bitmaps in C
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

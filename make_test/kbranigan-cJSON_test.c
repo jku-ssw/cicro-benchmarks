@@ -1,4 +1,4 @@
-#include "harness.h"
+#include "chayai.h"
 
 #include "kbranigan-cJSON/cJSON.h"
 
@@ -93,9 +93,9 @@ void doit(char *text)
     free(out);
 }
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(kbranigan, cJSON, 10, 100) {
 
-    for(int i = 0; i < 20000; i++) {
+    for(int i = 0; i < 20; i++) {
         doit(text1);
         doit(text2);
         doit(text3);
@@ -103,16 +103,13 @@ int __attribute__ ((noinline)) test_harness(void) {
         doit(text5);
         doit(text6);
     }
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="kbranigan-cJSON",
-        .description="Ultralightweight JSON parser",
-        .test_harness=*test_harness,
-        .expected_runtime=440L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(kbranigan, cJSON); // Ultralightweight JSON parser
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

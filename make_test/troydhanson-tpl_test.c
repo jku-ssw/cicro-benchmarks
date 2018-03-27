@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "troydhanson-tpl/src/tpl.h"
 
@@ -11,7 +11,7 @@
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(troydhanson, tpl, 10, 1) {
     tpl_node *tn, *tnl;
     int id;
     char *name, *names[] = { LOREM_IPSUM, "LOREM_IPSUM10", "LOREM_IPSUM1000" };
@@ -41,16 +41,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     free(addr);
     tpl_free(tnl);
     tpl_free(tn);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="troydhanson-tpl",
-        .description=" small binary serialization library",
-        .test_harness=*test_harness,
-        .expected_runtime=410L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(troydhanson, tpl); // small binary serialization library
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "vmg-crustache/src/crustache.h"
 
@@ -48,8 +48,7 @@ int crustache_partial(crustache_template **partial, const char *partial_name, si
 }
 
 
-int __attribute__ ((noinline)) test_harness(void) {
-
+BENCHMARK(vmg, crustache, 10, 1) {
     crustache_template* templt;
     crustache_api api = {
             crustache_context_find,
@@ -76,16 +75,13 @@ int __attribute__ ((noinline)) test_harness(void) {
     printf("%d \n", buf.size);
 
     crustache_free(templt);
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="vmg-crustache",
-        .description="", // TODO: missing
-        .test_harness=*test_harness,
-        .expected_runtime=0L // TODO: missing (ms)
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(vmg, crustache);
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

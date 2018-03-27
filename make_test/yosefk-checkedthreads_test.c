@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "yosefk-checkedthreads/include/checkedthreads.h"
 
@@ -13,23 +13,20 @@ void index_callback(int index, void* context) {
     array[index] += index*SCALE;
 }
 
-int __attribute__ ((noinline)) test_harness(void) {
+BENCHMARK(yosefk, checkedthreads, 10, 1) {
     int array[N]={0};
 
     ct_init(0);
     ct_for(N, index_callback, array, 0);
 
     ct_fini();
-
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="yosefk-checkedthreads",
-        .description="automated load balancing",
-        .test_harness=*test_harness,
-        .expected_runtime=380L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(yosefk, checkedthreads); // automated load balancing
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }

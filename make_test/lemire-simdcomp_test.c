@@ -1,11 +1,10 @@
 #include <stdlib.h>
 
-#include "harness.h"
+#include "chayai.h"
 
 #include "simdcomp.h"
 
-int __attribute__ ((noinline)) test_harness(void) {
-
+BENCHMARK(lemire, simdcomp, 10, 1) {
     int bit;
     size_t i;
     size_t length;
@@ -27,14 +26,14 @@ int __attribute__ ((noinline)) test_harness(void) {
             bb = simdpack_shortlength(data, length, (__m128i *) buffer,
                                       bit);
             if((bb - (__m128i *) buffer) * sizeof(__m128i) != (unsigned) simdpack_compressedbytes(length,bit)) {
-                return -1;
+                return;
             }
             simdunpack_shortlength((__m128i *) buffer, length,
                                    backdata, bit);
             for (i = 0; i < length; ++i) {
 
                 if (data[i] != backdata[i]) {
-                    return -1;
+                    return;
                 }
             }
         }
@@ -42,15 +41,13 @@ int __attribute__ ((noinline)) test_harness(void) {
         free(backdata);
         free(buffer);
     }
-    return 0;
 }
 
-int main(int argc, char* argv[]) {
-    _test_harness harness = {
-        .name="lemire-simdcomp",
-        .description="compressing lists of integers",
-        .test_harness=*test_harness,
-        .expected_runtime=600L
-    };
-    return _execute_harness(argc, argv, harness);
+int main(int argc, char** argv) {
+
+    REGISTER_BENCHMARK(lemire, simdcomp); // compressing lists of integers
+
+    RUN_BENCHMARKS(argc, argv);
+
+    return 0;
 }
