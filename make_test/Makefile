@@ -11,8 +11,6 @@ LDFLAGS =
 TEST_SUFFIX = test
 TEST_DIR = .
 
-HARNESS_C = harness.c
-
 C_HAYAI_DIR = ../C-Hayai/src
 C_HAYAI_LDFLAGS = -I $(C_HAYAI_DIR) -lm
 C_HAYAI_CFLAGS = $(C_HAYAI_DIR)/libchayai.a
