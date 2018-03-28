@@ -63,7 +63,7 @@ def barplot(ax, dpoints):
     width = (1 - space) / (len(conditions))
 
     # Create a set of bars at each position
-    for i,cond in enumerate(conditions):
+    for i,cond in enumerate(sorted(conditions)):
         indeces = range(1, len(categories)+1)
         vals = dpoints[dpoints[:,0] == cond][:,2].astype(np.float)
         errors = dpoints[dpoints[:,0] == cond][:,3].astype(np.float)
