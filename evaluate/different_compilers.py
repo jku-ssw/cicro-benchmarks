@@ -121,11 +121,12 @@ def run_sulong_jdk_benchmark(workdir, file):
 COMPILERS = {
     #"gcc" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "", "LDFLAGS": ""}},
     #"clang" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
-    "gcc-O3" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "-O3", "LDFLAGS": ""}},
-    "clang-O3" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-O3", "LDFLAGS": ""}},
+    #"gcc-O3" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "-O3", "LDFLAGS": ""}},
+    #"clang-O3" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-O3", "LDFLAGS": ""}},
     #"lli" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_lli_benchmark},
     #"sulong" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_benchmark},
     #"sulong-jdk" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
+    "sulong-jdk-O3" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-O3", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
 }
 
 class EvaluationDb(object):
