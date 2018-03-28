@@ -23,7 +23,7 @@ def parse_file(path):
                 if name not in ret:
                     ret[name] = {}
                 
-                ret[name][compiler] = benchmark['mean']
+                ret[name][compiler] = benchmark
 
     return ret
 
@@ -41,14 +41,14 @@ if __name__ == "__main__":
                 y[compiler] = []
 
     for key, value in sorted(bench_results.items()):
-        normalize_val = value.get('clang')
+        normalize_val = value.get('clang', {}).get('mean')
         if normalize_val is None:
             print('ignore  benchmark!!!')
-            continue # Ignore benchmark
+            continue  # Ignore benchmark
 
         x.append(key.replace('_test', ''))
         for compiler in y:
-            y[compiler].append(value.get(compiler, 0) / normalize_val)
+            y[compiler].append(value.get(compiler, {}).get('mean', 0) / normalize_val)
 
     ind = np.arange(len(x))
     width = 0.90/len(y)  # the width of the bars
@@ -59,8 +59,6 @@ if __name__ == "__main__":
     for compiler in y:
         rects[compiler] = ax.bar(ind + i*width, y[compiler], width) # , color='r'
         i += 1
-
-    ax.legend((0, 0), ('Men', 'Women'))
 
     ax.set_xticks(ind + width * (len(y)-1) / 2)
     ax.set_xticklabels(x, rotation=45, ha='right')

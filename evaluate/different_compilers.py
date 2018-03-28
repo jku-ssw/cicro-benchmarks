@@ -121,9 +121,11 @@ def run_sulong_jdk_benchmark(workdir, file):
 COMPILERS = {
     #"gcc" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "", "LDFLAGS": ""}},
     #"clang" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
+    "gcc-O3" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "-O3", "LDFLAGS": ""}},
+    "clang-O3" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-O3", "LDFLAGS": ""}},
     #"lli" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_lli_benchmark},
     #"sulong" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_benchmark},
-    "sulong-jdk" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
+    #"sulong-jdk" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
 }
 
 class EvaluationDb(object):
@@ -187,7 +189,7 @@ if __name__ == "__main__":
 
     if os.path.isfile(OUTPUT_FILE):
         print('"{0}" already exists!'.format(OUTPUT_FILE))
-        with open(path) as f:
+        with open(OUTPUT_FILE) as f:
             data = json.load(f)
 
     try:

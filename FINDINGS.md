@@ -274,7 +274,7 @@ cp build/test/t-nn_linear.bc ../../../java-llvm-ir-builder-dev/sulong/t-nn_linea
 
 Similar bug found as for: swenston/sort
 
-Bugreport: https://github.com/graalvm/sulong/issues/824
+Reported: [](https://github.com/graalvm/sulong/issues/824)
 
 
 # antirez/otree (2017.30.11)
