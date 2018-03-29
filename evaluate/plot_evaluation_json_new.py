@@ -88,6 +88,32 @@ def barplot(ax, dpoints):
     fig.subplots_adjust(bottom=0.20)
 
 
+def print_metrics(dpoints):
+    compilers = {}
+
+    for p in dpoints:
+        compiler, name, mean, std_dev = p
+
+        if compiler not in compilers:
+            compilers[compiler] = {'mean': [], 'std_dev': []}
+
+        if mean:
+            compilers[compiler]['mean'].append(mean)
+        if std_dev:
+            compilers[compiler]['std_dev'].append(std_dev)
+
+    print(" |----------------------||--------|---------|---------|")
+    print(" | {:<20} || {:<6} | {:<7} | {:<7} |".format('benchmark', 'points', 'runtime', 'std_dev'))
+    print(" |----------------------||--------|---------|---------|")
+    for compiler in sorted(compilers):
+        mean = compilers[compiler]['mean']
+        std_dev = compilers[compiler]['std_dev']
+        assert len(mean) == len(std_dev)
+
+        print(" | {:<20} || {:<6} | {:<7.5f} | {:<7.5f} |".format(compiler, len(mean), sum(mean) / len(mean), sum(std_dev) / len(std_dev)))
+    print(" |----------------------||--------|---------|---------|")
+
+
 if __name__ == "__main__":
     bench_results = parse_file(OUTPUT_FILE)
 
@@ -119,5 +145,7 @@ if __name__ == "__main__":
     ax = fig.add_subplot(111)
 
     barplot(ax, dpoints)
+
+    print_metrics(dpoints)
 
     plt.show()
