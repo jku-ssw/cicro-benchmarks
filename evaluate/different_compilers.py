@@ -72,8 +72,15 @@ def run_sulong_benchmark(workdir, file):
 
 
 def run_sulong_jdk_1000_benchmark(workdir, file):
-    process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
-    process_bc.wait(timeout=10)
+    normal_exec_time = run_sulong_jdk_benchmark(workdir, file)
+
+    if not normal_exec_time:
+        return None
+
+    print("    start full evalulation")
+
+    #process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
+    #process_bc.wait(timeout=10)
 
     time.sleep(1)
     process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_1000_TIMEOUT), "--jdk", "jvmci", "--dynamicimports=/compiler",
@@ -89,8 +96,9 @@ def run_sulong_jdk_1000_benchmark(workdir, file):
     if process.returncode != 0:
         return None
 
-    fast_exec_time = parse_exec_output(stdout)
-    print("    full evalulation finished: {}s".format(fast_exec_time))
+    print("    full evalulation finished")
+
+    return parse_exec_output(stdout)
 
 
 def run_sulong_jdk_benchmark(workdir, file):
@@ -98,7 +106,8 @@ def run_sulong_jdk_benchmark(workdir, file):
     process_bc.wait(timeout=10)
 
     time.sleep(1)
-    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_TIMEOUT), "--jdk", "jvmci", "--dynamicimports=/compiler", "lli",  "{}.bc".format(file), '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
+    process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_TIMEOUT), "--jdk", "jvmci", "--dynamicimports=/compiler",
+                                "lli",  "{}.bc".format(file), '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
     try:
         stdout, _ = process.communicate(timeout=SULONG_TIMEOUT+5)
     except subprocess.TimeoutExpired:
@@ -109,14 +118,7 @@ def run_sulong_jdk_benchmark(workdir, file):
     if process.returncode != 0:
         return None
 
-    normal_exec_time = parse_exec_output(stdout)
-
-    try:
-        run_sulong_jdk_1000_benchmark(workdir, file)
-    except:
-        pass
-
-    return normal_exec_time
+    return parse_exec_output(stdout)
 
 
 COMPILERS = {
@@ -155,8 +157,8 @@ if __name__ == "__main__":
             params = COMPILERS[compiler].get('make', {})
 
             # clean directory
-            process = subprocess.Popen(['make', 'clean'], cwd=args.testdir, stdout=subprocess.DEVNULL)
-            process.communicate()
+            #process = subprocess.Popen(['make', 'clean'], cwd=args.testdir, stdout=subprocess.DEVNULL)
+            #process.communicate()
 
             make_params = []
             for key  in params:
