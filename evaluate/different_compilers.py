@@ -6,10 +6,12 @@ import re
 import signal
 import sqlite3
 import subprocess
+import sys
 import time
+import traceback
 import json
 
-DATABASE_FILE = "evaluation.db"
+OUTPUT_FILE = 'compiler_evaluation.json'
 
 
 def parse_exec_output(stdout):
@@ -70,11 +72,12 @@ def run_sulong_benchmark(workdir, file):
 
 
 def run_sulong_jdk_1000_benchmark(workdir, file):
-    print("    ...run test with full compilation")
+    process_bc = subprocess.Popen(["extract-bc", file], cwd=workdir)
+    process_bc.wait(timeout=10)
 
     time.sleep(1)
     process = subprocess.Popen(["mx", "-p", SULONG_EXEC_DIR, "--timeout={}".format(SULONG_1000_TIMEOUT), "--jdk", "jvmci", "--dynamicimports=/compiler",
-                                "lli",  "{}.bc".format(file), '--output=json', "-w=101",
+                                "lli",  "{}.bc".format(file), '--output=json', "--warmup=101",
                                 "-Dgraal.TruffleCompilationThreshold=10"], cwd=workdir, stdout=subprocess.PIPE)
     try:
         stdout, _ = process.communicate(timeout=SULONG_1000_TIMEOUT+5)
@@ -88,8 +91,6 @@ def run_sulong_jdk_1000_benchmark(workdir, file):
 
     fast_exec_time = parse_exec_output(stdout)
     print("    full evalulation finished: {}s".format(fast_exec_time))
-
-    db.add_entry("{}-100".format(compiler), testcase, fast_exec_time)
 
 
 def run_sulong_jdk_benchmark(workdir, file):
@@ -126,54 +127,10 @@ COMPILERS = {
     #"lli" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_lli_benchmark},
     #"sulong" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_benchmark},
     #"sulong-jdk" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
-    "sulong-jdk-O3" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-O3", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
+    #"sulong-jdk-O3" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-O3", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
+    "sulong-jdk-1000-O3" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-O3", "LDFLAGS": ""}, "exec": run_sulong_jdk_1000_benchmark},
 }
 
-class EvaluationDb(object):
-    def __init__(self):
-        self.conn = sqlite3.connect(DATABASE_FILE)
-        self.conn.execute("PRAGMA journal_mode=WAL")
-
-        self.create_tables()
-
-        self.c = self.conn.cursor()
-
-    def create_tables(self):
-        query = """CREATE TABLE IF NOT EXISTS`EVALUATION_RAW` (
-            `NAME`	TEXT NOT NULL,
-            `TESTCASE`	INTEGER NOT NULL,
-            `EXECUTION_TIME_MS`	REAL NOT NULL,
-            `EXECUTION_SD_MS`	REAL NOT NULL,
-            PRIMARY KEY(`NAME`,`TESTCASE`)
-        );"""
-        self.conn.execute(query)
-
-    def add_entry(self, name, testcase, execution_time, standard_derivation):
-        query = """INSERT INTO EVALUATION_RAW (
-            NAME,
-            TESTCASE,
-            EXECUTION_TIME_MS,
-            EXECUTION_SD_MS
-            )
-
-            VALUES(?, ?, ?, ?);
-
-        """
-
-        tupel = (
-            name,
-            testcase,
-            execution_time
-        )
-
-        try:
-            self.c.execute(query, tupel)
-            self.conn.commit()
-        except sqlite3.Error as e:
-            print(e)
-
-
-OUTPUT_FILE = 'compiler_evaluation.json'
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Execute tests for all given compilers with their parameters')
@@ -224,17 +181,13 @@ if __name__ == "__main__":
 
                     data[testcase][compiler] = exec_output
 
-
                     print(exec_output)
-                    #if exec_time is not None:
-                    #    print("   Finished: {}s".format(exec_time))
-                    #    db.add_entry(compiler, testcase, exec_time)
-                    #else:
-                    #    print("   EXIT CODE != 0")
                 except RuntimeError:
                     print("   FAILED!")
+                except (KeyboardInterrupt, SystemExit):
+                    raise
                 except:
-                    print("   OTHER ERROR")  # TODO: trackback
+                    traceback.print_exc(file=sys.stdout)
     finally:
         with open(OUTPUT_FILE, 'w') as f:
             f.write(json.dumps(data, indent=2))
