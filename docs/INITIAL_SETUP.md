@@ -28,7 +28,15 @@ cmake ../benchmark
 make
 ```
 
+lli:
+```
 Problem: cannot execute tests on lli due to __dso_handling not emitted, not implemented intrinsics
+```
+
+sulong:
+```
+Caused by: java.lang.LinkageError: External function @_ZNSt8ios_base4InitC1Ev cannot be found.
+```
 
 ## https://nonius.io/
 
