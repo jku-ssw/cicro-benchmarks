@@ -4,6 +4,7 @@
 #include "chayai.h"
 
 #include "ctz-cifra/src/sha3.h"
+#include "ctz-cifra/src/salsa20.h"
 
 #define LOREM_IPSUM "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
 #define LOREM_IPSUM10 LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM
@@ -30,12 +31,26 @@ BENCHMARK(cifra, sha3_512, 100, 1) {
     cf_hash(&cf_sha3_512, LOREM_IPSUM1000, sizeof(LOREM_IPSUM1000), out_sha3_512);
 }
 
+BENCHMARK(cifra, chacha20, 100, 1) {
+    uint8_t key[32] = {1};
+    uint8_t nonce[8] = {1};
+    uint8_t block[sizeof(LOREM_IPSUM1000)];
+
+    memset(block, 0, 256);
+
+    cf_chacha20_ctx ctx;
+    cf_chacha20_init(&ctx, key, sizeof(key), nonce);
+    cf_chacha20_cipher(&ctx, (const uint8_t *)LOREM_IPSUM1000, block, sizeof(block));
+}
+
 int main(int argc, char** argv) {
 
     REGISTER_BENCHMARK(cifra, sha3_224); // A collection of cryptographic primitives targeted at embedded use
     REGISTER_BENCHMARK(cifra, sha3_256);
     REGISTER_BENCHMARK(cifra, sha3_384);
     REGISTER_BENCHMARK(cifra, sha3_512);
+
+    REGISTER_BENCHMARK(cifra, chacha20);
 
     RUN_BENCHMARKS(argc, argv);
 

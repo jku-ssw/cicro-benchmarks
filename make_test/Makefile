@@ -126,7 +126,7 @@ codeplea-tinyexpr_$(TEST_SUFFIX): codeplea-tinyexpr codeplea-tinyexpr_test.c $(C
 ########## https://github.com/ctz/cifra
 
 ctz-cifra_$(TEST_SUFFIX): ctz-cifra ctz-cifra_test.c $(C_HAYAI_DIR)
-	$(CC) $(CFLAGS) ctz-cifra_test.c ctz-cifra/src/blockwise.c ctz-cifra/src/chash.c ctz-cifra/src/sha3.c $(C_HAYAI_CFLAGS) \
+	$(CC) $(CFLAGS) ctz-cifra_test.c ctz-cifra/src/blockwise.c ctz-cifra/src/chash.c ctz-cifra/src/sha3.c ctz-cifra/src/chacha20.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/ctz-cifra_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -I ctz-cifra/src/ext
 
 ########## https://github.com/dbalmain/ferret
