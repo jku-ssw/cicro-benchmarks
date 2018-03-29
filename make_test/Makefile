@@ -174,9 +174,13 @@ FLAME-BLIS_INC_PARAMS = $(foreach d, $(FLAME-BLIS_INC), -I$d)
 
 flame-blis_$(TEST_SUFFIX): flame-blis flame-blis_test.c $(C_HAYAI_DIR)
 	#(cd flame-blis && ./configure generic)
-	(cd flame-blis && make)
+	(cd ./flame-blis && make -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)')
 	$(CC) $(CFLAGS) flame-blis_test.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/flame-blis_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) ${FLAME-BLIS_INC_PARAMS} -lm -lpthread ./flame-blis/lib/generic/libblis.a
+
+flame-blis_clean:
+	(cd ./flame-blis && make clean)
+	rm -f "$(TEST_DIR)/flame-blis_$(TEST_SUFFIX)"
 
 ########## https://github.com/imneme/pcg-c-basic
 
@@ -385,8 +389,8 @@ vmg-crustache_$(TEST_SUFFIX): vmg-crustache vmg-crustache_test.c $(C_HAYAI_DIR)
 ########## https://github.com/wbhart/bsdnt
 
 wbhart-bsdnt_$(TEST_SUFFIX): wbhart-bsdnt wbhart-bsdnt_test.c $(C_HAYAI_DIR)
-	(cd ./wbhart-bsdnt && ./configure)
-	(cd ./wbhart-bsdnt &&  make AS=$(AS) CC=$(CC) CFLAGS='$(CFLAGS) -fPIC')
+	(cd ./wbhart-bsdnt && ./configure AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)')
+	(cd ./wbhart-bsdnt &&  make -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS) -fPIC' LDFLAGS='$(LDFLAGS)')
 	$(CC) $(CFLAGS) wbhart-bsdnt_test.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm ./wbhart-bsdnt/libbsdnt.a
 
@@ -405,10 +409,16 @@ websnarf-bstrlib_$(TEST_SUFFIX): websnarf-bstrlib websnarf-bstrlib_test.c $(C_HA
 ########## https://github.com/wolkykim/qlibc
 
 wolkykim-qlibc_$(TEST_SUFFIX): wolkykim-qlibc wolkykim-qlibc_test.c $(C_HAYAI_DIR)
-	(cd ./wolkykim-qlibc && ./configure)
-	(cd ./wolkykim-qlibc &&  make)
+	(cd ./wolkykim-qlibc && ./configure  CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)')
+	(cd ./wolkykim-qlibc &&  make -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)')
 	$(CC) $(CFLAGS) wolkykim-qlibc_test.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/wolkykim-qlibc_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lpthread wolkykim-qlibc/lib/libqlibc.a
+
+wolkykim-qlibc_clean:
+ifneq ("$(wildcard ./wbhart-bsdnt/Makefile)","")
+	(cd ./wbhart-bsdnt && make distclean && rm -f Makefile)
+endif
+	rm -f "$(TEST_DIR)/wolkykim-qlibc_$(TEST_SUFFIX)"
 
 ########## https://github.com/xamarin/flex
 
