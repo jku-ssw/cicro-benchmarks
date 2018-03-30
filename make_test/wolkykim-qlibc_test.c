@@ -2,7 +2,7 @@
 
 #include "wolkykim-qlibc/include/qlibc/qlibc.h"
 
-BENCHMARK(wolkykim, qlibc, 100, 10) {
+BENCHMARK(wolkykim_qlibc, hashtbl, 100, 10) {
     qhashtbl_t *tbl = qhashtbl(0, 0);
 
     int i;
@@ -25,9 +25,45 @@ BENCHMARK(wolkykim, qlibc, 100, 10) {
     tbl->free(tbl);
 }
 
+BENCHMARK(wolkykim_qlibc, grow, 100, 10) {
+    qgrow_t *grow = qgrow(0);
+
+    // add elements
+    for(int i = 0; i < 10000; i++) {
+        grow->addstr(grow, "AB");       // no need to supply size
+        grow->addstrf(grow, "%d", 12);  // for formatted string
+        grow->addstr(grow,"CD");
+    }
+
+    char *final = grow->tostring(grow);
+
+    if(final[2] != '1') {
+        abort();
+    }
+
+    free(final);
+    grow->free(grow);
+}
+
+BENCHMARK(wolkykim_qlibc, listtbl, 100, 10) {
+    qlisttbl_t *tbl = qlisttbl(0);
+    char buffer[8];
+
+    for(int i = 0; i < 1000; i++) {
+        snprintf(buffer, sizeof(buffer), "e%d", i*74771 % 1151483);
+        tbl->putstr(tbl, buffer, "object1");
+    }
+
+    tbl->sort(tbl);
+
+    tbl->free(tbl);
+}
+
 int main(int argc, char** argv) {
 
-    REGISTER_BENCHMARK(wolkykim, qlibc); // general purpose C/C++ library
+    REGISTER_BENCHMARK(wolkykim_qlibc, hashtbl); // general purpose C/C++ library
+    REGISTER_BENCHMARK(wolkykim_qlibc, grow);
+    REGISTER_BENCHMARK(wolkykim_qlibc, listtbl);
 
     RUN_BENCHMARKS(argc, argv);
 
