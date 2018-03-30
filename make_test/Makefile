@@ -442,7 +442,8 @@ yosefk-checkedthreads_$(TEST_SUFFIX): yosefk-checkedthreads yosefk-checkedthread
 ########## https://github.com/zedshaw/liblcthw
 
 zedshaw-liblcthw_$(TEST_SUFFIX): zedshaw-liblcthw zedshaw-liblcthw_test.c $(C_HAYAI_DIR)
-	$(CC) $(CFLAGS) zedshaw-liblcthw_test.c zedshaw-liblcthw/src/lcthw/bstree.c zedshaw-liblcthw/src/lcthw/bstrlib.c $(C_HAYAI_CFLAGS) \
+	$(CC) $(CFLAGS) zedshaw-liblcthw_test.c zedshaw-liblcthw/src/lcthw/bstree.c zedshaw-liblcthw/src/lcthw/bstrlib.c \
+	 zedshaw-liblcthw/src/lcthw/hashmap.c zedshaw-liblcthw/src/lcthw/darray.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/zedshaw-liblcthw_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -I zedshaw-liblcthw/src
 
 ########## https://github.com/zhemao/libds
