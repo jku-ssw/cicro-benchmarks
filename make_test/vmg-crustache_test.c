@@ -4,9 +4,7 @@
 
 #include "vmg-crustache/src/crustache.h"
 
-#define TEMPLATE "asdf ASDF\0"
-
-#define TEMPLATE2 "<h1>{{header}}</h1>\n"\
+#define TEMPLATE "<h1>{{header}}</h1>\n"\
 "{{#bug}}\n"\
 "{{/bug}}\n"\
 "\n"\
@@ -24,55 +22,52 @@
 "{{/empty}}"
 
 int crustache_context_find(crustache_var *var, void *context, const char *key, size_t key_size) {
-    fprintf(stderr, "crustache_context_find\n");
-    return 0;
-}
+    if(strncmp("header", key, key_size) == 0
+       || strncmp("name", key, key_size) == 0
+       || strncmp("url", key, key_size) == 0) {
+        var->type = CRUSTACHE_VAR_STR;
+        var->data = key;
+        var->size = key_size;
+    } else {
+        var->type = CRUSTACHE_VAR_CONTEXT;
+        var->data = "";
+    }
 
-int crustache_list_get(crustache_var *var, void *list, size_t i) {
-    fprintf(stderr, "crustache_list_get\n");
-    return 0;
-}
-
-int crustache_lambda(crustache_var *var, void *lambda, const char *raw_template, size_t raw_size) {
-    fprintf(stderr, "crustache_lambda\n");
-    return 0;
-}
-
-void crustache_var_free(crustache_var_t type, void *var) {
-    fprintf(stderr, "crustache_var_free\n");
-}
-
-int crustache_partial(crustache_template **partial, const char *partial_name, size_t name_size) {
-    fprintf(stderr, "crustache_partial\n");
     return 0;
 }
 
 
-BENCHMARK(vmg, crustache, 10, 1) {
+BENCHMARK(vmg, crustache, 100, 10) {
     crustache_template* templt;
     crustache_api api = {
             crustache_context_find,
-            crustache_list_get,
-            crustache_lambda,
-            crustache_var_free,
-            crustache_partial,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
             0
     };
 
-    crustache_new(&templt, &api, TEMPLATE, sizeof(TEMPLATE));
+    int error = crustache_new(&templt, &api, TEMPLATE, sizeof(TEMPLATE));
+    if(error < 0) {
+        abort();
+    }
 
-
-
-    struct buf buf;
-    buf.size = 0;
+    struct buf *buf = bufnew(128);
 
     crustache_var var;
     var.type = CRUSTACHE_VAR_CONTEXT;
     var.size = 0;
 
-    int error = crustache_render(&buf, templt, &var);
-    printf("return code: %d\n", error);
-    printf("%d \n", buf.size);
+
+    for(int i = 0; i < 5000; i++) {
+        error = crustache_render(buf, templt, &var);
+        if(error < 0) {
+            abort();
+        }
+    }
+
+    bufrelease(buf);
 
     crustache_free(templt);
 }
