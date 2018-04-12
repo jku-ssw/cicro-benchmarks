@@ -349,8 +349,13 @@ skeeto-branchless-utf8_$(TEST_SUFFIX): skeeto-branchless-utf8 skeeto-branchless-
 ########## https://github.com/snowballstem/snowball
 
 snowballstem-snowball_$(TEST_SUFFIX): snowballstem-snowball snowballstem-snowball_test.c $(C_HAYAI_DIR)
+	(cd ./snowballstem-snowball && make -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)')
 	$(CC) $(CFLAGS) snowballstem-snowball_test.c snowballstem-snowball/libstemmer.o $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/snowballstem-snowball_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
+
+snowballstem-snowball_clean:
+	(cd ./snowballstem-snowball && make clean)
+	rm -f "$(TEST_DIR)/snowballstem-snowball $(TEST_SUFFIX)"
 
 ########## https://github.com/swenson/sort
 
