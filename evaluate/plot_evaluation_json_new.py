@@ -88,6 +88,50 @@ def barplot(ax, dpoints):
     fig.subplots_adjust(bottom=0.20)
 
 
+def histogram(ax, dpoints, compiler):
+    # Aggregate the conditions and the categories according to their
+    # mean values
+    conditions = [(c, np.mean(dpoints[dpoints[:,0] == c][:,2].astype(float))) 
+                  for c in np.unique(dpoints[:,0])]
+    categories = [(c, np.mean(dpoints[dpoints[:,1] == c][:,2].astype(float))) 
+                  for c in np.unique(dpoints[:,1])]
+
+    # sort the conditions, categories and data so that the bars in
+    # the plot will be ordered by category and condition
+    conditions = [c[0] for c in sorted(conditions, key=o.itemgetter(1))]
+    categories = [c[0] for c in sorted(categories, key=o.itemgetter(1))]
+
+    dpoints = np.array(sorted(dpoints, key=lambda x: categories.index(x[1])))
+
+    vals = dpoints[dpoints[:, 0] == compiler][:, 2].astype(np.float)
+    vals = list(filter(None, vals))  # filter elements which are zero
+    plt.hist(vals, bins=6, density=True, weights=vals)  # weights=np.zeros_like(vals) + 1. / vals.size
+
+    ax.set_ylabel(compiler)
+
+
+def boxplot(ax, dpoints, compiler):
+    # Aggregate the conditions and the categories according to their
+    # mean values
+    conditions = [(c, np.mean(dpoints[dpoints[:,0] == c][:,2].astype(float))) 
+                  for c in np.unique(dpoints[:,0])]
+    categories = [(c, np.mean(dpoints[dpoints[:,1] == c][:,2].astype(float))) 
+                  for c in np.unique(dpoints[:,1])]
+
+    # sort the conditions, categories and data so that the bars in
+    # the plot will be ordered by category and condition
+    conditions = [c[0] for c in sorted(conditions, key=o.itemgetter(1))]
+    categories = [c[0] for c in sorted(categories, key=o.itemgetter(1))]
+
+    dpoints = np.array(sorted(dpoints, key=lambda x: categories.index(x[1])))
+
+    vals = dpoints[dpoints[:, 0] == compiler][:, 2].astype(np.float)
+    vals = list(filter(None, vals))  # filter elements which are zero
+    ax.boxplot(vals, vert=False, notch=1)
+    
+    ax.set_ylabel(compiler)
+
+
 def print_metrics(dpoints):
     compilers = {}
 
@@ -141,11 +185,30 @@ if __name__ == "__main__":
 
     dpoints = np.array(dpoints_raw)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
+    #fig = plt.figure()
+    #ax = fig.add_subplot(111)
 
-    barplot(ax, dpoints)
+    #barplot(ax, dpoints)
 
     print_metrics(dpoints)
 
+    #plt.show()
+
+    fig = plt.figure()
+    i = 0
+    ax = None
+    for compiler in sorted(compilers):
+        i += 1
+        ax = fig.add_subplot(len(compilers)*100 + 10 + i, sharex=ax)
+        histogram(ax, dpoints, compiler)
     plt.show()
+
+    fig = plt.figure()
+    i = 0
+    ax = None
+    for compiler in sorted(compilers):
+        i += 1
+        ax = fig.add_subplot(len(compilers)*100 + 10 + i, sharex=ax, sharey=ax)
+        boxplot(ax, dpoints, compiler)
+    plt.show()
+
