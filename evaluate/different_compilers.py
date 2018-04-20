@@ -124,10 +124,12 @@ def run_sulong_jdk_benchmark(workdir, file):
 COMPILERS = {
     #"gcc" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "", "LDFLAGS": ""}},
     #"clang" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
+    "clang-3" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}}, # for verification purpose of repeatability
+    #"tcc" : {"make": {"CC": "tcc", "AS": "tcc", "CFLAGS": "", "LDFLAGS": ""}},
     #"gcc-O3" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "-O3", "LDFLAGS": ""}},
     #"clang-O3" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-O3", "LDFLAGS": ""}},
     #"lli" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_lli_benchmark},
-    "lli-O3" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-O3", "LDFLAGS": ""}, "exec": run_lli_benchmark},
+    #"lli-O3" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-O3", "LDFLAGS": ""}, "exec": run_lli_benchmark},
     #"sulong" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_benchmark},
     #"sulong-jdk" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
     #"sulong-jdk-O3" : {"make": {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-O3", "LDFLAGS": ""}, "exec": run_sulong_jdk_benchmark},
@@ -158,15 +160,15 @@ if __name__ == "__main__":
             params = COMPILERS[compiler].get('make', {})
 
             # clean directory
-            #process = subprocess.Popen(['make', 'clean'], cwd=args.testdir, stdout=subprocess.DEVNULL)
-            #process.communicate()
+            process = subprocess.Popen(['make', 'clean'], cwd=args.testdir, stdout=subprocess.DEVNULL)
+            process.communicate()
 
             make_params = []
             for key  in params:
                 make_params.append("{}={}".format(key, params[key]))
 
             # build all tests
-            process = subprocess.Popen(['make'] + make_params, cwd=args.testdir)
+            process = subprocess.Popen(['make', '-i'] + make_params, cwd=args.testdir)  # ignore single errors
             process.communicate()
 
             # execute all tests
