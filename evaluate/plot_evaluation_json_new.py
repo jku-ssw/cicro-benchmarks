@@ -110,7 +110,7 @@ def histogram(ax, dpoints, compiler):
     ax.set_ylabel(compiler)
 
 
-def boxplot(ax, dpoints, compiler):
+def boxplot(ax, dpoints):
     # Aggregate the conditions and the categories according to their
     # mean values
     conditions = [(c, np.mean(dpoints[dpoints[:,0] == c][:,2].astype(float))) 
@@ -125,11 +125,17 @@ def boxplot(ax, dpoints, compiler):
 
     dpoints = np.array(sorted(dpoints, key=lambda x: categories.index(x[1])))
 
-    vals = dpoints[dpoints[:, 0] == compiler][:, 2].astype(np.float)
-    vals = list(filter(None, vals))  # filter elements which are zero
-    ax.boxplot(vals, vert=False, notch=1)
-    
-    ax.set_ylabel(compiler)
+    val_arr = []
+    val_labels = []
+
+    # Create a set of bars at each position
+    for i,cond in enumerate(sorted(conditions)):
+        vals = dpoints[dpoints[:, 0] == cond][:, 2].astype(np.float)
+        vals = list(filter(None, vals))  # filter elements which are zero
+        val_arr.append(vals)
+        val_labels.append(cond)
+
+    ax.boxplot(val_arr, vert=False, notch=1, labels=val_labels)
 
 
 def print_metrics(dpoints):
@@ -185,30 +191,24 @@ if __name__ == "__main__":
 
     dpoints = np.array(dpoints_raw)
 
-    #fig = plt.figure()
-    #ax = fig.add_subplot(111)
-
-    #barplot(ax, dpoints)
-
     print_metrics(dpoints)
 
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    barplot(ax, dpoints)
+    plt.show()
+
+    #fig = plt.figure()
+    #i = 0
+    #ax = None
+    #for compiler in sorted(compilers):
+    #    i += 1
+    #    ax = fig.add_subplot(len(compilers)*100 + 10 + i, sharex=ax)
+    #    histogram(ax, dpoints, compiler)
     #plt.show()
 
     fig = plt.figure()
-    i = 0
-    ax = None
-    for compiler in sorted(compilers):
-        i += 1
-        ax = fig.add_subplot(len(compilers)*100 + 10 + i, sharex=ax)
-        histogram(ax, dpoints, compiler)
-    plt.show()
-
-    fig = plt.figure()
-    i = 0
-    ax = None
-    for compiler in sorted(compilers):
-        i += 1
-        ax = fig.add_subplot(len(compilers)*100 + 10 + i, sharex=ax, sharey=ax)
-        boxplot(ax, dpoints, compiler)
+    ax = fig.add_subplot(111)
+    boxplot(ax, dpoints)
     plt.show()
 
