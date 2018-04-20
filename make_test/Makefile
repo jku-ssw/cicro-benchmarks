@@ -51,7 +51,7 @@ exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 
 100-Cranium_$(TEST_SUFFIX): 100-Cranium 100-Cranium_test.c $(C_HAYAI_DIR)
 	$(CC) $(CFLAGS) 100-Cranium_test.c $(C_HAYAI_CFLAGS) \
-	 -o "$(TEST_DIR)/100-Cranium_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm -lbenchmark -lpthread
+	 -o "$(TEST_DIR)/100-Cranium_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm -lpthread
 
 ########## https://github.com/adamdunkels/ubasic
 
