@@ -29,7 +29,7 @@ def timeout_handling(process):
 def run_benchmark(workdir, file):
     time.sleep(1)
     process = subprocess.Popen(["./{}".format(file), '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
-    stdout, _ = process.communicate(timeout=60)
+    stdout, _ = process.communicate(timeout=120)
 
     if process.returncode != 0:
         return None
@@ -42,7 +42,7 @@ def run_lli_benchmark(workdir, file):
     process_bc.wait(timeout=10)
 
     process = subprocess.Popen(["lli",  "{}.bc".format(file), '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
-    stdout, _ = process.communicate(timeout=60)
+    stdout, _ = process.communicate(timeout=120)
 
     if process.returncode != 0:
         return None
@@ -124,7 +124,7 @@ def run_sulong_jdk_benchmark(workdir, file):
 COMPILERS = {
     #"gcc" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "", "LDFLAGS": ""}},
     #"clang" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
-    "clang-3" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}}, # for verification purpose of repeatability
+    "clang-fsanitize=address" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-fsanitize=address", "LDFLAGS": "-fsanitize=address"}},
     #"tcc" : {"make": {"CC": "tcc", "AS": "tcc", "CFLAGS": "", "LDFLAGS": ""}},
     #"gcc-O3" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "-O3", "LDFLAGS": ""}},
     #"clang-O3" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-O3", "LDFLAGS": ""}},
