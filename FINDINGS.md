@@ -418,6 +418,10 @@ Implemented, but way to tight loop at the moment to do good benchmarking
 
 Implemented
 
+Memleaks were found and fixed
+
+Fixed: [](https://github.com/bashrc/libdeep/pull/12)
+
 # https://github.com/haldean/x6502 (2017.19.12)
 
 Dropped: We need an 6502 assembler to build files which can be run

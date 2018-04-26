@@ -14,25 +14,25 @@
 BENCHMARK(libdeep, learn, 10, 1) {
     int no_of_outputs = 4;
     int output_field_index[] = { 7,8,9,10 };
-    float error_threshold_percent[] = { 0.6f, 4.5f };
+    float error_threshold_percent[] = { 10.5f, 10.5f, 10.5f, 40.0f };
     unsigned int random_seed = 123;
 
     deeplearn learner;
     deeplearndata_read_csv(DATA_FILE,
                            &learner,
-                           3*3, 1,
+                           4*4, 3,
                            no_of_outputs,
                            output_field_index, 0,
                            error_threshold_percent,
                            &random_seed);
 
-    /* set learning rate */
-    deeplearn_set_learning_rate(&learner, 10.f);
+    deeplearn_set_learning_rate(&learner, 0.9f);
 
-    /* set percentage of dropouts */
-    deeplearn_set_dropouts(&learner, 1.f);
+    deeplearn_set_pruning(&learner, 10000, 0.9f);
 
-    learner.history.interval = 900000;
+    deeplearn_set_dropouts(&learner, 1.1f);
+
+    learner.history.interval = 500000;
 
     deeplearn_set_title(&learner, TITLE);
 
