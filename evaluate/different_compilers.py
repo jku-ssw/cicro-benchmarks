@@ -29,7 +29,7 @@ def timeout_handling(process):
 def run_benchmark(workdir, file):
     time.sleep(1)
     process = subprocess.Popen(["./{}".format(file), '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
-    stdout, _ = process.communicate(timeout=120)
+    stdout, _ = process.communicate(timeout=240)
 
     if process.returncode != 0:
         return None
@@ -49,6 +49,16 @@ def run_lli_benchmark(workdir, file):
 
     return parse_exec_output(stdout)
 
+
+def run_valgrind_benchmark(workdir, file):
+
+    process = subprocess.Popen(["valgrind", "./{}".format(file), '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
+    stdout, _ = process.communicate(timeout=5*60)
+
+    if process.returncode != 0:
+        return None
+
+    return parse_exec_output(stdout)
 
 SULONG_EXEC_DIR = '/home/thomas/JKU/java-llvm-ir-builder-dev/sulong'
 SULONG_TIMEOUT = 20*10
@@ -123,8 +133,15 @@ def run_sulong_jdk_benchmark(workdir, file):
 
 COMPILERS = {
     #"gcc" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "", "LDFLAGS": ""}},
-    #"clang" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
-    "clang-fsanitize=address" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-fsanitize=address", "LDFLAGS": "-fsanitize=address"}},
+    "clang-1" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
+    "clang-2" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
+    "clang-3" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
+    #"clang-fsanitize=address" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-fsanitize=address", "LDFLAGS": "-fsanitize=address"}},
+    #"valgrind" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_valgrind_benchmark},
+    #"softboundcets-3.8" : {"make": {"CC": "/home/thomas/JKU/ssw_msr2018/softboundcets-3.8.0/llvm-38/build/bin/clang",
+    #                                "AS": "/home/thomas/JKU/ssw_msr2018/softboundcets-3.8.0/llvm-38/build/bin/clang",
+    #                                "CFLAGS": "-fsoftboundcets",
+    #                                "LDFLAGS": "-L /home/thomas/JKU/ssw_msr2018/softboundcets-3.8.0/runtime/ -lm -lrt -lsoftboundcets_rt"}},
     #"tcc" : {"make": {"CC": "tcc", "AS": "tcc", "CFLAGS": "", "LDFLAGS": ""}},
     #"gcc-O3" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "-O3", "LDFLAGS": ""}},
     #"clang-O3" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-O3", "LDFLAGS": ""}},

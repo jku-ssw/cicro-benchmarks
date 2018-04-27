@@ -159,8 +159,10 @@ def print_metrics(dpoints):
         mean = compilers[compiler]['mean']
         std_dev = compilers[compiler]['std_dev']
         assert len(mean) == len(std_dev)
-
-        print(" | {:<20} || {:<6} | {:<7.5f} | {:<7.5f} |".format(compiler, len(mean), sum(mean) / len(mean), sum(std_dev) / len(std_dev)))
+        n_points = len(mean)
+        runtime = sum(mean) / len(mean)
+        std_dev = sum(std_dev) / len(std_dev)
+        print(" | {:<20} || {:<6} | {:<7.5f} | {:<7.5f} |".format(compiler, n_points, runtime, std_dev))
     print(" |----------------------||--------|---------|---------|")
 
 
@@ -175,23 +177,25 @@ if __name__ == "__main__":
     dpoints_raw = []
 
     for key, value in sorted(bench_results.items()):
-        normalize_val = value.get('clang', {}).get('mean')
+        normalize_val = value.get('clang-1', {}).get('mean')
         if normalize_val is None:
             print('ignore  benchmark!!!')
             continue  # Ignore benchmark
+        else:
+            normalize_val = float(normalize_val)
 
         for compiler in compilers:
-            mean = value.get(compiler, {}).get('mean', 0)
-            std_dev = value.get(compiler, {}).get('std_dev')
+            mean = float(value.get(compiler, {}).get('mean', 0))
+            std_dev = float(value.get(compiler, {}).get('std_dev'))
 
             mean_normalized = mean / normalize_val
             std_dev_normalized = std_dev / normalize_val if std_dev else None
 
             dpoints_raw.append([compiler, key, mean_normalized, std_dev_normalized])
 
-    dpoints = np.array(dpoints_raw)
+    print_metrics(dpoints_raw)
 
-    print_metrics(dpoints)
+    dpoints = np.array(dpoints_raw)
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
