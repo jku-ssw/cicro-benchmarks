@@ -177,6 +177,9 @@ if __name__ == "__main__":
     dpoints_raw = []
 
     for key, value in sorted(bench_results.items()):
+        if key in ['yosefk.checkedthreads', 'otree.alloc_free']:  # 'mbrossard.threadpool', 'lucasb.heatmap', 'codeplea.tinyexpr', 'rax.tree'
+            print('ignore testcase: \"{}\"'.format(key))
+            continue
         normalize_val = value.get('clang-1', {}).get('mean')
         if normalize_val is None:
             print('ignore  benchmark!!!')
@@ -185,11 +188,16 @@ if __name__ == "__main__":
             normalize_val = float(normalize_val)
 
         for compiler in compilers:
-            mean = float(value.get(compiler, {}).get('mean', 0))
-            std_dev = float(value.get(compiler, {}).get('std_dev'))
+            mean = value.get(compiler, {}).get('mean')
+            std_dev = value.get(compiler, {}).get('std_dev')
 
-            mean_normalized = mean / normalize_val
-            std_dev_normalized = std_dev / normalize_val if std_dev else None
+            if mean is None or std_dev is None:
+                print('ignore compiler: \"{}\" in testcase: \"{}\"'.format(compiler, key))
+                dpoints_raw.append([compiler, key, 0, 0])
+                continue
+
+            mean_normalized = float(mean) / normalize_val
+            std_dev_normalized = float(std_dev) / normalize_val if std_dev else None
 
             dpoints_raw.append([compiler, key, mean_normalized, std_dev_normalized])
 

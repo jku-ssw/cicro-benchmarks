@@ -133,10 +133,12 @@ def run_sulong_jdk_benchmark(workdir, file):
 
 COMPILERS = {
     #"gcc" : {"make": {"CC": "gcc", "AS": "as", "CFLAGS": "", "LDFLAGS": ""}},
-    "clang-1" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
-    "clang-2" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
-    "clang-3" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
-    #"clang-fsanitize=address" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-fsanitize=address", "LDFLAGS": "-fsanitize=address"}},
+    #"clang-1" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
+    #"clang-2" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
+    #"clang-3" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}},
+    "clang-fsanitize=address-1" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-fsanitize=address", "LDFLAGS": "-fsanitize=address"}},
+    "clang-fsanitize=address-2" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-fsanitize=address", "LDFLAGS": "-fsanitize=address"}},
+    "clang-fsanitize=address-3" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "-fsanitize=address", "LDFLAGS": "-fsanitize=address"}},
     #"valgrind" : {"make": {"CC": "clang", "AS": "clang", "CFLAGS": "", "LDFLAGS": ""}, "exec": run_valgrind_benchmark},
     #"softboundcets-3.8" : {"make": {"CC": "/home/thomas/JKU/ssw_msr2018/softboundcets-3.8.0/llvm-38/build/bin/clang",
     #                                "AS": "/home/thomas/JKU/ssw_msr2018/softboundcets-3.8.0/llvm-38/build/bin/clang",
