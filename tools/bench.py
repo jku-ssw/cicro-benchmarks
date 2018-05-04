@@ -4,12 +4,12 @@ import argparse
 import collections
 import glob
 import logging
-import json
 import os
 import subprocess
 import sys
 import tempfile
 
+from util.bench_results import BenchmarkingResults
 from util.color_logger import get_logger
 from util.console import query_yes_no
 
@@ -39,7 +39,12 @@ class _ListAllRuntimeAction(argparse._StoreTrueAction):
         super(_ListAllRuntimeAction, self).__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
-        raise NotImplementedError("List Runtime is not implemented yet!")  # TODO: implement
+        harness = BenchmarkingHarness('.')
+
+        add_default_runtimes(harness)
+
+        harness.print_runtimes()
+
         parser.exit()
 
 
@@ -76,23 +81,36 @@ class BenchmarkingHarness(object):
         logger.info('clean benchmark directory')
         process = subprocess.Popen(['make', 'clean'], cwd=workdir, stdout=subprocess.DEVNULL)
         process.communicate()
+        if process.returncode != 0:
+            logger.error('"make clean" step exited with non zero return code!')
+            return False
 
-        make_params = []
+        make_params = ['-j', str(kwargs.get('make_jobs', 1))]  # -j = number of jobs to run simultaneously
+
+        if kwargs.get('ignore_errors', False):
+            make_params.append('-i')  # -i = ignore-errors
+            logger.warning('errors during the make step will be ignored')
+
         for key in make_env:
             make_params.append('{}={}'.format(key, make_env[key]))
 
         # build all tests
-        logger.info('build benchmarks with "%s"', " ".join(make_params))
-        process = subprocess.Popen(['make', '-i'] + make_params, cwd=args.testdir)  # -i = ignore single errors
+        logger.info('build benchmarks with "%s"', ' '.join(make_params))
+        process = subprocess.Popen(['make'] + make_params, cwd=args.testdir)
         process.communicate()
+        if process.returncode != 0:
+            logger.error('"make" step exited with non zero return code!')
+            return False
+
+        return True
 
     @staticmethod
     def default_executor(filepath, workdir, **kwargs):
-        pass
+        return None
 
     @staticmethod
     def default_cleanup(workdir, **kwargs):
-        pass
+        return True
 
     def add_runtime(self, name, make_env, make_func=default_make.__get__(object), exec_func=default_executor.__get__(object), cleanup_func=default_cleanup.__get__(object)):
         assert name not in self.registered_runtimes
@@ -108,15 +126,16 @@ class BenchmarkingHarness(object):
         print()
         print(" {:<30} | {}".format('runtime enviroment', 'enviroment variables'))
         print("{:-<32}|{:-<50}".format('', ''))
-        for runtime in self.registered_runtimes:
-            values = self.registered_runtimes[runtime]
+        for runtime, values in self.registered_runtimes.items():
             print(" {:<30} | {}".format(runtime, values['make_env']))
         print("{:-<32}|{:-<50}".format('', ''))
 
     def execute_runtimes(self, regex):
         pass
 
-    def execute_single_runtime(self, runtime):
+    def execute_single_runtime(self, runtime, bench_results, **kwargs):
+        assert type(bench_results) is BenchmarkingResults
+
         if runtime not in self.registered_runtimes:
             logger.error('runtime not found: "%s"', runtime)
             return {}
@@ -127,27 +146,64 @@ class BenchmarkingHarness(object):
         exec_func = found_runtime['exec_func']
         cleanup_func = found_runtime['cleanup_func']
 
+        logger.info('start with the execution of the runtime enviroment "%s"', runtime)
 
         try:
-            make_func(self.testdir, found_runtime['make_env'])
+            # compilation step
+            if kwargs.get('skip_compilation', False):
+                logger.warning('compilation step skipped for "%s"', runtime)
+            else:
+                logger.info('execute compilation step for "%s"', runtime)
+                if not make_func(self.testdir, found_runtime['make_env'], **kwargs):
+                    logger.error('compilation step for "%s" failed', runtime)
+                    return False
+
+            # execution step
+            # TODO:
+            harness = 'asdf'
+            try:
+                result_data = exec_func(harness, self.testdir)
+                if type(result_data) is dict and len(result_data) != 0:
+                    bench_results.set_single_run(harness, runtime, result_data, overwrite=True)  # TODO: overwrite handing?
+                else:
+                    logger.error('benchmark run of "%s:%s" did not return valid data', harness, runtime)
+            except KeyboardInterrupt:
+                raise
+            except:
+                logger.exception('Something went wrong while running the benchmark: "%s:%s"', harness, runtime)
+
+            # cleanup step
+            if kwargs.get('skip_cleanup', False):
+                logger.warning('cleanup step skipped for "%s"', runtime)
+            else:
+                logger.info('execute cleanup step for "%s"', runtime)
+                if not cleanup_func(self.testdir, **kwargs):
+                    logger.error('cleanup step for "%s" failed', runtime)
+                    return False
+
+        except KeyboardInterrupt:
+            raise
         except:
-            logger.exception('Something went wrong while building the benchmarks')
-            return {}
+            logger.exception('Something went wrong while executing the runtime enviroment "%s"', runtime)
+            return False
+
+        return True
+
 
 def add_default_runtimes(harness):
     """Those are some default runtimes which can also serve as example for custom ones"""
 
     # Clang
-    harness.add_runtime('clang-O0', {"CC": "clang", "AS": "clang"})
-    harness.add_runtime('clang-O1', {"CC": "clang", "AS": "clang", "CFLAGS": "-O1"})
-    harness.add_runtime('clang-O2', {"CC": "clang", "AS": "clang", "CFLAGS": "-O2"})
-    harness.add_runtime('clang-O3', {"CC": "clang", "AS": "clang", "CFLAGS": "-O3"})
+    harness.add_runtime('clang-O0', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything"})
+    harness.add_runtime('clang-O1', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O1"})
+    harness.add_runtime('clang-O2', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O2"})
+    harness.add_runtime('clang-O3', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O3"})
 
     # Clang + AddressSanitizer
-    harness.add_runtime('clang-fsanitize=address-O0', {"CC": "clang", "AS": "clang"})
-    harness.add_runtime('clang-fsanitize=address-O1', {"CC": "clang", "AS": "clang", "CFLAGS": "-O1 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
-    harness.add_runtime('clang-fsanitize=address-O2', {"CC": "clang", "AS": "clang", "CFLAGS": "-O2 -fsanitize=address -Wno-everything", "LDFLAGS": "-fsanitize=address"})
-    harness.add_runtime('clang-fsanitize=address-O3', {"CC": "clang", "AS": "clang", "CFLAGS": "-O3 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
+    harness.add_runtime('clang-fsanitize=address-O0', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything"})
+    harness.add_runtime('clang-fsanitize=address-O1', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O1 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
+    harness.add_runtime('clang-fsanitize=address-O2', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O2 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
+    harness.add_runtime('clang-fsanitize=address-O3', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O3 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
 
     # lli (bytecode executor)
     def lli_executor(filepath, workdir, **kwargs):
@@ -162,10 +218,10 @@ def add_default_runtimes(harness):
             # TODO: execute testcase
             raise NotImplementedError("execution of testcases is not implemented yet")
 
-    harness.add_runtime('lli-O0', {"CC": "wllvm", "AS": "wllvm"}, exec_func=lli_executor)
-    harness.add_runtime('lli-O1', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-O1"}, exec_func=lli_executor)
-    harness.add_runtime('lli-O2', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-O2"}, exec_func=lli_executor)
-    harness.add_runtime('lli-O3', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-O3"}, exec_func=lli_executor)
+    harness.add_runtime('lli-O0', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything"}, exec_func=lli_executor)
+    harness.add_runtime('lli-O1', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O1"}, exec_func=lli_executor)
+    harness.add_runtime('lli-O2', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O2"}, exec_func=lli_executor)
+    harness.add_runtime('lli-O3', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O3"}, exec_func=lli_executor)
 
     # GNU Compiler Collection
     harness.add_runtime('gcc-O0', {"CC": "gcc", "AS": "as"})
@@ -199,9 +255,17 @@ if __name__ == "__main__":
     parser.add_argument('--only-missing', action='store_true',
                         help='only execute benchmarks which are missing in the benchfile')
     parser.add_argument('--list-runtimes', action=_ListAllRuntimeAction,
-                        help='show a list of all runtimes which can be executed')
+                        help='show a list of all runtimes which can be executed')  # TODO: currently this lists only the default runtimes
     #parser.add_argument('--no-color', action='store_true',
     #                    help='disable color output')
+    parser.add_argument('--skip-compilation', action='store_true',
+                        help='skip the compilation step when benchmarking')
+    parser.add_argument('--skip-cleanup', action='store_true',
+                        help='skip the cleanup step when benchmarking')
+    parser.add_argument('--ignore-errors', '-i', action='store_true',
+                        help='ignore all errors in the make step to do at least a partial benchmark')
+    parser.add_argument('--jobs', '-j',type=int, default=2,
+                        help='number of jobs used for make')
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='enable debug output')
     parser.add_argument('--yes', '-y', action='store_true',
@@ -209,8 +273,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.verbose:
-        logger.setLevel(logging.DEBUG)
+    if not args.verbose:
+        logging.disable(logging.DEBUG)  # we want to set all loggers
 
     if not is_system_ready_for_benchmarking():
         if not args.yes and query_yes_no('Do you want to continue with the benchmarks?') == 'no':
@@ -221,6 +285,13 @@ if __name__ == "__main__":
 
     add_default_runtimes(harness)
 
-    harness.print_runtimes()
+    execution_kwargs = {
+        'skip_compilation': args.skip_compilation,
+        'skip_cleanup': args.skip_cleanup,
+        'ignore_errors': args.ignore_errors,
+        'make_jobs': args.jobs
+    }
 
-    harness.execute_single_runtime('clang-fsanitize=address-O2')
+    results = BenchmarkingResults()
+
+    harness.execute_single_runtime('clang-O3', results, **execution_kwargs)
