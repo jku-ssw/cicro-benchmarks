@@ -3,7 +3,7 @@
 AS = clang
 CC = clang
 
-CFLAGS = -g
+CFLAGS =
 LDFLAGS =
 
 # Some configuration variables for the generated tests
@@ -396,7 +396,7 @@ vmg-crustache_$(TEST_SUFFIX): vmg-crustache vmg-crustache_test.c $(C_HAYAI_DIR)
 ########## https://github.com/wbhart/bsdnt
 
 wbhart-bsdnt_$(TEST_SUFFIX): wbhart-bsdnt wbhart-bsdnt_test.c $(C_HAYAI_DIR)
-	(cd ./wbhart-bsdnt && ./configure AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)')
+	(cd ./wbhart-bsdnt && ./configure AS='$(AS)' CC='$(CC)')
 	(cd ./wbhart-bsdnt &&  make -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS) -fPIC' LDFLAGS='$(LDFLAGS)')
 	$(CC) $(CFLAGS) wbhart-bsdnt_test.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm ./wbhart-bsdnt/libbsdnt.a
