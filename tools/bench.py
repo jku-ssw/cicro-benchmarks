@@ -165,11 +165,15 @@ class BenchmarkingHarness(object):
             logger.error('runtime not found: "%s"', runtime)
             return {}
 
+        runtime_name = runtime + kwargs.get('suffix', '')
+
         found_runtime = self.registered_runtimes[runtime]
 
         make_func = found_runtime['make_func']
         exec_func = found_runtime['exec_func']
         cleanup_func = found_runtime['cleanup_func']
+
+        allow_overwrite = kwargs.get('allow_overwrite', False)   # TODO: overwrite handing?
 
         logger.info('start with the execution of the runtime enviroment "%s"', runtime)
 
@@ -189,20 +193,24 @@ class BenchmarkingHarness(object):
                 harness_path = os.path.join(self.testdir, harness)
 
                 if not re.match(kwargs.get('filter_harness', '.*'), harness):
-                    logger.debug('ignore benchmark: "%s:%s" (did not match filter rule)', harness_name, runtime)
+                    logger.debug('ignore benchmark: "%s:%s" (did not match filter rule)', harness_name, runtime_name)
+                    continue
+
+                if not allow_overwrite and bench_results.is_run_present(harness_name, runtime_name):
+                    logger.warning('benchmark run of "%s:%s" already present, skip', harness_name, runtime_name)
                     continue
 
                 try:
-                    logger.info('benchmark: "%s:%s"', harness_name, runtime)
-                    result_data = exec_func(harness_path, self.testdir)  # TODO: timeout
+                    logger.info('benchmark: "%s:%s"', harness_name, runtime_name)
+                    result_data = exec_func(harness_path, self.testdir, **kwargs)
                     if type(result_data) is dict and len(result_data) != 0:
-                        bench_results.set_single_run(harness, runtime, result_data, overwrite=True)  # TODO: overwrite handing?
+                        bench_results.set_single_run(harness_name, runtime_name, result_data, overwrite=allow_overwrite)
                     else:
-                        logger.error('benchmark run of "%s:%s" did not return valid data: "%s"', harness_name, runtime, result_data)
+                        logger.error('benchmark run of "%s:%s" did not return valid data: "%s"', harness_name, runtime_name, result_data)
                 except KeyboardInterrupt:
                     raise
                 except:
-                    logger.exception('Something went wrong while running the benchmark: "%s:%s"', harness_name, runtime)
+                    logger.exception('Something went wrong while running the benchmark: "%s:%s"', harness_name, runtime_name)
 
             # cleanup step
             if kwargs.get('skip_cleanup', False):
@@ -288,14 +296,14 @@ if __name__ == "__main__":
 
     parser.add_argument('testdir', metavar='TESTDIR', type=_TestDirType(),
                         help='directory where the tests and the Makefile is contained')
-    parser.add_argument('benchfile',metavar='BENCHFILE', type=argparse.FileType('w'),
+    parser.add_argument('benchfile',metavar='BENCHFILE', type=str,
                         help='file where the benchmarks are written to')
 
     parser.add_argument('--filter-runtimes', metavar='REGEX', type=str, default='gcc-O0|clang-O0',
                         help='regular expression to select which runtimes should be used')
     parser.add_argument('--filter-harness', metavar='REGEX', type=str, default='.*',
                         help='regular expression to select which harness should be used (based on filename)')
-    parser.add_argument('--timeout', metavar='SECONDS', type=int, default=60,
+    parser.add_argument('--timeout', metavar='SECONDS', type=int, default=240,
                         help='timeout of a single benchmark run, given in seconds')
     parser.add_argument('--suffix', metavar='STRING', type=str, default="",
                         help='suffix which should be added to the runtime name')
@@ -333,23 +341,30 @@ if __name__ == "__main__":
 
     add_default_runtimes(harness)
 
-    execution_kwargs = {
-        'skip_compilation': args.skip_compilation,
-        'skip_cleanup': args.skip_cleanup,
-        'filter_harness': args.filter_harness,
-        'ignore_errors': args.ignore_errors,
-        'make_jobs': args.jobs
-    }
-
     results = BenchmarkingResults()
 
+    if os.path.isfile(args.benchfile):
+        with open(args.benchfile, 'r') as f:
+            results.load_file(f)
+
     try:
+        execution_kwargs = {
+            'skip_compilation': args.skip_compilation,
+            'skip_cleanup': args.skip_cleanup,
+            'filter_harness': args.filter_harness,
+            'ignore_errors': args.ignore_errors,
+            'make_jobs': args.jobs,
+            'timeout': args.timeout,
+            'suffix': args.suffix,
+            'allow_overwrite': not args.only_missing
+        }
+
         harness.execute_runtimes(args.filter_runtimes, results, **execution_kwargs)
     except KeyboardInterrupt:
         pass
     except:
         logger.exception('Something went wrong while executing the testcases')
     finally:
-        logger.info('start writing results into file')
-        pass
-        #results.write
+        logger.info('write results into benchmark file')
+        with open(args.benchfile, 'w') as f:
+            results.store_file(f)
