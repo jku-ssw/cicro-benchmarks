@@ -291,8 +291,9 @@ def add_default_runtimes(harness):
 
 
 if __name__ == "__main__":
-    # Parse Comandline Arguments
-    parser = argparse.ArgumentParser(description='Execute benchmarks and export them')
+    # Parse Command-line Arguments
+    parser = argparse.ArgumentParser(description='Execute benchmarks and export them',
+                                     formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=30, width=120))
 
     parser.add_argument('testdir', metavar='TESTDIR', type=_TestDirType(),
                         help='directory where the tests and the Makefile is contained')
