@@ -56,6 +56,24 @@ class BenchmarkingResults(object):
             if runtime in harness_data:
                 yield harness_data[runtime]
 
+    def get_all_benchmarks_of_runtime(self, runtime):
+        for run in self.get_all_runs(runtime):
+            for benchmark in run.get('benchmarks', []):
+                print(benchmark)
+
+    @staticmethod
+    def benchmark_name(benchmark):
+        return "{}.{}".format(benchmark.get('fixture'), benchmark.get('name'))
+
+    def get_all_benchmark_names(self):
+        benchmarks = set()
+        for harness_data in self.data.values():
+            for run in harness_data.values():
+                for benchmark in run.get('benchmarks', []):
+                    benchmarks.add(BenchmarkingResults.benchmark_name(benchmark))
+
+        return benchmarks
+
     def get_harness(self, harness):
         return self.data[harness]
 
