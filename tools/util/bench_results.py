@@ -24,12 +24,12 @@ class BenchmarkingResults(object):
 
         for harness, harness_data in new_data.items():
             for runtime, runtime_data in harness_data.items():
-                self.set_single_run(harness, runtime, runtime_data, overwrite=False)
+                self.set_single_run(harness, runtime, runtime_data, overwrite=False, very_verbose=False)
 
     def store_file(self, file):
         json.dump(self.data, file)
 
-    def set_single_run(self, harness_name, runtime, data, overwrite=False):
+    def set_single_run(self, harness_name, runtime, data, overwrite=False, very_verbose=True):
         if harness_name not in self.data:
             self.data[harness_name] = {}
 
@@ -40,9 +40,9 @@ class BenchmarkingResults(object):
                 logger.error('benchmark run of "%s:%s" already present, skip writing', harness_name, runtime)
                 logger.info('data: %s', data)
                 return
-
         logger.debug('set benchmark run of "%s:%s"', harness_name, runtime)
-        logger.debug('data: "%s"', data)
+        if very_verbose:
+            logger.debug('data: "%s"', data)
         self.data[harness_name][runtime] = data
 
     def is_run_present(self, harness, runtime):
@@ -50,6 +50,11 @@ class BenchmarkingResults(object):
 
     def get_single_run(self, harness, runtime):
         return self.data[harness][runtime]
+
+    def get_all_runs(self, runtime):
+        for harness, harness_data in self.data.items():
+            if runtime in harness_data:
+                yield harness_data[runtime]
 
     def get_harness(self, harness):
         return self.data[harness]
