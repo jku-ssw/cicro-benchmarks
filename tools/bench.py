@@ -83,11 +83,12 @@ class BenchmarkingHarness(object):
 
         # clean directory
         logger.info('clean benchmark directory')
-        process = subprocess.Popen(['make', 'clean'], cwd=workdir, stdout=subprocess.DEVNULL)
-        process.communicate()
-        if process.returncode != 0:
-            logger.error('"make clean" exited with non zero return code!')
-            return False
+        with subprocess.Popen(['make', 'clean'], cwd=workdir, stdout=subprocess.DEVNULL) as process:
+            process.communicate()
+
+            if process.returncode != 0:
+                logger.error('"make clean" exited with non zero return code!')
+                return False
 
         make_params = ['-j', str(kwargs.get('make_jobs', 1))]  # -j = number of jobs to run simultaneously
 
@@ -98,13 +99,13 @@ class BenchmarkingHarness(object):
         for key in make_env:
             make_params.append('{}={}'.format(key, make_env[key]))
 
-        # build all tests
         logger.info('build benchmarks with "%s"', ' '.join(make_params))
-        process = subprocess.Popen(['make'] + make_params, cwd=args.testdir)
-        process.communicate()
-        if process.returncode != 0:
-            logger.error('"make" exited with non zero return code!')
-            return False
+        with subprocess.Popen(['make'] + make_params, cwd=args.testdir) as process:
+            process.communicate()
+
+            if process.returncode != 0:
+                logger.error('"make" exited with non zero return code!')
+                return False
 
         return True
 
@@ -113,13 +114,13 @@ class BenchmarkingHarness(object):
         assert os.path.isfile(filepath)
         assert os.path.isdir(workdir)
 
-        process = subprocess.Popen([filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
-        stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
+        with subprocess.Popen([filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE) as process:
+            stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
 
-        if process.returncode != 0:
-            return None
+            if process.returncode != 0:
+                return None
 
-        return json.loads(stdout)
+            return json.loads(stdout)
 
     @staticmethod
     def default_cleanup(workdir, **kwargs):
@@ -145,15 +146,17 @@ class BenchmarkingHarness(object):
             print(" {:<30} | {}".format(runtime, values['make_env']))
         print("{:-<32}|{:-<50}".format('', ''))
 
-    def execute_runtimes(self, regex):
-        pass
-
     def find_all_harness(self):
         found_harness = []
         for harness in sorted(os.listdir(self.testdir)):
             if harness.endswith("_test"):
                 found_harness.append(harness)
         return found_harness
+
+    def execute_runtimes(self, filter, bench_results, **kwargs):
+        for runtime in self.registered_runtimes.keys():
+            if re.match(filter, runtime):
+                self.execute_single_runtime(runtime, bench_results, **kwargs)
 
     def execute_single_runtime(self, runtime, bench_results, **kwargs):
         assert type(bench_results) is BenchmarkingResults
@@ -248,18 +251,18 @@ def add_default_runtimes(harness):
             bc_filepath = os.path.join(tmp, bc_filename)
             logger.debug('extract bitcode file to: "%s"', bc_filepath)
 
-            process_bc = subprocess.Popen(["extract-bc", filepath, '-o', bc_filepath])
-            process_bc.wait(timeout=30)  # 30 Seconds should be way enough time to do the bitcode extraction
+            with subprocess.Popen(["extract-bc", filepath, '-o', bc_filepath]) as process:
+                process.wait(timeout=30)  # 30 Seconds should be way enough time to do the bitcode extraction
 
             assert os.path.isfile(bc_filepath)
 
-            process = subprocess.Popen(['lli', bc_filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
-            stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
+            with subprocess.Popen(['lli', bc_filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE) as process:
+                stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
 
-            if process.returncode != 0:
-                return None
+                if process.returncode != 0:
+                    return None
 
-            return json.loads(stdout)
+                return json.loads(stdout)
 
     harness.add_runtime('lli-O0', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything"}, make_func=lli_make, exec_func=lli_executor)
     harness.add_runtime('lli-O1', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O1"}, make_func=lli_make, exec_func=lli_executor)
@@ -340,4 +343,13 @@ if __name__ == "__main__":
 
     results = BenchmarkingResults()
 
-    harness.execute_single_runtime('clang-O3', results, **execution_kwargs)
+    try:
+        harness.execute_runtimes(args.filter_runtimes, results, **execution_kwargs)
+    except KeyboardInterrupt:
+        pass
+    except:
+        logger.exception('Something went wrong while executing the testcases')
+    finally:
+        logger.info('start writing results into file')
+        pass
+        #results.write
