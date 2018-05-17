@@ -3,8 +3,10 @@
 import argparse
 import collections
 import glob
+import json
 import logging
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -77,19 +79,21 @@ class BenchmarkingHarness(object):
 
     @staticmethod
     def default_make(workdir, make_env, **kwargs):
+        assert os.path.isdir(workdir)
+
         # clean directory
         logger.info('clean benchmark directory')
         process = subprocess.Popen(['make', 'clean'], cwd=workdir, stdout=subprocess.DEVNULL)
         process.communicate()
         if process.returncode != 0:
-            logger.error('"make clean" step exited with non zero return code!')
+            logger.error('"make clean" exited with non zero return code!')
             return False
 
         make_params = ['-j', str(kwargs.get('make_jobs', 1))]  # -j = number of jobs to run simultaneously
 
         if kwargs.get('ignore_errors', False):
             make_params.append('-i')  # -i = ignore-errors
-            logger.warning('errors during the make step will be ignored')
+            logger.warning('errors during "make" will be ignored')
 
         for key in make_env:
             make_params.append('{}={}'.format(key, make_env[key]))
@@ -99,17 +103,28 @@ class BenchmarkingHarness(object):
         process = subprocess.Popen(['make'] + make_params, cwd=args.testdir)
         process.communicate()
         if process.returncode != 0:
-            logger.error('"make" step exited with non zero return code!')
+            logger.error('"make" exited with non zero return code!')
             return False
 
         return True
 
     @staticmethod
     def default_executor(filepath, workdir, **kwargs):
-        return None
+        assert os.path.isfile(filepath)
+        assert os.path.isdir(workdir)
+
+        process = subprocess.Popen([filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
+        stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
+
+        if process.returncode != 0:
+            return None
+
+        return json.loads(stdout)
 
     @staticmethod
     def default_cleanup(workdir, **kwargs):
+        assert os.path.isdir(workdir)
+
         return True
 
     def add_runtime(self, name, make_env, make_func=default_make.__get__(object), exec_func=default_executor.__get__(object), cleanup_func=default_cleanup.__get__(object)):
@@ -132,6 +147,13 @@ class BenchmarkingHarness(object):
 
     def execute_runtimes(self, regex):
         pass
+
+    def find_all_harness(self):
+        found_harness = []
+        for harness in sorted(os.listdir(self.testdir)):
+            if harness.endswith("_test"):
+                found_harness.append(harness)
+        return found_harness
 
     def execute_single_runtime(self, runtime, bench_results, **kwargs):
         assert type(bench_results) is BenchmarkingResults
@@ -159,18 +181,25 @@ class BenchmarkingHarness(object):
                     return False
 
             # execution step
-            # TODO:
-            harness = 'asdf'
-            try:
-                result_data = exec_func(harness, self.testdir)
-                if type(result_data) is dict and len(result_data) != 0:
-                    bench_results.set_single_run(harness, runtime, result_data, overwrite=True)  # TODO: overwrite handing?
-                else:
-                    logger.error('benchmark run of "%s:%s" did not return valid data', harness, runtime)
-            except KeyboardInterrupt:
-                raise
-            except:
-                logger.exception('Something went wrong while running the benchmark: "%s:%s"', harness, runtime)
+            for harness in self.find_all_harness():
+                harness_name = harness[:-len('_test')] if harness.endswith('_test') else harness
+                harness_path = os.path.join(self.testdir, harness)
+
+                if not re.match(kwargs.get('filter_harness', '.*'), harness):
+                    logger.debug('ignore benchmark: "%s:%s" (did not match filter rule)', harness_name, runtime)
+                    continue
+
+                try:
+                    logger.info('benchmark: "%s:%s"', harness_name, runtime)
+                    result_data = exec_func(harness_path, self.testdir)  # TODO: timeout
+                    if type(result_data) is dict and len(result_data) != 0:
+                        bench_results.set_single_run(harness, runtime, result_data, overwrite=True)  # TODO: overwrite handing?
+                    else:
+                        logger.error('benchmark run of "%s:%s" did not return valid data: "%s"', harness_name, runtime, result_data)
+                except KeyboardInterrupt:
+                    raise
+                except:
+                    logger.exception('Something went wrong while running the benchmark: "%s:%s"', harness_name, runtime)
 
             # cleanup step
             if kwargs.get('skip_cleanup', False):
@@ -206,6 +235,13 @@ def add_default_runtimes(harness):
     harness.add_runtime('clang-fsanitize=address-O3', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O3 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
 
     # lli (bytecode executor)
+    def lli_make(workdir, make_env, **kwargs):
+        if 'LLVM_COMPILER' not in os.environ:
+            logger.error('enviroment variable "LLVM_COMPILER" is required to build with wllvm')
+            return False
+
+        return BenchmarkingHarness.default_make(workdir, make_env, **kwargs)
+
     def lli_executor(filepath, workdir, **kwargs):
         with tempfile.TemporaryDirectory() as tmp:
             bc_filename = os.path.splitext(os.path.basename(filepath))[0] + '.bc'
@@ -215,13 +251,20 @@ def add_default_runtimes(harness):
             process_bc = subprocess.Popen(["extract-bc", filepath, '-o', bc_filepath])
             process_bc.wait(timeout=30)  # 30 Seconds should be way enough time to do the bitcode extraction
 
-            # TODO: execute testcase
-            raise NotImplementedError("execution of testcases is not implemented yet")
+            assert os.path.isfile(bc_filepath)
 
-    harness.add_runtime('lli-O0', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything"}, exec_func=lli_executor)
-    harness.add_runtime('lli-O1', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O1"}, exec_func=lli_executor)
-    harness.add_runtime('lli-O2', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O2"}, exec_func=lli_executor)
-    harness.add_runtime('lli-O3', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O3"}, exec_func=lli_executor)
+            process = subprocess.Popen(['lli', bc_filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE)
+            stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
+
+            if process.returncode != 0:
+                return None
+
+            return json.loads(stdout)
+
+    harness.add_runtime('lli-O0', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything"}, make_func=lli_make, exec_func=lli_executor)
+    harness.add_runtime('lli-O1', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O1"}, make_func=lli_make, exec_func=lli_executor)
+    harness.add_runtime('lli-O2', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O2"}, make_func=lli_make, exec_func=lli_executor)
+    harness.add_runtime('lli-O3', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O3"}, make_func=lli_make, exec_func=lli_executor)
 
     # GNU Compiler Collection
     harness.add_runtime('gcc-O0', {"CC": "gcc", "AS": "as"})
@@ -246,7 +289,9 @@ if __name__ == "__main__":
                         help='file where the benchmarks are written to')
 
     parser.add_argument('--filter-runtimes', metavar='REGEX', type=str, default='gcc-O0|clang-O0',
-                        help='regular expression to select which runtimes shold be used')
+                        help='regular expression to select which runtimes should be used')
+    parser.add_argument('--filter-harness', metavar='REGEX', type=str, default='.*',
+                        help='regular expression to select which harness should be used (based on filename)')
     parser.add_argument('--timeout', metavar='SECONDS', type=int, default=60,
                         help='timeout of a single benchmark run, given in seconds')
     parser.add_argument('--suffix', metavar='STRING', type=str, default="",
@@ -288,6 +333,7 @@ if __name__ == "__main__":
     execution_kwargs = {
         'skip_compilation': args.skip_compilation,
         'skip_cleanup': args.skip_cleanup,
+        'filter_harness': args.filter_harness,
         'ignore_errors': args.ignore_errors,
         'make_jobs': args.jobs
     }
