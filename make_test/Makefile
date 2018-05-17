@@ -422,8 +422,8 @@ wolkykim-qlibc_$(TEST_SUFFIX): wolkykim-qlibc wolkykim-qlibc_test.c $(C_HAYAI_DI
 	 -o "$(TEST_DIR)/wolkykim-qlibc_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lpthread wolkykim-qlibc/lib/libqlibc.a
 
 wolkykim-qlibc_clean:
-ifneq ("$(wildcard ./wbhart-bsdnt/Makefile)","")
-	(cd ./wbhart-bsdnt && make distclean && rm -f Makefile)
+ifneq ("$(wildcard ./wolkykim-qlibc/Makefile)","")
+	(cd ./wolkykim-qlibc && make distclean && rm -f Makefile)
 endif
 	rm -f "$(TEST_DIR)/wolkykim-qlibc_$(TEST_SUFFIX)"
 
