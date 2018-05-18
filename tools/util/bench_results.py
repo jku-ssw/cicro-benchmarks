@@ -61,24 +61,6 @@ class BenchmarkingResults(object):
 
         json.dump(file_data, file)
 
-    def set_single_run(self, harness_name, runtime, data, overwrite=False):
-        """if harness_name not in self.data:
-            self.data[harness_name] = {}
-
-        if runtime in self.data[harness_name]:
-            if overwrite:
-                logger.warning('benchmark run of "%s:%s" already present, overwrite data', harness_name, runtime)
-            else:
-                logger.error('benchmark run of "%s:%s" already present, skip writing', harness_name, runtime)
-                logger.info('data: %s', data)
-                return
-        logger.debug('set benchmark run of "%s:%s"', harness_name, runtime)
-        if very_verbose:
-            logger.debug('data: "%s"', data)"""
-
-        for benchmark in data.get('benchmarks', []):
-            self.add_benchmark(benchmark, runtime, harness_name)
-
     def get_benchmark(self, benchmark_name, runtime):
         self.c.execute('SELECT `DATA` FROM `BENCHMARKS` WHERE `NAME`=? AND `RUNTIME`=?', (benchmark_name, runtime))
         return self.c.fetchone()  # TODO: return data?
@@ -86,14 +68,21 @@ class BenchmarkingResults(object):
     def is_benchmark_present(self, benchmark_name, runtime):
         return self.get_benchmark(benchmark_name, runtime) is not None
 
+    def set_single_run(self, harness_name, runtime, data, overwrite=False):
+        for benchmark in data.get('benchmarks', []):
+            self.add_benchmark(benchmark, runtime, harness_name, overwrite=overwrite)
+
     def add_benchmark(self, data, runtime, harness=None, overwrite=False):
         benchmark_name = get_benchmark_name(data)
         harness = harness if harness is not None else data.get('harness')
 
         if self.is_benchmark_present(benchmark_name, runtime):
             if not overwrite:
-                logger.error('benchmark already present in db: "%s:%s"', benchmark_name, runtime)
+                logger.error('benchmark run of "%s:%s" already present, skip writing', benchmark_name, runtime)
+                logger.info('data: %s', data)
                 return
+
+            logger.warning('benchmark run of "%s:%s" already present, overwrite data', benchmark_name, runtime)
 
             query = """UPDATE `BENCHMARKS` SET `HARNESS`=?,`DATA`=? WHERE `NAME`=? AND `RUNTIME`=?"""
             try:
@@ -127,6 +116,13 @@ class BenchmarkingResults(object):
     def get_all_benchmarks_of_runtime(self, runtime):
         self.c.execute('SELECT `NAME` FROM `BENCHMARKS` WHERE `RUNTIME`=? ORDER BY `NAME`', (runtime,))
         return [result[0] for result in self.c.fetchall()]
+
+    def get_all_benchmark_runs(self, benchmark):
+        self.c.execute('SELECT `RUNTIME`, `DATA` FROM `BENCHMARKS` WHERE `NAME`=? ORDER BY `RUNTIME`', (benchmark,))
+        result = {}
+        for row in self.c.fetchall():
+            result[row[0]] = json.loads(row[1])
+        return result
 
     def get_all_benchmark_names(self):
         self.c.execute('SELECT DISTINCT(`NAME`) FROM `BENCHMARKS` ORDER BY `NAME`')

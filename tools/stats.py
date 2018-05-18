@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import sys
 
 from util.bench_results import BenchmarkingResults
 from util.color_logger import get_logger
@@ -40,6 +41,10 @@ if __name__ == "__main__":
 
     results = BenchmarkingResults()
 
-    results.load_file(args.benchfile)
+    try:
+        results.load_file(args.benchfile)
+    except Exception:
+        logger.exception("cannot load file")
+        sys.exit()
 
     log_general_stats(results)

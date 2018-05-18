@@ -2,12 +2,17 @@
 
 import argparse
 import logging
+import sys
 
 from util.bench_results import BenchmarkingResults
 from util.color_logger import get_logger
-
+from util.analyze import preprocess
 
 logger = get_logger('plot' )
+
+
+def boxplot(datapoints):
+    pass
 
 
 if __name__ == "__main__":
@@ -33,9 +38,14 @@ if __name__ == "__main__":
 
     results = BenchmarkingResults()
 
-    results.load_file(args.benchfile)
+    try:
+        results.load_file(args.benchfile)
+    except Exception:
+        logger.exception("cannot load file")
+        sys.exit()
 
-    #for runtime in sorted(results.get_all_runtimes()):
-    #    results.get_all_benchmarks(runtime)
+    processed_data = preprocess(results, 'clang-O2')  # TODO: baseline
 
-    print(results.get_all_benchmark_names())
+    logger.debug(str(processed_data))
+
+    boxplot(processed_data)
