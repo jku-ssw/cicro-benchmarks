@@ -345,8 +345,13 @@ if __name__ == "__main__":
     results = BenchmarkingResults()
 
     if os.path.isfile(args.benchfile):
-        with open(args.benchfile, 'r') as f:
-            results.load_file(f)
+        try:
+            with open(args.benchfile, 'r') as f:
+                results.load_file(f)
+        except Exception:
+            logger.exception("cannot load file")
+            if not args.yes and query_yes_no('Do you want to continue? The given file exists, but does not contain valid data', default="no") == 'no':
+                sys.exit()
 
     try:
         execution_kwargs = {

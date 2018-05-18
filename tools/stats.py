@@ -11,10 +11,10 @@ logger = get_logger('stats' )
 
 
 def log_general_stats(results):
-    logger.info("number of different harnesses present: %d", len(results.get_all_harness()))
+    logger.info("number of different benchmarks present: %d", len(results.get_all_benchmark_names()))
 
     for runtime in sorted(results.get_all_runtimes()):
-        logger.info('runtime "%s" has %d runs', runtime, len(list(results.get_all_runs(runtime))))
+        logger.info('runtime "%s" has %d benchmarks', runtime, len(list(results.get_all_benchmarks_of_runtime(runtime))))
 
 
 if __name__ == "__main__":
