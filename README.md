@@ -1,4 +1,4 @@
-# C benchmarking suit
+# C Benchmarking Suite
 
 this is a benchmarking Suite for C compilers, optimiziers and runtime enviroments to get known how changes affect runtime
 performance in general. Compared to other benchmarking suites our approach is to use a high number of "real world" code
@@ -6,7 +6,7 @@ samples to get known of the general runtime impact.
 
 ## HowTo Use
 
-in the ```tools``` directory there are a few scripts which manage most of the benchmarking work.
+in the ```./tools/``` directory there are a few scripts which manage most of the benchmarking work.
 
 ### run benchmark
 
