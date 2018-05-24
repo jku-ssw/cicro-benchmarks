@@ -186,12 +186,12 @@ FLAME-BLIS_INC_PARAMS = $(foreach d, $(FLAME-BLIS_INC), -I$d)
 
 flame-blis_$(TEST_SUFFIX): flame-blis flame-blis_test.c $(C_HAYAI_LIB)
 	#(cd flame-blis && ./configure generic)
-	(cd ./flame-blis && make -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)')
+	(cd ./flame-blis && $(MAKE) -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)')
 	$(CC) $(CFLAGS) flame-blis_test.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/flame-blis_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) ${FLAME-BLIS_INC_PARAMS} -lm -lpthread ./flame-blis/lib/generic/libblis.a
 
 flame-blis_clean:
-	(cd ./flame-blis && make clean)
+	(cd ./flame-blis && $(MAKE) clean)
 	rm -f "$(TEST_DIR)/flame-blis_$(TEST_SUFFIX)"
 
 ########## https://github.com/imneme/pcg-c-basic
@@ -359,12 +359,12 @@ skeeto-branchless-utf8_$(TEST_SUFFIX): skeeto-branchless-utf8 skeeto-branchless-
 ########## https://github.com/snowballstem/snowball
 
 snowballstem-snowball_$(TEST_SUFFIX): snowballstem-snowball snowballstem-snowball_test.c $(C_HAYAI_LIB)
-	(cd ./snowballstem-snowball && make -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)')
+	(cd ./snowballstem-snowball && $(MAKE) -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)')
 	$(CC) $(CFLAGS) snowballstem-snowball_test.c snowballstem-snowball/libstemmer.o $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/snowballstem-snowball_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 snowballstem-snowball_clean:
-	(cd ./snowballstem-snowball && make clean)
+	(cd ./snowballstem-snowball && $(MAKE) clean)
 	rm -f "$(TEST_DIR)/snowballstem-snowball $(TEST_SUFFIX)"
 
 ########## https://github.com/swenson/sort
@@ -407,13 +407,13 @@ vmg-crustache_$(TEST_SUFFIX): vmg-crustache vmg-crustache_test.c $(C_HAYAI_LIB)
 
 wbhart-bsdnt_$(TEST_SUFFIX): wbhart-bsdnt wbhart-bsdnt_test.c $(C_HAYAI_LIB)
 	(cd ./wbhart-bsdnt && ./configure AS='$(AS)' CC='$(CC)')
-	(cd ./wbhart-bsdnt &&  make -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS) -fPIC' LDFLAGS='$(LDFLAGS)')
+	(cd ./wbhart-bsdnt &&  $(MAKE) -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS) -fPIC' LDFLAGS='$(LDFLAGS)')
 	$(CC) $(CFLAGS) wbhart-bsdnt_test.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm ./wbhart-bsdnt/libbsdnt.a
 
 wbhart-bsdnt_clean:
 ifneq ("$(wildcard ./wbhart-bsdnt/Makefile)","")
-	(cd ./wbhart-bsdnt && make distclean && rm -f Makefile)
+	(cd ./wbhart-bsdnt && $(MAKE) distclean && rm -f Makefile)
 endif
 	rm -f "$(TEST_DIR)/wbhart-bsdnt_$(TEST_SUFFIX)"
 
@@ -427,13 +427,13 @@ websnarf-bstrlib_$(TEST_SUFFIX): websnarf-bstrlib websnarf-bstrlib_test.c $(C_HA
 
 wolkykim-qlibc_$(TEST_SUFFIX): wolkykim-qlibc wolkykim-qlibc_test.c $(C_HAYAI_LIB)
 	(cd ./wolkykim-qlibc && ./configure  CC='$(CC)' CFLAGS='$(CFLAGS) -fPIC' LDFLAGS='$(LDFLAGS)')
-	(cd ./wolkykim-qlibc &&  make -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS) -fPIC' LDFLAGS='$(LDFLAGS)')
+	(cd ./wolkykim-qlibc &&  $(MAKE) -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS) -fPIC' LDFLAGS='$(LDFLAGS)')
 	$(CC) $(CFLAGS) wolkykim-qlibc_test.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/wolkykim-qlibc_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lpthread wolkykim-qlibc/lib/libqlibc.a
 
 wolkykim-qlibc_clean:
 ifneq ("$(wildcard ./wolkykim-qlibc/Makefile)","")
-	(cd ./wolkykim-qlibc && make distclean && rm -f Makefile)
+	(cd ./wolkykim-qlibc && $(MAKE) distclean && rm -f Makefile)
 endif
 	rm -f "$(TEST_DIR)/wolkykim-qlibc_$(TEST_SUFFIX)"
 
