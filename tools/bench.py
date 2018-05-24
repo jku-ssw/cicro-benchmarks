@@ -355,8 +355,8 @@ if __name__ == "__main__":
 
     try:
         execution_kwargs = {
+            'skip_clean': args.skip_clean or args.skip_compilation,
             'skip_compilation': args.skip_compilation,
-            'skip_clean': args.skip_clean,
             'filter_harness': args.filter_harness,
             'ignore_errors': args.ignore_errors,
             'make_jobs': args.jobs,
@@ -365,7 +365,7 @@ if __name__ == "__main__":
             'allow_overwrite': not args.only_missing
         }
 
-        harness.execute_runtimes(args.filter_runtimes, results, **execution_kwargs)
+        harness.execute_runtimes(args.filter_runtime, results, **execution_kwargs)
     except KeyboardInterrupt:
         pass
     except:
