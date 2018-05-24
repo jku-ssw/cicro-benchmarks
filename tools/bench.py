@@ -78,7 +78,7 @@ class BenchmarkingHarness(object):
         self.registered_runtimes = collections.OrderedDict()
 
     @staticmethod
-    def default_make(workdir, make_env, **kwargs):
+    def default_clean(workdir, **kwargs):
         assert os.path.isdir(workdir)
 
         # clean directory
@@ -89,6 +89,12 @@ class BenchmarkingHarness(object):
             if process.returncode != 0:
                 logger.error('"make clean" exited with non zero return code!')
                 return False
+
+        return True
+
+    @staticmethod
+    def default_make(workdir, make_env, **kwargs):
+        assert os.path.isdir(workdir)
 
         make_params = ['-j', str(kwargs.get('make_jobs', 1))]  # -j = number of jobs to run simultaneously
 
@@ -122,13 +128,7 @@ class BenchmarkingHarness(object):
 
             return json.loads(stdout)
 
-    @staticmethod
-    def default_cleanup(workdir, **kwargs):
-        assert os.path.isdir(workdir)
-
-        return True
-
-    def add_runtime(self, name, make_env, make_func=default_make.__get__(object), exec_func=default_executor.__get__(object), cleanup_func=default_cleanup.__get__(object)):
+    def add_runtime(self, name, make_env, make_func=default_make.__get__(object), exec_func=default_executor.__get__(object), clean_func=default_clean.__get__(object)):
         assert name not in self.registered_runtimes
         assert 'CC' in make_env and 'AS' in make_env
 
@@ -136,7 +136,7 @@ class BenchmarkingHarness(object):
         self.registered_runtimes[name] = {'make_env': make_env,  # enviroment variables required for make
                                           'make_func': make_func,  # function executed to build all benchmarks
                                           'exec_func': exec_func,  # function executed for every benchmark, to be executed
-                                          'cleanup_func': cleanup_func}  # function executed after running all benchmarks
+                                          'clean_func': clean_func}  # function executed after running all benchmarks
 
     def print_runtimes(self):
         print()
@@ -171,13 +171,22 @@ class BenchmarkingHarness(object):
 
         make_func = found_runtime['make_func']
         exec_func = found_runtime['exec_func']
-        cleanup_func = found_runtime['cleanup_func']
+        clean_func = found_runtime['clean_func']
 
         allow_overwrite = kwargs.get('allow_overwrite', False)   # TODO: overwrite handing?
 
         logger.info('start with the execution of the runtime enviroment "%s"', runtime)
 
         try:
+            # clean step
+            if kwargs.get('skip_clean', False):
+                logger.warning('clean step skipped for "%s"', runtime)
+            else:
+                logger.info('execute clean step for "%s"', runtime)
+                if not clean_func(self.testdir, **kwargs):
+                    logger.error('clean step for "%s" failed', runtime)
+                    return False
+
             # compilation step
             if kwargs.get('skip_compilation', False):
                 logger.warning('compilation step skipped for "%s"', runtime)
@@ -211,15 +220,6 @@ class BenchmarkingHarness(object):
                     raise
                 except:
                     logger.exception('Something went wrong while running the benchmark: "%s:%s"', harness_name, runtime_name)
-
-            # cleanup step
-            if kwargs.get('skip_cleanup', False):
-                logger.warning('cleanup step skipped for "%s"', runtime)
-            else:
-                logger.info('execute cleanup step for "%s"', runtime)
-                if not cleanup_func(self.testdir, **kwargs):
-                    logger.error('cleanup step for "%s" failed', runtime)
-                    return False
 
         except KeyboardInterrupt:
             raise
@@ -315,10 +315,10 @@ if __name__ == "__main__":
                         help='show a list of all runtimes which can be executed')  # TODO: currently this lists only the default runtimes
     #parser.add_argument('--no-color', action='store_true',
     #                    help='disable color output')
+    parser.add_argument('--skip-clean', action='store_true',
+                        help='skip the clean step when benchmarking')
     parser.add_argument('--skip-compilation', action='store_true',
                         help='skip the compilation step when benchmarking')
-    parser.add_argument('--skip-cleanup', action='store_true',
-                        help='skip the cleanup step when benchmarking')
     parser.add_argument('--ignore-errors', '-i', action='store_true',
                         help='ignore all errors in the make step to do at least a partial benchmark')
     parser.add_argument('--jobs', '-j',type=int, default=2,
@@ -356,7 +356,7 @@ if __name__ == "__main__":
     try:
         execution_kwargs = {
             'skip_compilation': args.skip_compilation,
-            'skip_cleanup': args.skip_cleanup,
+            'skip_clean': args.skip_clean,
             'filter_harness': args.filter_harness,
             'ignore_errors': args.ignore_errors,
             'make_jobs': args.jobs,

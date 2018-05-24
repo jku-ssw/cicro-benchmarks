@@ -416,8 +416,8 @@ websnarf-bstrlib_$(TEST_SUFFIX): websnarf-bstrlib websnarf-bstrlib_test.c $(C_HA
 ########## https://github.com/wolkykim/qlibc
 
 wolkykim-qlibc_$(TEST_SUFFIX): wolkykim-qlibc wolkykim-qlibc_test.c $(C_HAYAI_DIR)
-	(cd ./wolkykim-qlibc && ./configure  CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)')
-	(cd ./wolkykim-qlibc &&  make -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)')
+	(cd ./wolkykim-qlibc && ./configure  CC='$(CC)' CFLAGS='$(CFLAGS) -fPIC' LDFLAGS='$(LDFLAGS)')
+	(cd ./wolkykim-qlibc &&  make -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS) -fPIC' LDFLAGS='$(LDFLAGS)')
 	$(CC) $(CFLAGS) wolkykim-qlibc_test.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/wolkykim-qlibc_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lpthread wolkykim-qlibc/lib/libqlibc.a
 
