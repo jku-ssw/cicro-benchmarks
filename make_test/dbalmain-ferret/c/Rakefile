@@ -1,0 +1,537 @@
+require 'set'
+require 'erb'
+require 'rake'
+require 'rake/clean'
+require 'ostruct'
+
+class String
+  def /(path)
+    File.join(self, path)
+  end
+end
+
+DEP_EXT = '.dep'
+def dep_file(src)
+  TMP/File.basename(src) + DEP_EXT
+end
+
+def src2obj(src)
+  src.pathmap("%n.o")
+end
+
+def obj_map(srcs, prefix = '')
+  srcs.map do |src|
+    obj = prefix + src2obj(src)
+    FILE2SRC[obj] = src.pathmap('%X.c')
+    obj
+  end
+end
+
+def with_src(file)
+  if src = FILE2SRC[file]
+    yield src
+  else
+    puts "Sorry, I don't know anything about '#{file}'"
+  end
+end
+
+def with_file(file, default=nil)
+  if file.nil? and default
+    yield default
+  elsif File.exists?(file)
+    yield file
+  else
+    puts "Sorry, I don't know anything about '#{file}'"
+  end
+end
+
+def qsh(msg, script)
+  puts "#{msg}..."
+  sh script, {:verbose => false}
+end
+
+def vsh(msg, script)
+  #puts "#{msg}..."
+  sh script
+end
+
+###
+# Useful Constants
+###
+
+DAY = 24 * 60 * 60 # seconds in day
+
+###
+# Path Constants
+#
+# Note: The following may look like a lot of work to do every time Rake is run
+# but it turns out this all runs in less than 0.01 sec.
+###
+TMP             = '.rake'
+FILE2SRC        = {}
+
+STEMMER_DIR     = 'lib/libstemmer_c'
+STEMMER_INC_DIR = STEMMER_DIR / 'include'
+STEMMER_SRCS    = FileList[STEMMER_DIR / 'src_c/*.c',
+                           STEMMER_DIR / 'runtime/api.c',
+                           STEMMER_DIR / 'runtime/utilities.c',
+                           STEMMER_DIR / 'libstemmer/libstemmer.c']
+STEMMER_OBJS    = obj_map(STEMMER_SRCS, 'lib/')
+
+if ENV['USE_ZLIB'] or ENV['USE_CPP']
+  BZLIB_INC_DIR = nil
+  BZLIB_OBJS    = nil
+else
+  BZLIB_DIR     = 'lib/bzlib'
+  BZLIB_INC_DIR = BZLIB_DIR
+  BZLIB_SRCS    = FileList[BZLIB_DIR / '*.c']
+  BZLIB_OBJS    = obj_map(BZLIB_SRCS, 'lib/')
+end
+
+SRCS            = FileList['src/*.c']
+OBJS            = obj_map(SRCS + 
+                          FileList['src/scanner*.rl', 'src/*.y'])
+INC_DIR         = 'include'
+
+TEST_SRCS       = FileList['test/*.c']
+TEST_OBJS       = obj_map(TEST_SRCS)
+
+BENCHMARK_SRCS  = FileList['benchmark/*.c']
+BENCHMARK_OBJS  = obj_map(BENCHMARK_SRCS)
+
+INC_DIRS        = [STEMMER_INC_DIR, BZLIB_INC_DIR, INC_DIR,
+                    'test', 'benchmark'].compact
+INC_FILES       = FileList[*INC_DIRS.map{|dir| File.join(dir, '*.h')}]
+INC_MAP         = INC_FILES.inject({}) {|h, f| h[File.basename(f)] = f;h}
+
+SRC_FILES       = SRCS + TEST_SRCS + BENCHMARK_SRCS
+ALL_BUILD_FILES = INC_FILES + SRC_FILES
+ABF_BASENAMES   = ALL_BUILD_FILES.map do |src|
+  basename = File.basename(src)
+  FILE2SRC[dep_file(src)] = FILE2SRC[basename] = FILE2SRC[src] = src
+  basename
+end
+
+$gcov_results   = OpenStruct.new(:files => {})
+def gcov_sorted_keys
+  $gcov_results.files.keys.sort {|fn1, fn2|
+      res = $gcov_results.files[fn1].percent <=>
+            $gcov_results.files[fn2].percent
+      res = fn2 <=> fn1 if res == 0
+      res
+  }.reverse
+end
+
+###
+# Dependency Handling
+###
+DEP_L1_CACHE = Hash.new do |h, src|
+  Rake::Task[src].invoke unless File.exists?(src)
+  h[src] = File.read(src).scan(/# *include [<"](.*)[">]/).flatten.sort.uniq.
+    map {|bn| FILE2SRC[bn]}.compact
+end
+
+def collect_src_deps(src, collector)
+  collector[src] = true
+  dep_srcs = DEP_L1_CACHE[src]
+  dep_srcs.each do |dep_src|
+    unless collector[dep_src]
+      collector[dep_src] = true
+      collect_src_deps(dep_src, collector)
+    end
+  end
+end
+
+def get_dep_srcs(src)
+  df = dep_file(src)
+  if File.exists?(df) and File.exists?(src) and
+      File.stat(src).mtime < (mtime = File.stat(df).mtime)
+    dep_srcs = Marshal.load(File.read(df))
+    return dep_srcs unless dep_srcs.find {|f| File.stat(f).mtime > mtime}
+  end
+  collector = {}
+  collect_src_deps(src, collector)
+  dep_srcs = collector.keys
+  File.open(df, 'wb') {|f| f.write(Marshal.dump(dep_srcs))}
+  dep_srcs
+end
+
+###
+# Compilation Constants
+###
+CC       = 'gcc'
+DEFS     = "-DBZ_NO_STDIO -D_FILE_OFFSET_BITS=64 " +
+           "-D_POSIX_C_SOURCE=2 -DDEBUG -D_XOPEN_SOURCE=500"
+AR       = "ar"
+CINCS    = INC_DIRS.map{|d| "-I#{d}"}.join(' ')
+LDFLAGS  = "-lm -lpthread"
+DEP_DIR  = ".deps"
+GCOV_DIR = ".gcov"
+CFLAGS   = "-pedantic -Wall -Wextra #{CINCS} -g -fno-common -std=c99 #{DEFS} -funsigned-char"
+
+if (File.exists?(`which gdb 2> /dev/null`.chomp))
+  CFLAGS << " -DHAVE_GDB"
+end
+
+def check_coptions
+  copts_file = TMP/'copts'
+  old_copts = if File.exists?(copts_file)
+    Marshal.load(File.read(copts_file))
+  else
+    {}
+  end
+  copts = {
+    :cflags => CFLAGS,
+    :ldflags => LDFLAGS,
+    :cc => CC
+  }
+  if copts != old_copts
+    File.open(copts_file, 'w') {|f| f.write(Marshal.dump(copts))}
+    Rake::Task[:scrub].invoke
+  end
+end
+
+###
+# Create required directories
+###
+['test/testdir/store', TMP, GCOV_DIR].each {|d| FileUtils.mkdir_p(d)}
+
+###
+# Clean Constants
+###
+CLEAN  .include([ '*.o',
+                  '.rake/*.dep',
+                  '**/*.gcda',
+                  '**/*.gcno',
+                  '*.gcov',
+                  'y.tab.c'])
+CLOBBER.include([ '*.a',
+                  '**/*.o',
+                  '.rake/HAVE_',
+                  'testall',
+                  'gmon.out',
+                  FileList['src/*.rl'].pathmap('%X.c'),
+                  DEP_DIR,
+                  GCOV_DIR])
+
+SCRUB = FileList[CLEAN, '**/*.o']
+desc "clean for rebuild"
+task :scrub do
+  SCRUB.each {|fn| rm_r fn rescue nil}
+end
+
+###
+# Test Helpers
+###
+def run_tests
+  check_coptions
+  Rake::Task[:testall].invoke
+  sh "./testall -q -v"
+end
+
+def use_cpp
+  CC[1,2] = '++'
+  CFLAGS.sub!(/-std=c99/, ' -DUSE_ZLIB')
+  LDFLAGS << ' -lz'
+  FileList['.rake/HAVE_*'].each {|fn| CFLAGS << File.read(fn)}
+end
+
+###
+# gcov Helpers
+###
+GCOV_HIST_FILE = ".rake/gcov.history"
+def load_gcov_history
+  Marshal.load(File.read(GCOV_HIST_FILE))
+end
+
+task :default => :testall
+
+desc "Run all tests"
+task :test do
+  run_tests
+end
+
+desc "Run all tests with c++"
+task :"test++" do
+  use_cpp
+  run_tests
+end
+
+desc "Generate and print gcov results"
+task :gcov => :do_gcov do
+  puts "\ngcov Results\n=============\n"
+  total_lines = 0
+  total_lines_covered = 0
+  gcov_sorted_keys.each do |fn|
+    res = $gcov_results.files[fn]
+    puts "%23s %6.2f%% (%4d)" % [fn, res.percent, res.line_count]
+  end
+  puts "Total Lines:   %s" % $gcov_results.total_lines
+  puts "Covered Lines: %s (%0.2f%%)" % 
+            [$gcov_results.covered_lines, $gcov_results.percent]
+end
+
+desc "Generate .rake/gcov_results.html"
+task :gcov2html => [:do_gcov, '.rake/gcov_history.jpg'] do
+  puts "Generating .rake/gcov_results.html..."
+  File.open('.rake/gcov_results.html', 'w') do |f|
+    f.write(ERB.new(File.read('.rake/gcov_results.erb')).result(binding))
+  end
+end
+
+file '.rake/gcov_history.data' => GCOV_HIST_FILE do |t|
+  history = load_gcov_history
+  start = history.start_date
+  File.open(t.name, 'w') do |f|
+    history.data.each do |d|
+      f.write "%s %.2f\n" %
+        [Time.at((d.day + start) * DAY).strftime("%Y-%m-%d"), d.percent]
+    end
+  end
+end
+
+file '.rake/gcov_history.jpg' => '.rake/gcov_history.data' do |t|
+  sh "gnuplot .rake/gcov_history.plot"
+end
+
+task :do_gcov do
+  CFLAGS << " -fprofile-arcs -ftest-coverage -DNDEBUG"
+  FileList['**/*.gcda'].each{|fn| rm fn}
+  run_tests
+  gcov_result_map = {}
+  gcov_scanner = /File '([^']+)'\nLines executed:(\d+.\d+)% of (\d+)/
+  total_lines = covered_lines = 0
+  OBJS.each do |obj|
+    bn = obj.pathmap('%n')
+    %w{gcda gcno}.each do |ext|
+      fn = "#{bn}.#{ext}"
+      File.rename(fn, GCOV_DIR/fn) if File.exists?(fn)
+    end
+    next unless File.exists?(GCOV_DIR/"#{bn}.gcno") and
+                File.exists?(GCOV_DIR/"#{bn}.gcda")
+    gcov_cmd = "gcov -o .gcov/ #{obj}"
+    details = IO.popen(gcov_cmd).read.scan(gcov_scanner)
+    details.each do |filename, percent, line_count|
+      next if filename =~ /^\//
+      line_count = line_count.to_i
+      percent = percent.to_f
+      $gcov_results.files[filename] = OpenStruct.new(:percent => percent,
+                                                     :line_count => line_count)
+      total_lines += line_count
+      covered_lines += (0.01 * percent * line_count).to_i
+    end
+  end
+  $gcov_results.total_lines = total_lines
+  $gcov_results.covered_lines = covered_lines
+  $gcov_results.percent = percent = 100.0 * covered_lines /total_lines
+  history = load_gcov_history
+  today = Time.now.to_i/DAY - history.start_date
+  history.data.pop if history.data.last.day == today
+  history.data << OpenStruct.new(:day => today,
+                                 :total => total_lines,
+                                 :covered => covered_lines,
+                                 :percent => percent)
+  File.open(GCOV_HIST_FILE, 'w') {|f| f.write(Marshal.dump(history))}
+end
+
+desc "Build the benchmark runner"
+task :benchmark do
+  CFLAGS << ' -O2'
+  check_coptions
+  Rake::Task[:bench].invoke
+end
+
+desc "Build the benchmark runner with c++"
+task :"benchmark++" do
+  use_cpp
+  CFLAGS << ' -O2'
+  check_coptions
+  Rake::Task[:bench].invoke
+end
+
+desc "Detect and configure optional dependencies"
+task :config => '.rake/HAVE_SPARSE_HASH'
+
+namespace :build do
+  desc "Build the Ferret library 'libferret.a'"
+  task :lib => 'libferret.a'
+
+  LIB_FERRET_OBJS = [OBJS, STEMMER_OBJS, BZLIB_OBJS].flatten.compact
+  file "libferret.a" => LIB_FERRET_OBJS do |t|
+    qsh "Generating library: #{t.name}",
+        "#{AR} -cru #{t.name} #{t.prerequisites.join(' ')}"
+  end
+
+  file "testall" => ['test/all_tests.h', TEST_OBJS, 'libferret.a'].flatten do |t|
+    qsh "Building tests",
+        "#{CC} #{CFLAGS} #{t.prerequisites.join(' ')} #{LDFLAGS} -o testall"
+  end
+
+  desc "Build the test tokenizer"
+  task :tokenize do
+    CFLAGS << ' -O2 -DTOKENIZE'
+    check_coptions
+    Rake::Task[:tokenize].invoke
+  end
+
+  file "tokenize" => [LIB_FERRET_OBJS].flatten do |t|
+    qsh "Building tokenize",
+        "#{CC} #{CFLAGS} #{t.prerequisites.join(' ')} #{LDFLAGS} -o #{t.name}"
+  end
+
+  file "bench" => [BENCHMARK_OBJS, 'libferret.a'].flatten do |t|
+    qsh "Building bench",
+        "#{CC} #{CFLAGS} #{t.prerequisites.join(' ')} #{LDFLAGS} -o #{t.name}"
+  end
+
+  file 'test/all_tests.h' => FileList['test/test_*.c'] do |t|
+    File.open(t.name, 'w') do |f|
+      tests = t.prerequisites.map{|fn|
+        File.read(fn).scan(/TestSuite \*(ts_[_A-Za-z0-9]+)/)
+      }.flatten
+      f.write(ERB.new(File.read('test/all_tests.erb')).result(binding))
+    end
+  end
+
+  file 'benchmark/all_benchmarks.h' => FileList['benchmark/bm_*.c'] do |t|
+    File.open(t.name, 'w') do |f|
+      benchmarks = t.prerequisites.map{|fn|
+        File.read(fn).scan(/BENCH\((\w+)\)/)
+      }.flatten
+      f.write(ERB.new(File.read('benchmark/all_benchmarks.erb')).result(binding))
+    end
+  end
+
+  file 'include/internal.h' =>
+        FileList['include/*.h'].exclude('include/internal.h') do |t|
+    # read in all of the data removing the initial masking defines
+    data = t.prerequisites.map {|f| File.read(f).sub(/^.*\n.*\n/, '')}.join
+    File.open(t.name, 'w') do |f|
+      f.write "#ifndef FRT_INTERNAL_H\n"
+      f.write "#define FRT_INTERNAL_H\n"
+      f.write "\n"
+
+      [
+        ['Constants', 'FRT_'],
+        ['Types',     'Frt' ],
+        ['Functions', 'frt_']
+      ].each do |header, re|
+        names = data.scan(/#{re}[A-Za-z0-9_]+/).sort.uniq
+        next unless names and names.size > 0
+        f.write "/* #{header} */\n"
+        maxlen = names.map{|name| name.size}.max - re.size
+        names.each do |name|
+          f.write "#define %-#{maxlen}s #{name}\n" % name.sub(/^#{re}/, '')
+        end
+        f.write "\n"
+      end
+      f.write "#endif\n"
+    end
+  end
+
+  rule '.o' => lambda {|obj| get_dep_srcs(FILE2SRC[obj])} do |t|
+    qsh "Compiling #{t.name}",
+        "#{CC} #{CFLAGS} -c -o #{t.name} #{FILE2SRC[t.name]}"
+  end
+
+  rule '.c' => '.y' do |t|
+    sh "yacc -o #{t.name} -p frt_ #{t.prerequisites.join(' ')}"
+  end
+
+  rule '.c' => '.rl' do |t|
+    sh "ragel #{t.prerequisites.join(' ')} -o #{t.name}"
+  end
+
+  file 'src/scanner_mb.rl' => 'src/scanner.in' do
+    FileUtils.touch('src/scanner_mb.rl')
+  end
+
+  file '.rake/HAVE_SPARSE_HASH' => '.rake/have_sparse_hash.cpp' do |t|
+    begin
+      sh "g++ #{t.prerequisites.join(' ')}"
+      File.open(t.name, 'w') {|f| f.write(' -DHAVE_SPARSE_HASH')}
+    rescue
+      File.open(t.name, 'w') {|f|}
+    end
+  end
+end
+
+task :valgrind do
+  check_coptions
+  Rake::Task[:testall].invoke
+  sh "valgrind --suppressions=valgrind.supp " +
+              "--leak-check=yes             " +
+              "--show-reachable=yes         " +
+              "--workaround-gcc296-bugs=yes -v ./testall -q"
+end
+
+task :gen_valgrind do
+  check_coptions
+  Rake::Task[:testall].invoke
+  sh "valgrind --suppressions=valgrind.supp " +
+              "--leak-check=yes             " +
+              "--show-reachable=yes         " +
+              "--gen-suppressions=yes       " +
+              "--workaround-gcc296-bugs=yes -v ./testall -q"
+end
+
+
+namespace :show do
+  desc "Show a files dependencies"
+  task :dep, :src do |t, args|
+    with_src(args.src) {|src| puts get_dep_srcs(src).sort.join("\n")}
+  end
+
+  desc "Show a files direct dependencies"
+  task :'dirdep', :src do |t, args|
+    with_src(args.src) {|src| puts DEP_L1_CACHE[src].sort.join("\n")}
+  end
+
+  desc "Show names in the global namespace"
+  task :names, :file do |t, args|
+    with_file(args.file, 'libferret.a') do |f|
+      `nm -s #{f}`.split(/\n/).each do |l|
+        puts l if l =~ /[0-9a-f]* +([-ABCDGINRSTUVW?])/
+      end
+    end
+  end
+
+  def badname?(l)
+    l =~ /[0-9a-f]* +([-ABCDGINRSTVW?]) (.*)/ and
+                  $2 !~ /^(Frt|frt_|FRT_)/
+  end
+
+  desc "Show bad global names (no frt prefix)"
+  task :badnames, :file do |t, args|
+    with_file(args.file, 'libferret.a') do |f| Rake::Task[f].invoke
+      `nm -s #{f}`.split(/\n/).each do |l|
+        puts l if badname?(l)
+      end
+    end
+  end
+
+  desc "Show all bad global names (no frt prefix)"
+  task :'allbadnames' => OBJS do
+    SRCS.each do |src|
+      next if src =~ /posh\.c/
+      obj = src2obj(src)
+      badnames = `nm -s #{obj}`.split(/\n/).map do |l|
+        '  ==> ' + l.sub(/.* /, '') if badname?(l)
+      end.compact
+      puts obj, *badnames if badnames.size > 0
+    end
+  end
+end
+
+namespace :publish do
+  desc "Publish the gcoverage results"
+  task :gcov => :gcov2html do
+    sh 'scp -P 8900 .rake/gcov_results.html ' +
+         '.rake/gcov_history.jpg davebalmain.com:/var/www/ferret'
+  end
+end
+
+desc "Look for TODO and FIXME tags in the code"
+task :todo do
+  FileList['**/*.[ch]'].egrep /[#*].*(FIXME|TODO|TBD)/i
+end

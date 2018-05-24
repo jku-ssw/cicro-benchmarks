@@ -1,0 +1,7 @@
+obj/*
+lib/*
+bin/*
+.*.swp
+*.pyc
+core
+include/checkedthreads_config.h

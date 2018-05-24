@@ -1,0 +1,17 @@
+*.o
+*.bc
+librope.a
+tests
+*.swp
+.DS_Store
+Debug
+Release
+librope.suo
+librope.sdf
+librope.vcxproj.*
+Build
+*.dSYM
+
+afl/afl
+afl/afl_findings
+

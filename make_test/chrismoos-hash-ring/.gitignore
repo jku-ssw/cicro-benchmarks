@@ -1,0 +1,9 @@
+.DS_Store
+bin/
+build
+ebin
+priv
+c_src/*.o
+.eunit
+*.swp
+lib/python

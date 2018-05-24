@@ -1,0 +1,17 @@
+/hw
+/tmp
+/sample
+/include/config.h*
+/include/stamp-h1
+/Makefile
+/Makefile.in
+/aclocal.m4
+/autom4te.cache
+/autoscan.log
+/config*
+
+*.o
+.deps
+.dirstamp
+
+!configure.ac

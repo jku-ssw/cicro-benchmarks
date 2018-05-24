@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<PackOnBuild>true</PackOnBuild>
+		<InferPackageContents>false</InferPackageContents>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+	  <DocumentationFile>bin\Debug\netstandard2.0\Xamarin.Flex.xml</DocumentationFile>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+	  <DebugType></DebugType>
+	  <DocumentationFile>bin\Release\netstandard2.0\Xamarin.Flex.xml</DocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="NuGet.Build.Packaging" Version="0.2.1">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="GitInfo" Version="2.0.6">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include="..\base.cs">
+			<Link>base.cs</Link>
+		</Compile>
+		<Compile Include="..\flex.cs">
+			<Link>flex.cs</Link>
+		</Compile>
+	</ItemGroup>
+	<Import Project="Xamarin.Flex.Pack.targets" Condition="'$(PackOnBuild)' == 'true'" />
+</Project>

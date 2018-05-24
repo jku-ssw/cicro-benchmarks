@@ -1,0 +1,33 @@
+
+# build files
+/build
+*.o
+*.swp
+*.gcov
+/.sconsign.dblite
+/.sconf_temp/
+/config.log
+mpack-test-file
+mpack-test-blank-file
+/mpack-test-dir/
+/analysis/
+/docs/html/
+/vgcore.*
+
+# visual studio project
+*.suo
+*.opensdf
+*.sdf
+*.vcxproj.user
+/projects/vs/Debug/
+/projects/vs/Release/
+
+# xcode project
+xcuserdata/
+*.xcworkspace/
+.DS_Store
+
+# other junk
+.directory
+/tags
+

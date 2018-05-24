@@ -1,0 +1,6 @@
+*.dep
+HAVE_*
+copts
+gcov_results.html
+gcov_history.jpg
+gcov_history.data

@@ -1,0 +1,99 @@
+################################################################################
+## qLibc
+##
+## Copyright (c) 2010-2015 Seungyoung Kim.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are met:
+##
+## 1. Redistributions of source code must retain the above copyright notice,
+##    this list of conditions and the following disclaimer.
+## 2. Redistributions in binary form must reproduce the above copyright notice,
+##    this list of conditions and the following disclaimer in the documentation
+##    and/or other materials provided with the distribution.
+##
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+## AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+## IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+## ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+## LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+## CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+## SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+## INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+## CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+## ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+## POSSIBILITY OF SUCH DAMAGE.
+################################################################################
+
+prefix		= @prefix@
+exec_prefix	= @exec_prefix@
+
+## qlibc definitions
+QLIBC_INCDIR		= ../include/qlibc
+QLIBC_LIBDIR		= ../lib
+
+## Compiler options
+CC		= @CC@
+CFLAGS		= @CFLAGS@
+CPPFLAGS	= @CPPFLAGS@ -I${QLIBC_INCDIR}
+RM		= @RM@
+DEPLIBS		= @DEPLIBS@
+
+TARGETS1	= \
+		test_qstring		\
+		test_qhashtbl		\
+		test_qhasharr		\
+		test_qhasharr_darkdh	\
+		test_qtreetbl		\
+		test_qlist		\
+		test_qvector		\
+		test_qqueue		\
+		test_qstack
+
+TARGETS2	= ${TARGETS1}
+TARGETS		= ${@EXAMPLES_TARGETS@}
+LIBQLIBC	= ${QLIBC_LIBDIR}/libqlibc.a ${DEPLIBS}
+LIBQLIBCEXT	= ${QLIBC_LIBDIR}/libqlibcext.a
+
+## Main
+all:	${TARGETS}
+
+run:	test
+test:	all
+	@./launcher.sh ${TARGETS}
+
+test_qstring: test_qstring.o
+	${CC} ${CFLAGS} ${CPPFLAGS} -o $@ test_qstring.o ${LIBQLIBC}
+
+test_qtreetbl: test_qtreetbl.o
+	${CC} ${CFLAGS} ${CPPFLAGS} -o $@ test_qtreetbl.o ${LIBQLIBC} -lm
+
+test_qhashtbl: test_qhashtbl.o
+	${CC} ${CFLAGS} ${CPPFLAGS} -o $@ test_qhashtbl.o ${LIBQLIBC}
+
+test_qhasharr: test_qhasharr.o
+	${CC} ${CFLAGS} ${CPPFLAGS} -o $@ test_qhasharr.o ${LIBQLIBC}
+
+test_qhasharr_darkdh: test_qhasharr_darkdh.o
+	${CC} ${CFLAGS} ${CPPFLAGS} -o $@ test_qhasharr_darkdh.o ${LIBQLIBC}
+
+test_qlist: test_qlist.o
+	${CC} ${CFLAGS} ${CPPFLAGS} -o $@ test_qlist.o ${LIBQLIBC}
+
+test_qqueue: test_qqueue.o
+	${CC} ${CFLAGS} ${CPPFLAGS} -o $@ test_qqueue.o ${LIBQLIBC}
+
+test_qstack: test_qstack.o
+	${CC} ${CFLAGS} ${CPPFLAGS} -g -o $@ test_qstack.o ${LIBQLIBC}
+
+test_qvector: test_qvector.o
+	${CC} ${CFLAGS} ${CPPFLAGS} -g -o $@ test_qvector.o ${LIBQLIBC}
+
+## Clear Module
+clean:
+	${RM} -f *.o ${TARGETS}
+
+## Compile Module
+.c.o:
+	${CC} ${CFLAGS} ${CPPFLAGS} -c -o $@ $<

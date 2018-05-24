@@ -1,0 +1,8 @@
+testall
+benchall
+search_bench
+bench
+tokenize
+.deps
+.gdb-bt
+.gcov

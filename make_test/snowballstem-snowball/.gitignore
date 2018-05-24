@@ -1,0 +1,12 @@
+*.o
+/libstemmer
+/snowball
+/src_c
+/stemwords
+/dist
+/jsx_out
+/python_out
+/rust/Cargo.lock
+/rust/target/
+/go/algorithms/
+/go/stemwords/algorithms.go

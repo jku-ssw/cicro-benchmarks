@@ -1,0 +1,8 @@
+#ifndef HW_HIGHWAY_H
+#define HW_HIGHWAY_H
+
+#define DEFAULT_WORKER 2
+#define MAX_PATHS_COUNT 65535
+#define MAX_FD_NUM 4096
+
+#endif // HW_HIGHWAY_H

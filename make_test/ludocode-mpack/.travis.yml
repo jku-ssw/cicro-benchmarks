@@ -1,0 +1,44 @@
+language: c
+
+dist: trusty
+sudo: false
+
+addons:
+  apt:
+    packages:
+      - clang
+      - valgrind
+
+script: tools/ci.sh
+
+compiler:
+  - clang
+  - gcc
+  - scan-build
+
+env:
+  - AMALGAMATED=1
+  - STANDARD=1
+
+matrix:
+  include:
+
+    # osx build
+    - os: osx
+      compiler: clang
+      env: "OSX=1"
+
+    # code coverage build
+    - os: linux
+      compiler: gcov
+      env: "STANDARD=1"
+      addons:
+        apt:
+          packages:
+            - valgrind
+            # these packages are needed for urllib3[secure] for SNI support for
+            # coveralls integration
+            - build-essential
+            - python-dev
+            - libffi-dev
+            - libssl-dev

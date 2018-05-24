@@ -1,0 +1,87 @@
+language: c
+sudo: false
+
+os:
+  - linux
+  - osx
+
+compiler:
+  - gcc
+  - clang
+
+env:
+  - OOT=1 TEST=0 THR="none" CONF="auto"
+  - OOT=0 TEST=1 THR="none" CONF="auto"
+  - OOT=0 TEST=1 THR="none" CONF="penryn"
+  - OOT=0 TEST=0 THR="none" CONF="sandybridge"
+  - OOT=0 TEST=0 THR="none" CONF="haswell"
+  - OOT=0 TEST=0 THR="none" CONF="knl"
+  - OOT=0 TEST=0 THR="none" CONF="bulldozer"
+  - OOT=0 TEST=0 THR="none" CONF="piledriver"
+  - OOT=0 TEST=0 THR="none" CONF="steamroller"
+  - OOT=0 TEST=0 THR="none" CONF="excavator"
+  - OOT=0 TEST=0 THR="none" CONF="zen"
+  - OOT=0 TEST=0 THR="openmp" CONF="auto"
+  - OOT=0 TEST=0 THR="pthreads" CONF="auto"
+  
+matrix:
+  allow_failures:
+    - env: OOT=0 TEST=0 THR="none" CONF="knl"
+    - os: osx
+      env: OOT=0 TEST=1 THR="none" CONF="auto"
+  exclude:
+    - os: linux
+      compiler: clang
+    - os: osx
+      compiler: gcc
+    - os: osx
+      env: OOT=1 TEST=0 THR="none" CONF="auto"
+    - os: osx
+      env: OOT=0 TEST=1 THR="none" CONF="penryn"
+    - os: osx
+      env: OOT=0 TEST=0 THR="none" CONF="sandybridge"
+    - os: osx
+      env: OOT=0 TEST=0 THR="none" CONF="haswell"
+    - os: osx
+      env: OOT=0 TEST=0 THR="none" CONF="knl"
+    - os: osx
+      env: OOT=0 TEST=0 THR="none" CONF="bulldozer"
+    - os: osx
+      env: OOT=0 TEST=0 THR="none" CONF="piledriver"
+    - os: osx
+      env: OOT=0 TEST=0 THR="none" CONF="steamroller"
+    - os: osx
+      env: OOT=0 TEST=0 THR="none" CONF="excavator"
+    - os: osx
+      env: OOT=0 TEST=0 THR="none" CONF="zen"
+    - os: osx
+      env: OOT=0 TEST=0 THR="openmp" CONF="auto"
+
+install:
+  - if [ "$CC" = "gcc" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then export CC="gcc-5"; fi
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-5
+    - clang
+    
+script:
+  - export DIST_PATH=.
+  - pwd
+  - if [ $OOT -eq 1 ]; then mkdir oot; cd oot; export DIST_PATH=..; fi
+  - pwd
+  - $DIST_PATH/configure -t $THR CC=$CC $CONF
+  - pwd
+  - ls -l
+  - $CC --version
+  - make -j 2
+  - export BLIS_IC_NT=2
+  - export BLIS_JC_NT=1
+  - export BLIS_IR_NT=1
+  - export BLIS_JR_NT=1
+  - if [ $TEST -eq 1 ]; then travis_wait 30 make BLIS_ENABLE_TEST_OUTPUT=yes test; fi
+  - if [ $TEST -eq 1 ]; then $DIST_PATH/build/check-test.sh ./output.testsuite; fi
+

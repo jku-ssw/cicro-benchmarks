@@ -1,0 +1,15 @@
+AS=clang
+CC=clang
+
+TESTHARNESS=jku_test
+
+build_jku:
+	./configure
+	make -C . AS=$(AS) CC=$(CC)
+
+build_test: build_jku
+	$(CC) jku_test.c -o $(TESTHARNESS)
+
+clean:
+	make -C . distclean
+	rm -f Makefile
