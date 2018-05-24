@@ -4,6 +4,8 @@ import argparse
 import logging
 import sys
 
+import matplotlib.pyplot as plt
+
 from util.bench_results import BenchmarkingResults
 from util.color_logger import get_logger
 from util.analyze import preprocess
@@ -12,7 +14,28 @@ logger = get_logger('plot' )
 
 
 def boxplot(datapoints):
-    pass
+    # get all valid labels
+    labels = set()
+    for value in datapoints.values():
+        labels.update(value.keys())
+    labels = sorted(labels, reverse=True)
+
+    # creaet value arrays
+    values = []
+    for label in labels:
+        label_values = []
+        for value in datapoints.values():
+            if label in value:
+                assert value[label]['mean'] != 0
+                label_values.append(value[label]['mean'])
+        values.append(label_values)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    ax.boxplot(values, vert=False, notch=1, labels=labels)
+
+    plt.show()
 
 
 if __name__ == "__main__":

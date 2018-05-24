@@ -20,12 +20,18 @@ def preprocess(results, baseline):
             baseline_mean = runs[baseline]['mean']
             baseline_std_dev = runs[baseline]['std_dev']
 
+            assert baseline_mean != 0
+            assert baseline_std_dev != 0
+
             for runtime, data in runs.items():
                 if runtime == baseline:
                     continue
 
                 normalized_mean = data['mean'] / baseline_mean
                 normalized_std_dev = data['std_dev'] / baseline_std_dev
+
+                assert normalized_mean != 0
+                assert normalized_std_dev != 0
 
                 processed_data[benchmark_name][runtime] = {'mean': normalized_mean,
                                                            'std_dev': normalized_std_dev}
