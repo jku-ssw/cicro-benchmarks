@@ -234,13 +234,13 @@ def add_default_runtimes(harness):
     """Those are some default runtimes which can also serve as example for custom ones"""
 
     # Clang
-    harness.add_runtime('clang-O0', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything"})
+    harness.add_runtime('clang-O0', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O0"})
     harness.add_runtime('clang-O1', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O1"})
     harness.add_runtime('clang-O2', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O2"})
     harness.add_runtime('clang-O3', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O3"})
 
     # Clang + AddressSanitizer
-    harness.add_runtime('clang-fsanitize=address-O0', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything"})
+    harness.add_runtime('clang-fsanitize=address-O0', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O0 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
     harness.add_runtime('clang-fsanitize=address-O1', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O1 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
     harness.add_runtime('clang-fsanitize=address-O2', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O2 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
     harness.add_runtime('clang-fsanitize=address-O3', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O3 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
@@ -272,19 +272,19 @@ def add_default_runtimes(harness):
 
                 return json.loads(stdout)
 
-    harness.add_runtime('lli-O0', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything"}, make_func=lli_make, exec_func=lli_executor)
+    harness.add_runtime('lli-O0', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O0"}, make_func=lli_make, exec_func=lli_executor)
     harness.add_runtime('lli-O1', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O1"}, make_func=lli_make, exec_func=lli_executor)
     harness.add_runtime('lli-O2', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O2"}, make_func=lli_make, exec_func=lli_executor)
     harness.add_runtime('lli-O3', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O3"}, make_func=lli_make, exec_func=lli_executor)
 
     # GNU Compiler Collection
-    harness.add_runtime('gcc-O0', {"CC": "gcc", "AS": "as"})
+    harness.add_runtime('gcc-O0', {"CC": "gcc", "AS": "as", "CFLAGS": "-O0"})
     harness.add_runtime('gcc-O1', {"CC": "gcc", "AS": "as", "CFLAGS": "-O1"})
     harness.add_runtime('gcc-O2', {"CC": "gcc", "AS": "as", "CFLAGS": "-O2"})
     harness.add_runtime('gcc-O3', {"CC": "gcc", "AS": "as", "CFLAGS": "-O3"})
 
     # Tiny C Compiler
-    harness.add_runtime('tcc-O0', {"CC": "tcc", "AS": "tcc"})
+    harness.add_runtime('tcc-O0', {"CC": "tcc", "AS": "tcc", "CFLAGS": "-O0"})
     harness.add_runtime('tcc-O1', {"CC": "tcc", "AS": "tcc", "CFLAGS": "-O1"})
     harness.add_runtime('tcc-O2', {"CC": "tcc", "AS": "tcc", "CFLAGS": "-O2"})
     harness.add_runtime('tcc-O3', {"CC": "tcc", "AS": "tcc", "CFLAGS": "-O3"})

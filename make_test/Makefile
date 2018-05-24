@@ -13,7 +13,7 @@ TEST_DIR = .
 
 C_HAYAI_DIR = ../C-Hayai
 C_HAYAI_LDFLAGS = -I $(C_HAYAI_DIR)/src -lm
-C_HAYAI_LIB = $(C_HAYAI_DIR)/src/libchayai.a
+C_HAYAI_LIB = $(C_HAYAI_DIR)/build/src/libchayai.a
 C_HAYAI_CFLAGS = $(C_HAYAI_LIB)
 
 # Projects to build
@@ -36,7 +36,7 @@ all: $(PROJECTS:=_$(TEST_SUFFIX))
 
 clean: $(PROJECTS:=_clean)
 	rm -f .*.o
-	$(MAKE) -C $(C_HAYAI_DIR) clean
+	rm -rf $(C_HAYAI_DIR)/build
 
 test: $(addprefix exec_, $(PROJECTS:=_$(TEST_SUFFIX)))
 
@@ -51,8 +51,9 @@ exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 # Build Benchmark Runner
 
 $(C_HAYAI_LIB): $(C_HAYAI_DIR)/src/*
-	(cd $(C_HAYAI_DIR) && cmake . -DCMAKE_C_COMPILER='$(CC)' -DCMAKE_C_FLAGS='$(CFLAGS)' -DCMAKE_STATIC_LINKER_FLAGS='$(LDFLAGS)')
-	$(MAKE) -C $(C_HAYAI_DIR) -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)'
+	mkdir -p $(C_HAYAI_DIR)/build
+	(cd $(C_HAYAI_DIR)/build && cmake ../ -DCMAKE_C_COMPILER='$(CC)' -DCMAKE_C_FLAGS='$(CFLAGS)' -DCMAKE_STATIC_LINKER_FLAGS='$(LDFLAGS)')
+	$(MAKE) -C $(C_HAYAI_DIR)/build -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)'
 
 #.PHONY: $(C_HAYAI_LIB)
 
