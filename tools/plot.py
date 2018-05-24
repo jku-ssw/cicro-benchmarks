@@ -45,6 +45,8 @@ if __name__ == "__main__":
 
     parser.add_argument('benchfile',metavar='BENCHFILE', type=argparse.FileType('r'),
                         help='file where the benchmarks are written to')
+    parser.add_argument('base', metavar='BASE_RUNTIME', type=str,
+                        help='runtime run which is used as base')
 
     parser.add_argument('--filter-runtimes', metavar='REGEX', type=str, default='gcc-O0|clang-O0',
                         help='regular expression to select which runtimes should be used')
@@ -67,7 +69,12 @@ if __name__ == "__main__":
         logger.exception("cannot load file")
         sys.exit()
 
-    processed_data = preprocess(results, 'clang-O2')  # TODO: baseline
+    if args.base not in results.get_all_runtimes():
+        logger.error('%s is not a valid runtime', args.base)
+        logger.info('valid: %s', results.get_all_runtimes())
+        sys.exit()
+
+    processed_data = preprocess(results, args.base)  # TODO: baseline
 
     logger.debug(str(processed_data))
 
