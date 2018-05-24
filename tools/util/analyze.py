@@ -1,4 +1,4 @@
-import logging
+import re
 
 from util.color_logger import get_logger
 
@@ -6,9 +6,12 @@ from util.color_logger import get_logger
 logger = get_logger('plot' )
 
 
-def preprocess(results, baseline):
+def preprocess(results, baseline, filter_runtime='.*', filter_benchmark='.*'):
     processed_data = {}
     for benchmark_name in results.get_all_benchmark_names():
+        if not re.match(filter_benchmark, benchmark_name):
+            continue
+
         try:
             runs = results.get_all_benchmark_runs(benchmark_name)
             if baseline not in runs:
@@ -25,6 +28,9 @@ def preprocess(results, baseline):
 
             for runtime, data in runs.items():
                 if runtime == baseline:
+                    continue
+
+                if not re.match(filter_runtime, runtime):
                     continue
 
                 normalized_mean = data['mean'] / baseline_mean

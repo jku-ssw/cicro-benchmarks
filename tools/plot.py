@@ -48,10 +48,10 @@ if __name__ == "__main__":
     parser.add_argument('base', metavar='BASE_RUNTIME', type=str,
                         help='runtime run which is used as base')
 
-    parser.add_argument('--filter-runtimes', metavar='REGEX', type=str, default='gcc-O0|clang-O0',
+    parser.add_argument('--filter-runtime', metavar='REGEX', type=str, default='.*',
                         help='regular expression to select which runtimes should be used')
-    parser.add_argument('--filter-harness', metavar='REGEX', type=str, default='.*',
-                        help='regular expression to select which harness should be used (based on filename)')
+    parser.add_argument('--filter-benchmark', metavar='REGEX', type=str, default='.*',
+                        help='regular expression to select which harness should be used (based on benchmark name)')
 
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='enable debug output')
@@ -74,7 +74,11 @@ if __name__ == "__main__":
         logger.info('valid: %s', results.get_all_runtimes())
         sys.exit()
 
-    processed_data = preprocess(results, args.base)  # TODO: baseline
+    processed_data = preprocess(results, args.base, filter_runtime=args.filter_runtime, filter_benchmark=args.filter_benchmark)
+
+    if not processed_data:
+        logger.error('no data to plot!')
+        sys.exit()
 
     logger.debug(str(processed_data))
 

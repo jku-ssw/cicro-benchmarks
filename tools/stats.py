@@ -30,10 +30,10 @@ if __name__ == "__main__":
     parser.add_argument('benchfile',metavar='BENCHFILE', type=argparse.FileType('r'),
                         help='file where the benchmarks are written to')
 
-    parser.add_argument('--filter-runtimes', metavar='REGEX', type=str, default='gcc-O0|clang-O0',
-                        help='regular expression to select which runtimes should be used')
-    parser.add_argument('--filter-harness', metavar='REGEX', type=str, default='.*',
-                        help='regular expression to select which harness should be used (based on filename)')
+    #parser.add_argument('--filter-runtime', metavar='REGEX', type=str, default='gcc-O0|clang-O0',
+    #                    help='regular expression to select which runtimes should be used')
+    #parser.add_argument('--filter-harness', metavar='REGEX', type=str, default='.*',
+    #                    help='regular expression to select which harness should be used (based on filename)')
 
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='enable debug output')
