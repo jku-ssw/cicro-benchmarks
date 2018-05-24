@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "chayai.h"
 
 #include "kbranigan-cJSON/cJSON.h"

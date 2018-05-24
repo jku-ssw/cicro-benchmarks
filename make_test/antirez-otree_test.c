@@ -18,8 +18,7 @@ BENCHMARK(otree, alloc_free, 100, 10) {
     bt = btree_open(NULL, "./btree.db", BTREE_CREAT); // TODO: store in tmp directory or even in RAM
     btree_clear_flags(bt, BTREE_FLAG_USE_WRITE_BARRIER);
     if (bt == NULL) {
-        perror("btree_open");
-        exit(1);
+        abort();
     }
 
     for (int j = 0; j < count; j++) { // TODO: do some more sophisticated that alloc and free behind each other

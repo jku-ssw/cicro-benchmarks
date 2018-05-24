@@ -6,6 +6,7 @@
 
 #include "stddef.h"
 #include <string.h>
+#include <stdlib.h>
 #include <argp.h>
 
 #define OUTPUT_STREAM stdout

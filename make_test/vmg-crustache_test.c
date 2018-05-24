@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "chayai.h"
 
@@ -26,7 +27,7 @@ int crustache_context_find(crustache_var *var, void *context, const char *key, s
        || strncmp("name", key, key_size) == 0
        || strncmp("url", key, key_size) == 0) {
         var->type = CRUSTACHE_VAR_STR;
-        var->data = key;
+        var->data = (void*)key;
         var->size = key_size;
     } else {
         var->type = CRUSTACHE_VAR_CONTEXT;

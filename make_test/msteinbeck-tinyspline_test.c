@@ -5,7 +5,7 @@
 #include "tinyspline.h"
 
 
-CTRL_POINTS = 500;
+int CTRL_POINTS = 500;
 BENCHMARK(msteinbeck, tinyspline, 10, 1) {
     tsBSpline spline;
 
@@ -19,9 +19,10 @@ BENCHMARK(msteinbeck, tinyspline, 10, 1) {
 
     /* Setup control points. */
     for(int i = 0; i < 3*CTRL_POINTS;) {
-        spline.ctrlp[i++] = i;
-        spline.ctrlp[i++] = i*-1.0;
-        spline.ctrlp[i++] = 0.0;
+        spline.ctrlp[i] = i+1;
+        spline.ctrlp[i+1] = (i+2) * -1.0;
+        spline.ctrlp[i+2] = 0.0;
+        i += 3;
     }
 
     tsBSpline draw;
