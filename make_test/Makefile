@@ -50,11 +50,11 @@ exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 
 # Build Benchmark Runner
 
-$(C_HAYAI_LIB):
+$(C_HAYAI_LIB): $(C_HAYAI_DIR)/src/*
 	(cd $(C_HAYAI_DIR) && cmake . -DCMAKE_C_COMPILER='$(CC)' -DCMAKE_C_FLAGS='$(CFLAGS)' -DCMAKE_STATIC_LINKER_FLAGS='$(LDFLAGS)')
 	$(MAKE) -C $(C_HAYAI_DIR) -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)'
 
-.PHONY: $(C_HAYAI_LIB)
+#.PHONY: $(C_HAYAI_LIB)
 
 
 ########## https://github.com/100/Cranium
