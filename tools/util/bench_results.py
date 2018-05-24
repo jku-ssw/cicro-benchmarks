@@ -129,7 +129,7 @@ class BenchmarkingResults(object):
         return [result[0] for result in self.c.fetchall()]
 
     def get_missing_benchmark_names(self, runtime):
-        self.c.execute('SELECT DISTINCT(`NAME`) FROM `BENCHMARKS` WHERE `NAME` NOT IN (SELECT `NAME` FROM `BENCHMARKS` WHERE `RUNTIME`=?)', (runtime, ))
+        self.c.execute('SELECT DISTINCT(`NAME`) FROM `BENCHMARKS` WHERE `NAME` NOT IN (SELECT `NAME` FROM `BENCHMARKS` WHERE `RUNTIME`=?) ORDER BY `NAME`', (runtime, ))
         return [result[0] for result in self.c.fetchall()]
 
     def get_all_runtimes(self):
