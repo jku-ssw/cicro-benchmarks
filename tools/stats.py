@@ -17,6 +17,10 @@ def log_general_stats(results):
     for runtime in sorted(results.get_all_runtimes()):
         logger.info('runtime "%s" has %d benchmarks', runtime, len(list(results.get_all_benchmarks_of_runtime(runtime))))
 
+        missing_benchmarks = results.get_missing_benchmark_names(runtime)
+        if missing_benchmarks:
+            logger.warning('  missing: %s', missing_benchmarks)
+
 
 if __name__ == "__main__":
     # Parse Command-line Arguments
