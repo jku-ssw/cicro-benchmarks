@@ -1,3 +1,17 @@
 *_test
 *.o*
 *.bc
+
+tmp/
+
+wbhart-bsdnt/Makefile
+wbhart-bsdnt/config.h
+wbhart-bsdnt/cpuid
+wbhart-bsdnt/endian
+wbhart-bsdnt/helper_arch.h
+wbhart-bsdnt/libbsdnt.a
+wbhart-bsdnt/nn_arch.h
+wbhart-bsdnt/nn_linear_arch.h
+wbhart-bsdnt/nn_quadratic_arch.h
+wbhart-bsdnt/nn_subquadratic_arch.h
+wbhart-bsdnt/types_arch.h
