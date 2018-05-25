@@ -148,7 +148,7 @@ dbalmain-ferret_$(TEST_SUFFIX): dbalmain-ferret dbalmain-ferret_test.c $(C_HAYAI
 	$(CC) $(CFLAGS) dbalmain-ferret_test.c dbalmain-ferret/c/src/*c dbalmain-ferret/c/lib/bzlib/*.c \
 	 dbalmain-ferret/c/lib/libstemmer_c/libstemmer/libstemmer.c dbalmain-ferret/c/lib/libstemmer_c/src_c/*.c \
 	 dbalmain-ferret/c/lib/libstemmer_c/runtime/*.c $(C_HAYAI_CFLAGS) \
-	 -o "$(TEST_DIR)/dbalmain-ferret_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm -lpthread -I dbalmain-ferret/c/include
+	 -o "$(TEST_DIR)/dbalmain-ferret_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm -lpthread -I dbalmain-ferret/c/include -I dbalmain-ferret/c/lib/libstemmer_c/include
 
 ########## https://github.com/dcjones/hat-trie
 
