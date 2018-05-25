@@ -186,13 +186,13 @@ FLAME-BLIS_INC = flame-blis flame-blis/config/generic $(sort $(dir $(wildcard fl
 FLAME-BLIS_INC_PARAMS = $(foreach d, $(FLAME-BLIS_INC), -I$d)
 
 flame-blis_$(TEST_SUFFIX): flame-blis flame-blis_test.c $(C_HAYAI_LIB)
-	#(cd flame-blis && ./configure generic)
+	(cd flame-blis && ./configure generic)
 	(cd ./flame-blis && $(MAKE) -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)')
 	$(CC) $(CFLAGS) flame-blis_test.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/flame-blis_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) ${FLAME-BLIS_INC_PARAMS} -lm -lpthread ./flame-blis/lib/generic/libblis.a
 
 flame-blis_clean:
-	(cd ./flame-blis && $(MAKE) clean)
+	(cd ./flame-blis && $(MAKE) clean cleanmk; exit 0)
 	rm -f "$(TEST_DIR)/flame-blis_$(TEST_SUFFIX)"
 
 ########## https://github.com/imneme/pcg-c-basic
