@@ -126,7 +126,11 @@ class BenchmarkingHarness(object):
             if process.returncode != 0:
                 return None
 
-            return json.loads(stdout)
+            try:
+                return json.loads(stdout)
+            except json.JSONDecodeError:
+                logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
+                raise
 
     def add_runtime(self, name, make_env, make_func=default_make.__get__(object), exec_func=default_executor.__get__(object), clean_func=default_clean.__get__(object)):
         assert name not in self.registered_runtimes
@@ -270,7 +274,11 @@ def add_default_runtimes(harness):
                 if process.returncode != 0:
                     return None
 
-                return json.loads(stdout)
+                try:
+                    return json.loads(stdout)
+                except json.JSONDecodeError:
+                    logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
+                    raise
 
     harness.add_runtime('lli-O0', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O0"}, make_func=lli_make, exec_func=lli_executor)
     harness.add_runtime('lli-O1', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O1"}, make_func=lli_make, exec_func=lli_executor)
