@@ -8,20 +8,6 @@
 #include "zedshaw-liblcthw/src/lcthw/bstree.h"
 #include "zedshaw-liblcthw/src/lcthw/hashmap.h"
 
-// override fprintf function, because liblcthw has some debug output on it
-#define DEBUG_STR "DEBUG %s:%d:"
-int fprintf(FILE * stream, const char * format, ...) {
-    if(stream == stderr && strncmp(DEBUG_STR, format, strlen(DEBUG_STR)) == 0) {
-        return 0;
-    } else {
-        va_list args;
-        va_start (args, format);
-        int ret = vfprintf(stream, format, args);
-        va_end (args);
-        return ret;
-    }
-}
-
 int cmp_node(void *a, void *b) {
 
     return (*(int*)b) - (*(int*)a);

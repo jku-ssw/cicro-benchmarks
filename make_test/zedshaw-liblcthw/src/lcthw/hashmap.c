@@ -1,4 +1,4 @@
-//#undef NDEBUG
+#define NDEBUG
 #include <stdint.h>
 #include <lcthw/hashmap.h>
 #include <lcthw/dbg.h>
