@@ -47,7 +47,6 @@ void chayai_set_warmup_iterations(unsigned int warmup)
 void chayai_run_benchmarks()
 {
     CHayaiBenchmarkResult result;
-    int64_t timeRun;
 
     if (currentOutputter == NULL) return;
     
@@ -62,7 +61,7 @@ void chayai_run_benchmarks()
         result.timeTotal = 0;
         result.timeRunMin = INT64_MAX;
         result.timeRunMax = INT64_MIN;
-        result.singleRuns = malloc(result.runs * sizeof(int64_t));
+        result.singleRuns = malloc(result.runs * sizeof(struct CHayaiBenchmarkSingleRunResult));
 
         currentOutputter->beginBenchmark(
             currentBenchmarkDescriptor->fixtureName,
@@ -76,11 +75,13 @@ void chayai_run_benchmarks()
         }
 
         for(unsigned int i=0; i < result.runs; i++) {
-            timeRun = currentBenchmarkDescriptor->runFunction();
-            result.timeTotal += timeRun;
-            result.singleRuns[i] = timeRun;
-            if (result.timeRunMin > timeRun) result.timeRunMin = timeRun;
-            if (result.timeRunMax < timeRun) result.timeRunMax = timeRun;
+            struct CHayaiBenchmarkSingleRunResult singleRun = currentBenchmarkDescriptor->runFunction();
+
+            result.singleRuns[i] = singleRun;
+
+            result.timeTotal += singleRun.time;
+            if (result.timeRunMin > singleRun.time) result.timeRunMin = singleRun.time;
+            if (result.timeRunMax < singleRun.time) result.timeRunMax = singleRun.time;
         }
         
         

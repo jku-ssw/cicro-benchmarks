@@ -128,7 +128,7 @@ static void chayai_console_outputter_end_benchmark(
     
     double variance = 0;
     for(unsigned int i=0; i < result->runs; i++) {
-        const double runTimeSingleRun = result->singleRuns[i] / 1e3;
+        const double runTimeSingleRun = result->singleRuns[i].time / 1e3;
         variance +=  (runTimeSingleRun - runTimeAvgUs) * (runTimeSingleRun - runTimeAvgUs);
     }
     variance /= result->runs;

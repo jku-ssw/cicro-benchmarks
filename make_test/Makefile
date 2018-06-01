@@ -57,6 +57,7 @@ $(C_HAYAI_LIB): $(C_HAYAI_DIR)/src/*
 
 #.PHONY: $(C_HAYAI_LIB)
 
+LDFLAGS += -lpapi
 
 ########## https://github.com/100/Cranium
 

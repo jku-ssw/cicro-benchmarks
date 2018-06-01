@@ -11,6 +11,11 @@ else()
     set(EXT_LIB "")
 endif()
 
+if(COMMAND cmake_policy)
+    cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
+
 add_executable(sample
   delivery_man_benchmark.c
   delivery_man_benchmark_with_fixture.c
