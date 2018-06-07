@@ -319,7 +319,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--testdir', metavar='TESTDIR', type=_TestDirType(), default=BENCHMARK_DIR,
                         help='directory where the tests and the Makefile is contained')
-    parser.add_argument('--filter-runtime', metavar='REGEX', type=str, default='gcc-O0|clang-O0',
+    parser.add_argument('--filter-runtime', metavar='REGEX', type=str, default='.*',
                         help='regular expression to select which runtimes should be used')
     parser.add_argument('--filter-harness', metavar='REGEX', type=str, default='.*',
                         help='regular expression to select which harness should be used (based on filename)')
