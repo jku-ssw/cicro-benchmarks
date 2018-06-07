@@ -3,11 +3,12 @@ import sqlite3
 
 from .color_logger import get_logger
 
-logger = get_logger('bench_results' )
+logger = get_logger('bench_results')
 
 
 def get_benchmark_name(benchmark):
     return "{}.{}".format(benchmark.get('fixture'), benchmark.get('name'))
+
 
 class BenchmarkingResults(object):
     def __init__(self):
@@ -111,7 +112,10 @@ class BenchmarkingResults(object):
 
     def get_all(self):
         self.c.execute('SELECT `NAME`, `RUNTIME`, `HARNESS`, `DATA` FROM `BENCHMARKS` ORDER BY `NAME`')
-        return [{'name': result[0], 'runtime': result[1], 'harness': result[2], 'data': json.loads(result[3])} for result in self.c.fetchall()]
+        return [{'name': result[0],
+                 'runtime': result[1],
+                 'harness': result[2],
+                 'data': json.loads(result[3])} for result in self.c.fetchall()]
 
     def get_all_benchmarks_of_runtime(self, runtime):
         self.c.execute('SELECT `NAME` FROM `BENCHMARKS` WHERE `RUNTIME`=? ORDER BY `NAME`', (runtime,))
@@ -129,7 +133,8 @@ class BenchmarkingResults(object):
         return [result[0] for result in self.c.fetchall()]
 
     def get_missing_benchmark_names(self, runtime):
-        self.c.execute('SELECT DISTINCT(`NAME`) FROM `BENCHMARKS` WHERE `NAME` NOT IN (SELECT `NAME` FROM `BENCHMARKS` WHERE `RUNTIME`=?) ORDER BY `NAME`', (runtime, ))
+        self.c.execute("""SELECT DISTINCT(`NAME`) FROM `BENCHMARKS`
+            WHERE `NAME` NOT IN (SELECT `NAME` FROM `BENCHMARKS` WHERE `RUNTIME`=?) ORDER BY `NAME`""", (runtime, ))
         return [result[0] for result in self.c.fetchall()]
 
     def get_all_runtimes(self):

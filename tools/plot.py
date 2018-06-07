@@ -10,7 +10,7 @@ from util.bench_results import BenchmarkingResults
 from util.color_logger import get_logger
 from util.analyze import preprocess
 
-logger = get_logger('plot' )
+logger = get_logger('plot')
 
 
 def boxplot(datapoints):
@@ -41,9 +41,11 @@ def boxplot(datapoints):
 if __name__ == "__main__":
     # Parse Command-line Arguments
     parser = argparse.ArgumentParser(description='Plot benchmark results',
-                                     formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=30, width=120))
+                                     formatter_class=lambda prog: argparse.HelpFormatter(prog,
+                                                                                         max_help_position=30,
+                                                                                         width=120))
 
-    parser.add_argument('benchfile',metavar='BENCHFILE', type=argparse.FileType('r'),
+    parser.add_argument('benchfile', metavar='BENCHFILE', type=argparse.FileType('r'),
                         help='file where the benchmarks are written to')
     parser.add_argument('base', metavar='BASE_RUNTIME', type=str,
                         help='runtime run which is used as base')
@@ -74,7 +76,10 @@ if __name__ == "__main__":
         logger.info('valid: %s', results.get_all_runtimes())
         sys.exit()
 
-    processed_data = preprocess(results, args.base, filter_runtime=args.filter_runtime, filter_benchmark=args.filter_benchmark)
+    processed_data = preprocess(results,
+                                args.base,
+                                filter_runtime=args.filter_runtime,
+                                filter_benchmark=args.filter_benchmark)
 
     if not processed_data:
         logger.error('no data to plot!')

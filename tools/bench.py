@@ -16,7 +16,7 @@ from util.color_logger import get_logger
 from util.console import query_yes_no
 
 
-logger = get_logger('bench' )
+logger = get_logger('bench')
 
 
 BASE_DIR = os.path.abspath(os.path.join(sys.path[0], '..'))
@@ -142,15 +142,17 @@ class BenchmarkingHarness(object):
                 logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
                 raise
 
-    def add_runtime(self, name, make_env, make_func=default_make.__get__(object), exec_func=default_executor.__get__(object), clean_func=default_clean.__get__(object)):
+    def add_runtime(self, name, make_env,
+                    make_func=default_make.__get__(object),
+                    exec_func=default_executor.__get__(object),
+                    clean_func=default_clean.__get__(object)):
         assert name not in self.registered_runtimes
         assert 'CC' in make_env and 'AS' in make_env
 
         logger.debug('register runtime to benchmark harness: "%s"', name)
-        resolved_make_env = {key : os.path.expandvars(var) for key, var in make_env.items()}
         self.registered_runtimes[name] = {'make_env': make_env,  # enviroment variables required for make
                                           'make_func': make_func,  # function executed to build all benchmarks
-                                          'exec_func': exec_func,  # function executed for every benchmark, to be executed
+                                          'exec_func': exec_func,  # function to execute a single benchmark
                                           'clean_func': clean_func}  # function executed after running all benchmarks
 
     def print_runtimes(self):
@@ -235,19 +237,22 @@ class BenchmarkingHarness(object):
                     if type(result_data) is dict and len(result_data) != 0:
                         bench_results.set_single_run(harness_name, runtime_name, result_data, overwrite=allow_overwrite)
                     else:
-                        logger.error('benchmark run of "%s:%s" did not return valid data: "%s"', harness_name, runtime_name, result_data)
+                        logger.error('benchmark run of "%s:%s" did not return valid data: "%s"',
+                                     harness_name, runtime_name, result_data)
                 except KeyboardInterrupt:
                     raise
-                except:
-                    logger.exception('Something went wrong while running the benchmark: "%s:%s"', harness_name, runtime_name)
+                except:  # NOQA: E722
+                    logger.exception('Something went wrong while running the benchmark: "%s:%s"',
+                                     harness_name, runtime_name)
 
         except KeyboardInterrupt:
             raise
-        except:
+        except:  # NOQA: E722
             logger.exception('Something went wrong while executing the runtime enviroment "%s"', runtime)
             return False
 
         return True
+
 
 def add_default_runtimes(harness):
     """Those are some default runtimes which can also serve as example for custom ones"""
@@ -279,16 +284,16 @@ def add_default_runtimes(harness):
             bc_filepath = os.path.join(tmp, bc_filename)
             logger.debug('extract bitcode file to: "%s"', bc_filepath)
 
-
-            with subprocess.Popen([os.path.expandvars("$WLLVM_DIR/extract-bc"), filepath, '-o', bc_filepath]) as process:
-                process.wait(timeout=30)  # 30 Seconds should be way enough time to do the bitcode extraction
+            with subprocess.Popen([os.path.expandvars("$WLLVM_DIR/extract-bc"), filepath, '-o', bc_filepath]) as p:
+                p.wait(timeout=30)  # 30 Seconds should be way enough time to do the bitcode extraction
 
             assert os.path.isfile(bc_filepath)
 
-            with subprocess.Popen([os.path.expandvars(tool), bc_filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE) as process:
-                stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
+            with subprocess.Popen([os.path.expandvars(tool), bc_filepath, '--output=json'],
+                                  cwd=workdir, stdout=subprocess.PIPE) as p:
+                stdout, _ = p.communicate(timeout=kwargs.get('timeout', 240))
 
-                if process.returncode != 0:
+                if p.returncode != 0:
                     return None
 
                 try:
@@ -301,12 +306,15 @@ def add_default_runtimes(harness):
         with open(config) as f:
             exec(f.read(), {'wllvm_make': wllvm_make, 'wllvm_executor': wllvm_executor, 'harness': harness})
 
+
 if __name__ == "__main__":
     # Parse Command-line Arguments
     parser = argparse.ArgumentParser(description='Execute benchmarks and export them',
-                                     formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=30, width=120))
+                                     formatter_class=lambda prog: argparse.HelpFormatter(prog,
+                                                                                         max_help_position=30,
+                                                                                         width=120))
 
-    parser.add_argument('benchfile',metavar='BENCHFILE', type=str,
+    parser.add_argument('benchfile', metavar='BENCHFILE', type=str,
                         help='file where the benchmarks are written to')
 
     parser.add_argument('--testdir', metavar='TESTDIR', type=_TestDirType(), default=BENCHMARK_DIR,
@@ -323,8 +331,8 @@ if __name__ == "__main__":
     parser.add_argument('--only-missing', action='store_true',
                         help='only execute benchmarks which are missing in the benchfile')
     parser.add_argument('--list-runtimes', action=_ListAllRuntimeAction,
-                        help='show a list of all runtimes which can be executed')  # TODO: currently this lists only the default runtimes
-    #parser.add_argument('--no-color', action='store_true',
+                        help='show a list of all runtimes which can be executed')
+    # parser.add_argument('--no-color', action='store_true',
     #                    help='disable color output')
     parser.add_argument('--skip-clean', action='store_true',
                         help='skip the clean step when benchmarking')
@@ -332,7 +340,7 @@ if __name__ == "__main__":
                         help='skip the compilation step when benchmarking')
     parser.add_argument('--ignore-errors', '-i', action='store_true',
                         help='ignore all errors in the make step to do at least a partial benchmark')
-    parser.add_argument('--jobs', '-j',type=int, default=2,
+    parser.add_argument('--jobs', '-j', type=int, default=2,
                         help='number of jobs used for make')
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='enable debug output')
@@ -361,7 +369,8 @@ if __name__ == "__main__":
                 results.load_file(f)
         except Exception:
             logger.exception("cannot load file")
-            if not args.yes and query_yes_no('Do you want to continue? The given file exists, but does not contain valid data', default="no") == 'no':
+            corrupted_msg = 'Do you want to continue? The given file exists, but does not contain valid data'
+            if not args.yes and query_yes_no(corrupted_msg, default="no") == 'no':
                 sys.exit()
 
     no_failures = True
@@ -380,7 +389,7 @@ if __name__ == "__main__":
         no_failures = harness.execute_runtimes(args.filter_runtime, results, **execution_kwargs)
     except KeyboardInterrupt:
         pass
-    except:
+    except:  # NOQA: E722
         no_failures = False
         logger.exception('Something went wrong while executing the testcases')
     finally:

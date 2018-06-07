@@ -8,14 +8,15 @@ from util.bench_results import BenchmarkingResults
 from util.color_logger import get_logger
 
 
-logger = get_logger('stats' )
+logger = get_logger('stats')
 
 
 def log_general_stats(results):
     logger.info("number of different benchmarks present: %d", len(results.get_all_benchmark_names()))
 
     for runtime in sorted(results.get_all_runtimes()):
-        logger.info('runtime "%s" has %d benchmarks', runtime, len(list(results.get_all_benchmarks_of_runtime(runtime))))
+        num_of_benchmarks = len(list(results.get_all_benchmarks_of_runtime(runtime)))
+        logger.info('runtime "%s" has %d benchmarks', runtime, num_of_benchmarks)
 
         missing_benchmarks = results.get_missing_benchmark_names(runtime)
         if missing_benchmarks:
@@ -25,14 +26,16 @@ def log_general_stats(results):
 if __name__ == "__main__":
     # Parse Command-line Arguments
     parser = argparse.ArgumentParser(description='Evaluate benchmark results',
-                                     formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=30, width=120))
+                                     formatter_class=lambda prog: argparse.HelpFormatter(prog,
+                                                                                         max_help_position=30,
+                                                                                         width=120))
 
-    parser.add_argument('benchfile',metavar='BENCHFILE', type=argparse.FileType('r'),
+    parser.add_argument('benchfile', metavar='BENCHFILE', type=argparse.FileType('r'),
                         help='file where the benchmarks are written to')
 
-    #parser.add_argument('--filter-runtime', metavar='REGEX', type=str, default='gcc-O0|clang-O0',
+    # parser.add_argument('--filter-runtime', metavar='REGEX', type=str, default='gcc-O0|clang-O0',
     #                    help='regular expression to select which runtimes should be used')
-    #parser.add_argument('--filter-harness', metavar='REGEX', type=str, default='.*',
+    # parser.add_argument('--filter-harness', metavar='REGEX', type=str, default='.*',
     #                    help='regular expression to select which harness should be used (based on filename)')
 
     parser.add_argument('--verbose', '-v', action='store_true',

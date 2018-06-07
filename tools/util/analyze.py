@@ -3,7 +3,7 @@ import re
 from util.color_logger import get_logger
 
 
-logger = get_logger('plot' )
+logger = get_logger('plot')
 
 
 def preprocess(results, baseline, filter_runtime='.*', filter_benchmark='.*'):
@@ -41,7 +41,7 @@ def preprocess(results, baseline, filter_runtime='.*', filter_benchmark='.*'):
 
                 processed_data[benchmark_name][runtime] = {'mean': normalized_mean,
                                                            'std_dev': normalized_std_dev}
-        except:
+        except:  # NOQA: E722
             logger.exception('exception occured while preprocessing benchmark "%s"', benchmark_name)
 
     return processed_data
