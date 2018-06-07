@@ -16,7 +16,7 @@ basic set of runtime enviroments specified (gcc, clang and tcc) which shows how 
 Run gcc with O3 and write the results in ```my_results.json```:
 
 ```
-./tools/bench.py make_test/ my_results.json --filter-runtime=gcc-O3
+./tools/bench.py ./benchmarks/ my_results.json --filter-runtime=gcc-O3
 ```
 
 ### analyze benchmark results
