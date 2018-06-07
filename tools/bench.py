@@ -169,9 +169,14 @@ class BenchmarkingHarness(object):
         return found_harness
 
     def execute_runtimes(self, filter, bench_results, **kwargs):
+        no_failures = True
         for runtime in self.registered_runtimes.keys():
             if re.match(filter, runtime):
-                self.execute_single_runtime(runtime, bench_results, **kwargs)
+                if self.execute_single_runtime(runtime, bench_results, **kwargs) is not True:
+                    logger.error("%s did not finish", runtime)
+                    no_failures = False
+
+        return no_failures
 
     def execute_single_runtime(self, runtime, bench_results, **kwargs):
         assert type(bench_results) is BenchmarkingResults
@@ -359,6 +364,7 @@ if __name__ == "__main__":
             if not args.yes and query_yes_no('Do you want to continue? The given file exists, but does not contain valid data', default="no") == 'no':
                 sys.exit()
 
+    no_failures = True
     try:
         execution_kwargs = {
             'skip_clean': args.skip_clean or args.skip_compilation,
@@ -371,12 +377,15 @@ if __name__ == "__main__":
             'allow_overwrite': not args.only_missing
         }
 
-        harness.execute_runtimes(args.filter_runtime, results, **execution_kwargs)
+        no_failures = harness.execute_runtimes(args.filter_runtime, results, **execution_kwargs)
     except KeyboardInterrupt:
         pass
     except:
+        no_failures = False
         logger.exception('Something went wrong while executing the testcases')
     finally:
         logger.info('write results into benchmark file')
         with open(args.benchfile, 'w') as f:
             results.store_file(f)
+
+        sys.exit(0 if no_failures else 1)
