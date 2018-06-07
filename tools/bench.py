@@ -137,6 +137,7 @@ class BenchmarkingHarness(object):
         assert 'CC' in make_env and 'AS' in make_env
 
         logger.debug('register runtime to benchmark harness: "%s"', name)
+        resolved_make_env = {key : os.path.expandvars(var) for key, var in make_env.items()}
         self.registered_runtimes[name] = {'make_env': make_env,  # enviroment variables required for make
                                           'make_func': make_func,  # function executed to build all benchmarks
                                           'exec_func': exec_func,  # function executed for every benchmark, to be executed
@@ -233,42 +234,35 @@ class BenchmarkingHarness(object):
 
         return True
 
-
 def add_default_runtimes(harness):
     """Those are some default runtimes which can also serve as example for custom ones"""
 
-    # Clang
-    harness.add_runtime('clang-O0', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O0"})
-    harness.add_runtime('clang-O1', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O1"})
-    harness.add_runtime('clang-O2', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O2"})
-    harness.add_runtime('clang-O3', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O3"})
+    if os.path.isfile('configs/env'):
+        config_file = open('configs/env')
+        for line in config_file:
+            key, value = line.rstrip().split('=', 1)
+            os.environ[key] = value
 
-    # Clang + AddressSanitizer
-    harness.add_runtime('clang-fsanitize=address-O0', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O0 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
-    harness.add_runtime('clang-fsanitize=address-O1', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O1 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
-    harness.add_runtime('clang-fsanitize=address-O2', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O2 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
-    harness.add_runtime('clang-fsanitize=address-O3', {"CC": "clang", "AS": "clang", "CFLAGS": "-Wno-everything -O3 -fsanitize=address", "LDFLAGS": "-fsanitize=address"})
+    def wllvm_make(workdir, make_env, **kwargs):
+            if 'LLVM_COMPILER' not in os.environ:
+                logger.error('enviroment variable "LLVM_COMPILER" is required to build with wllvm')
+                return False
 
-    # lli (bytecode executor)
-    def lli_make(workdir, make_env, **kwargs):
-        if 'LLVM_COMPILER' not in os.environ:
-            logger.error('enviroment variable "LLVM_COMPILER" is required to build with wllvm')
-            return False
+            return BenchmarkingHarness.default_make(workdir, make_env, **kwargs)
 
-        return BenchmarkingHarness.default_make(workdir, make_env, **kwargs)
-
-    def lli_executor(filepath, workdir, **kwargs):
-        with tempfile.TemporaryDirectory() as tmp:
+    def wllvm_executor(filepath, workdir, tool, **kwargs):
+        with NamedTemporaryFile(delete=False) as tmp:
             bc_filename = os.path.splitext(os.path.basename(filepath))[0] + '.bc'
             bc_filepath = os.path.join(tmp, bc_filename)
             logger.debug('extract bitcode file to: "%s"', bc_filepath)
 
-            with subprocess.Popen(["extract-bc", filepath, '-o', bc_filepath]) as process:
+
+            with subprocess.Popen([os.path.expandvars("$WLLVM_DIR/extract-bc"), filepath, '-o', bc_filepath]) as process:
                 process.wait(timeout=30)  # 30 Seconds should be way enough time to do the bitcode extraction
 
             assert os.path.isfile(bc_filepath)
 
-            with subprocess.Popen(['lli', bc_filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE) as process:
+            with subprocess.Popen([os.path.expandvars(tool), bc_filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE) as process:
                 stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
 
                 if process.returncode != 0:
@@ -280,23 +274,9 @@ def add_default_runtimes(harness):
                     logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
                     raise
 
-    harness.add_runtime('lli-O0', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O0"}, make_func=lli_make, exec_func=lli_executor)
-    harness.add_runtime('lli-O1', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O1"}, make_func=lli_make, exec_func=lli_executor)
-    harness.add_runtime('lli-O2', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O2"}, make_func=lli_make, exec_func=lli_executor)
-    harness.add_runtime('lli-O3', {"CC": "wllvm", "AS": "wllvm", "CFLAGS": "-Wno-everything -O3"}, make_func=lli_make, exec_func=lli_executor)
 
-    # GNU Compiler Collection
-    harness.add_runtime('gcc-O0', {"CC": "gcc", "AS": "as", "CFLAGS": "-O0"})
-    harness.add_runtime('gcc-O1', {"CC": "gcc", "AS": "as", "CFLAGS": "-O1"})
-    harness.add_runtime('gcc-O2', {"CC": "gcc", "AS": "as", "CFLAGS": "-O2"})
-    harness.add_runtime('gcc-O3', {"CC": "gcc", "AS": "as", "CFLAGS": "-O3"})
-
-    # Tiny C Compiler
-    harness.add_runtime('tcc-O0', {"CC": "tcc", "AS": "tcc", "CFLAGS": "-O0"})
-    harness.add_runtime('tcc-O1', {"CC": "tcc", "AS": "tcc", "CFLAGS": "-O1"})
-    harness.add_runtime('tcc-O2', {"CC": "tcc", "AS": "tcc", "CFLAGS": "-O2"})
-    harness.add_runtime('tcc-O3', {"CC": "tcc", "AS": "tcc", "CFLAGS": "-O3"})
-
+    for config in glob.glob('configs/*.py'):
+        exec(open(os.path.abspath(config)).read(), {'wllvm_make' : wllvm_make, 'wllvm_executor' : wllvm_executor, 'harness' : harness})
 
 if __name__ == "__main__":
     # Parse Command-line Arguments
