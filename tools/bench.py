@@ -137,7 +137,7 @@ class BenchmarkingHarness(object):
                 return None
 
             try:
-                return json.loads(stdout)
+                return json.loads(stdout.decode('utf-8'))
             except json.JSONDecodeError:
                 logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
                 raise
@@ -297,7 +297,7 @@ def add_default_runtimes(harness):
                     return None
 
                 try:
-                    return json.loads(stdout)
+                    return json.loads(stdout.decode('utf-8'))
                 except json.JSONDecodeError:
                     logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
                     raise

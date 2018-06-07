@@ -10,7 +10,7 @@ def execute_binary_analysis_tool(filepath, workdir, tool, **kwargs):
             return None
 
         try:
-            return json.loads(stdout)
+            return json.loads(stdout.decode('utf-8'))
         except json.JSONDecodeError:
             logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
             raise
