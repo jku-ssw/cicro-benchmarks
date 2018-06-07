@@ -274,7 +274,7 @@ cp build/test/t-nn_linear.bc ../../../java-llvm-ir-builder-dev/sulong/t-nn_linea
 
 Similar bug found as for: swenston/sort
 
-Reported: [](https://github.com/graalvm/sulong/issues/824)
+Reported: [graalvm/sulong/issues/824](https://github.com/graalvm/sulong/issues/824)
 
 
 # antirez/otree (2017.30.11)
@@ -299,7 +299,7 @@ sudo pacman -S erlang  # for test script (didn't worked)
 valgrind ./chrismoos-hash-ring_test -d -w=1 -m=1
 ==29530==    definitely lost: 2,462,208 bytes in 131,072 blocks
 
-Reported: [](https://github.com/chrismoos/hash-ring/issues/19)
+Reported: [chrismoos/hash-ring/issues/19](https://github.com/chrismoos/hash-ring/issues/19)
 
 # zhemao/libds (2017.30.11)
 
@@ -420,7 +420,7 @@ Implemented
 
 Memleaks were found and fixed
 
-Fixed: [](https://github.com/bashrc/libdeep/pull/12)
+Fixed: [bashrc/libdeep/pull/12](https://github.com/bashrc/libdeep/pull/12)
 
 # https://github.com/haldean/x6502 (2017.19.12)
 
@@ -483,14 +483,14 @@ Implemented
 this testcase caused a segfault:
 ```tcl
 set i 0; while {< $i 20} {if {== [- $i [* [/ $i 2] 2]] 0} {set i [+ $i 1]} {set i [+ $i 1]}; puts $i}
-```tcl
+```
 
 minimized:
-```
+```tcl
 set i 0; while {< $i 1} {if {== [- $i] -1} {} {set i [+ $i 1]}}
 ```
 
-Reported: [](https://github.com/zserge/partcl/issues/6)
+Reported: [zserge/partcl/issues/6](https://github.com/zserge/partcl/issues/6)
 
 # https://github.com/sahaRatul/sela (2017.22.12)
 
@@ -523,7 +523,7 @@ complexity of the the projects make it hard to write tests
 
 # https://github.com/watmough/jwHash (2018.01.12)
 
-Project is broken for now: [](https://github.com/watmough/jwHash/pull/6)
+Project is broken for now: [watmough/jwHash/pull/6](https://github.com/watmough/jwHash/pull/6)
 
 # https://github.com/lemire/simdcomp (2018.01.12)
 

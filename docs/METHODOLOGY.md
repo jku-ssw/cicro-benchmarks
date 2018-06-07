@@ -39,24 +39,3 @@ Constrains which needs to be fulfilled but are not evaluated automatically at th
   * How long is the expected execution time of the written testcase? (Median should be about 500ms, at least 200ms)
   * Do we need to run project specific Makefiles, or can we simply compile all files together?
     In case of a project specific Makefile it's harder to do a correct compilation.
-
-
-## Creating the testcases
-
-In the directory where the tests are stored (in our case ```make_test```) The following commands needs to be executed:
-```
-../add_new_test.py https://github.com/user/project
-git clone https://github.com/user/project user-project
-```
-
-The first commands creates the basic test harness, as well outputs some initial Makefile code which can be copied into
-the Makefile located in ```make_test```. To get the new testcase compiling you also need to add the new testcase to the
-```PROJECTS``` array located inside the Makefile.
-
-You can now compile and run the empty test harness:
-```
-make && ./user-project_test -d
-```
-
-Now the test harness is ready to be filled with the actual code. This often also needs some modification of the Makefile
-to incude all required dependencies and source files.

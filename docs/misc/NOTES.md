@@ -25,47 +25,6 @@ making available
 * checks that projects can be build by wllvm
 * check by Valgrind and MSan
 
-# Example Harness 
-
-```
-#include 
-#include 
-#include 
-#include 
-
-_attribute_ ((noinline))
-int benchmark(int problemSize);
-
-int getProblemsize();
-
-int main() {
-	int result = 0;
-	struct timeval tv_start = (struct timeval ) malloc(sizeof(struct timeval));
-	struct timeval tv_end = (struct timeval ) malloc(sizeof(struct timeval));
-	int start = 0;
-	int end = 0;
-	long time;
-	
-	int i;
-	int totalCount = 50;
-
-	int problemSize;
-	
-	for (i = 0; i < totalCount; i++) {
-		problemSize = getProblemsize();
-		gettimeofday(tv_start, NULL);
-		result = benchmark(problemSize);
-		gettimeofday(tv_end, NULL);
-		time = (tv_end->tv_sec-tv_start->tv_sec)*1000L+(long)((tv_end->tv_usec-tv_start->tv_usec)*0.001);
-		printf("execution time: %ld\n", time);
-	}
-	free(tv_start);
-	free(tv_end);
-	fflush(stdout);
-	return 0;
-}
-```
-
 # 2018.01.18
 ./fetch_github/fetch_github/fetch_github.py "language:c stars:250..300" --clone-repo-dir ./projects/
 
