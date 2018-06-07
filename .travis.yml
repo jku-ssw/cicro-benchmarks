@@ -5,6 +5,6 @@ script:
   # test code formatting
   - flake8 ./tools
 
-  # execute clang-O0 benchmark
+  # execute clang-O0 benchmark for all harnesses starting with 'a'
   - echo "CLANG=clang" > configs/env
-  - ./tools/bench.py -y my_results.json --filter-runtime=clang-O0
+  - ./tools/bench.py -y my_results.json --filter-runtime=clang-O0 --filter-harness="^a.*"
