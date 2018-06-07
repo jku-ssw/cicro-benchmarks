@@ -9,7 +9,7 @@ import os
 import re
 import subprocess
 import sys
-import tempfile
+from tempfile import NamedTemporaryFile
 
 from util.bench_results import BenchmarkingResults
 from util.color_logger import get_logger
@@ -17,6 +17,14 @@ from util.console import query_yes_no
 
 
 logger = get_logger('bench' )
+
+
+BASE_DIR = os.path.abspath(os.path.join(sys.path[0], '..'))
+BENCHMARK_DIR = os.path.join(BASE_DIR, 'benchmarks')
+CONFIG_DIR = os.path.join(BASE_DIR, 'configs')
+
+ENV_FILE = os.path.join(CONFIG_DIR, 'env')
+ENV_EXAMPLE_FILE = os.path.join(CONFIG_DIR, 'env.example')
 
 
 class _TestDirType(object):
@@ -41,7 +49,9 @@ class _ListAllRuntimeAction(argparse._StoreTrueAction):
         super(_ListAllRuntimeAction, self).__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
-        harness = BenchmarkingHarness('.')
+        logging.disable(logging.DEBUG)  # we want to set all loggers
+
+        harness = BenchmarkingHarness(BENCHMARK_DIR)
 
         add_default_runtimes(harness)
 
@@ -237,11 +247,19 @@ class BenchmarkingHarness(object):
 def add_default_runtimes(harness):
     """Those are some default runtimes which can also serve as example for custom ones"""
 
-    if os.path.isfile('configs/env'):
-        config_file = open('configs/env')
-        for line in config_file:
-            key, value = line.rstrip().split('=', 1)
-            os.environ[key] = value
+    if os.path.isfile(ENV_FILE):
+        with open(ENV_FILE) as f:
+            for line in f:
+                key, value = line.rstrip().split('=', 1)
+                os.environ[key] = value
+    elif os.path.isfile(ENV_EXAMPLE_FILE):
+        logger.warning('"%s" does not exist, use example file to specify required enviroment variables', ENV_FILE)
+        with open(ENV_EXAMPLE_FILE) as f:
+            for line in f:
+                key, value = line.rstrip().split('=', 1)
+                os.environ[key] = value
+    else:
+        logger.warning('no "env" file found in "%s"', CONFIG_DIR)
 
     def wllvm_make(workdir, make_env, **kwargs):
             if 'LLVM_COMPILER' not in os.environ:
@@ -274,20 +292,20 @@ def add_default_runtimes(harness):
                     logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
                     raise
 
-
-    for config in glob.glob('configs/*.py'):
-        exec(open(os.path.abspath(config)).read(), {'wllvm_make' : wllvm_make, 'wllvm_executor' : wllvm_executor, 'harness' : harness})
+    for config in glob.glob(os.path.join(CONFIG_DIR, '*.py')):
+        with open(config) as f:
+            exec(f.read(), {'wllvm_make': wllvm_make, 'wllvm_executor': wllvm_executor, 'harness': harness})
 
 if __name__ == "__main__":
     # Parse Command-line Arguments
     parser = argparse.ArgumentParser(description='Execute benchmarks and export them',
                                      formatter_class=lambda prog: argparse.HelpFormatter(prog, max_help_position=30, width=120))
 
-    parser.add_argument('testdir', metavar='TESTDIR', type=_TestDirType(),
-                        help='directory where the tests and the Makefile is contained')
     parser.add_argument('benchfile',metavar='BENCHFILE', type=str,
                         help='file where the benchmarks are written to')
 
+    parser.add_argument('--testdir', metavar='TESTDIR', type=_TestDirType(), default=BENCHMARK_DIR,
+                        help='directory where the tests and the Makefile is contained')
     parser.add_argument('--filter-runtime', metavar='REGEX', type=str, default='gcc-O0|clang-O0',
                         help='regular expression to select which runtimes should be used')
     parser.add_argument('--filter-harness', metavar='REGEX', type=str, default='.*',

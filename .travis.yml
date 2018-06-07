@@ -3,4 +3,4 @@ before_install:
   - sudo apt-get install -y libpapi-dev
 script:
 - echo "CLANG=clang" > configs/env
-- ./tools/bench.py -y benchmarks/ my_results.json --filter-runtime=clang-O0
+- ./tools/bench.py -y my_results.json --filter-runtime=clang-O0
