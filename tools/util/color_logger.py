@@ -1,5 +1,6 @@
 import logging
 
+
 # source: https://stackoverflow.com/a/384125/2967999
 class ColoredFormatter(logging.Formatter):
     RESET_SEQ = "\033[0m"
@@ -31,6 +32,7 @@ class ColoredFormatter(logging.Formatter):
 
 class ColoredLogger(logging.Logger):
     COLOR_FORMAT = "[%(asctime)s] [ %(levelname)-19s ]  %(message)s (%(filename)s:%(lineno)d)"
+
     def __init__(self, name):
         logging.Logger.__init__(self, name, logging.DEBUG)
 

@@ -8,4 +8,7 @@ add_library(chayai
 )
 
 target_link_libraries(chayai m)
-target_link_libraries(chayai papi)
+
+if( USE_PAPI )
+    target_link_libraries(chayai papi)
+endif()

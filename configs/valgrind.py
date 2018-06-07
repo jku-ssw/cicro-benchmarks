@@ -3,17 +3,17 @@ import subprocess
 import json
 
 def execute_binary_analysis_tool(filepath, workdir, tool, **kwargs):
-            with subprocess.Popen(tool + [filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE) as process:
-                stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
+    with subprocess.Popen(tool + [filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE) as process:
+        stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
 
-                if process.returncode != 0:
-                    return None
+        if process.returncode != 0:
+            return None
 
-                try:
-                    return json.loads(stdout)
-                except json.JSONDecodeError:
-                    logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
-                    raise
+        try:
+            return json.loads(stdout.decode('utf-8'))
+        except json.JSONDecodeError:
+            logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
+            raise
 
 def valgrind_executor(filepath, workdir, **kwargs):
     return execute_binary_analysis_tool(filepath, workdir, ['valgrind'], **kwargs)

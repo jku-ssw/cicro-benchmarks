@@ -12,7 +12,7 @@ TEST_SUFFIX = test
 TEST_DIR = .
 
 C_HAYAI_DIR = ../C-Hayai
-C_HAYAI_LDFLAGS = -I $(C_HAYAI_DIR)/src -lm
+C_HAYAI_LDFLAGS = -I $(C_HAYAI_DIR)/src -lm -lpapi
 C_HAYAI_LIB = $(C_HAYAI_DIR)/build/src/libchayai.a
 C_HAYAI_CFLAGS = $(C_HAYAI_LIB)
 
@@ -52,12 +52,10 @@ exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 
 $(C_HAYAI_LIB): $(C_HAYAI_DIR)/src/*
 	mkdir -p $(C_HAYAI_DIR)/build
-	(cd $(C_HAYAI_DIR)/build && cmake ../ -DCMAKE_C_COMPILER='$(CC)' -DCMAKE_C_FLAGS='$(CFLAGS)' -DCMAKE_STATIC_LINKER_FLAGS='$(LDFLAGS)')
+	(cd $(C_HAYAI_DIR)/build && cmake ../ -DCMAKE_C_COMPILER='$(CC)' -DCMAKE_C_FLAGS='$(CFLAGS)' -DCMAKE_STATIC_LINKER_FLAGS='$(LDFLAGS)' -DUSE_PAPI=ON)
 	$(MAKE) -C $(C_HAYAI_DIR)/build -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)'
 
 #.PHONY: $(C_HAYAI_LIB)
-
-LDFLAGS += -lpapi
 
 ########## https://github.com/100/Cranium
 

@@ -1,6 +1,10 @@
 language: c
 before_install:
-  - sudo apt-get install -y libpapi-dev
+  - sudo apt-get install -y libpapi-dev python-flake8
 script:
-- echo "CLANG=clang" > configs/env
-- ./tools/bench.py -y benchmarks/ my_results.json --filter-runtime=clang-O0
+  # test code formatting
+  - flake8 ./tools
+
+  # execute clang-O0 benchmark for all harnesses starting with 'a'
+  - echo "CLANG=clang" > configs/env
+  - ./tools/bench.py -y my_results.json --filter-runtime=clang-O0 --filter-harness="^a.*"
