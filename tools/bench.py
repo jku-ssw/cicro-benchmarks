@@ -9,7 +9,7 @@ import os
 import re
 import subprocess
 import sys
-from tempfile import NamedTemporaryFile
+import tempfile
 
 from util.bench_results import BenchmarkingResults
 from util.color_logger import get_logger
@@ -279,7 +279,7 @@ def add_default_runtimes(harness):
             return BenchmarkingHarness.default_make(workdir, make_env, **kwargs)
 
     def wllvm_executor(filepath, workdir, tool, **kwargs):
-        with NamedTemporaryFile(delete=False) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             bc_filename = os.path.splitext(os.path.basename(filepath))[0] + '.bc'
             bc_filepath = os.path.join(tmp, bc_filename)
             logger.debug('extract bitcode file to: "%s"', bc_filepath)
@@ -289,7 +289,11 @@ def add_default_runtimes(harness):
 
             assert os.path.isfile(bc_filepath)
 
-            with subprocess.Popen([os.path.expandvars(tool), bc_filepath, '--output=json'],
+            additional_args = []
+            warmup_iterations = kwargs.get('warmup_iterations', None)
+            if warmup_iterations:
+                additional_args.append('--warmup=%d' % warmup_iterations)
+            with subprocess.Popen([os.path.expandvars(tool), bc_filepath, '--output=json'] + additional_args,
                                   cwd=workdir, stdout=subprocess.PIPE) as p:
                 stdout, _ = p.communicate(timeout=kwargs.get('timeout', 240))
 
