@@ -35,6 +35,8 @@ C_HAYAI_PRIV_CONCAT7(C_HAYAI_PRIV_BENCHMARK_NAME_PREFIX, fixture_name, _, \
 
 // BENCHMARK
 
+#ifdef USE_PAPI
+
 #include <papi.h>
 
 #define C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS 4
@@ -44,9 +46,24 @@ C_HAYAI_PRIV_CONCAT7(C_HAYAI_PRIV_BENCHMARK_NAME_PREFIX, fixture_name, _, \
     long long values[C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS]; \
     PAPI_start_counters(events, C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS);
 
+#define C_HAYAY_PRIV_BENCHMARKER_PAPI_READ_COUNTERS \
+    PAPI_read_counters(values, C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS);
+
+#define C_HAYAY_PRIV_BENCHMARKER_PAPI_STOP_COUNTERS \
+    PAPI_stop_counters(values, C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS);
+
 #define C_HAYAY_PRIV_BENCHMARKER_PAPI_END \
     run.instructions = values[0]; \
     run.cycles = values[1];
+
+#else
+
+#define C_HAYAY_PRIV_BENCHMARKER_PAPI_INIT
+#define C_HAYAY_PRIV_BENCHMARKER_PAPI_READ_COUNTERS
+#define C_HAYAY_PRIV_BENCHMARKER_PAPI_STOP_COUNTERS
+#define C_HAYAY_PRIV_BENCHMARKER_PAPI_END
+
+#endif
 
 #define C_HAYAI_PRIV_BENCHMARK_2( \
     global_name, \
@@ -75,11 +92,11 @@ static inline struct CHayaiBenchmarkSingleRunResult C_HAYAI_PRIV_CONCAT2(global_
     struct CHayaiBenchmarkSingleRunResult run; \
     C_HAYAY_PRIV_BENCHMARKER_PAPI_INIT \
     startTime = chayai_clock_now(); \
-    PAPI_read_counters(values, C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS); \
+    C_HAYAY_PRIV_BENCHMARKER_PAPI_READ_COUNTERS \
     while (iterations--) { \
         C_HAYAI_PRIV_CONCAT2(global_name, _body)(); \
     } \
-    PAPI_stop_counters(values, C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS); \
+    C_HAYAY_PRIV_BENCHMARKER_PAPI_STOP_COUNTERS \
     endTime = chayai_clock_now(); \
     run.time = chayai_clock_duration(startTime, endTime); \
     C_HAYAY_PRIV_BENCHMARKER_PAPI_END \
@@ -168,12 +185,12 @@ static inline struct CHayaiBenchmarkSingleRunResult C_HAYAI_PRIV_CONCAT2(global_
     struct CHayaiBenchmarkSingleRunResult run; \
     C_HAYAY_PRIV_BENCHMARKER_PAPI_INIT \
     startTime = chayai_clock_now(); \
-    PAPI_read_counters(values, C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS); \
+    C_HAYAY_PRIV_BENCHMARKER_PAPI_READ_COUNTERS \
     while (iterations--) { \
         C_HAYAI_PRIV_CONCAT2(C_HAYAI_PRIV_BENCHMARK_NAME(fixture_name_arg, benchmark_name_arg), \
         _body) parameters; \
     } \
-    PAPI_stop_counters(values, C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS); \
+    C_HAYAY_PRIV_BENCHMARKER_PAPI_STOP_COUNTERS \
     endTime = chayai_clock_now(); \
     run.time = chayai_clock_duration(startTime, endTime); \
     C_HAYAY_PRIV_BENCHMARKER_PAPI_END \
@@ -238,11 +255,11 @@ static inline struct CHayaiBenchmarkSingleRunResult C_HAYAI_PRIV_CONCAT2(global_
     struct CHayaiBenchmarkSingleRunResult run; \
     C_HAYAY_PRIV_BENCHMARKER_PAPI_INIT \
     startTime = chayai_clock_now(); \
-    PAPI_read_counters(values, C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS); \
+    C_HAYAY_PRIV_BENCHMARKER_PAPI_READ_COUNTERS \
     while (iterations--) { \
         C_HAYAI_PRIV_CONCAT2(global_name, _body)(arg); \
     } \
-    PAPI_stop_counters(values, C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS); \
+    C_HAYAY_PRIV_BENCHMARKER_PAPI_STOP_COUNTERS \
     endTime = chayai_clock_now(); \
     C_HAYAI_PRIV_CONCAT2(fixture_name_arg, _tear_down)(arg); \
     run.time = chayai_clock_duration(startTime, endTime); \
@@ -324,12 +341,12 @@ static inline struct CHayaiBenchmarkSingleRunResult C_HAYAI_PRIV_CONCAT2(global_
     struct CHayaiBenchmarkSingleRunResult run; \
     C_HAYAY_PRIV_BENCHMARKER_PAPI_INIT \
     startTime = chayai_clock_now(); \
-    PAPI_read_counters(values, C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS); \
+    C_HAYAY_PRIV_BENCHMARKER_PAPI_READ_COUNTERS \
     while (iterations--) { \
         C_HAYAI_PRIV_CONCAT2(C_HAYAI_PRIV_BENCHMARK_NAME(fixture_name_arg, benchmark_name_arg), \
             _body) parameters; \
     } \
-    PAPI_stop_counters(values, C_HAYAY_PRIV_BENCHMARKER_PAPI_NUM_EVENTS); \
+    C_HAYAY_PRIV_BENCHMARKER_PAPI_STOP_COUNTERS \
     endTime = chayai_clock_now(); \
     C_HAYAI_PRIV_CONCAT2(fixture_name_arg, _tear_down)(arg); \
     run.time = chayai_clock_duration(startTime, endTime); \

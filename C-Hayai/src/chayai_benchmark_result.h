@@ -6,8 +6,10 @@
 typedef struct CHayaiBenchmarkSingleRunResult
 {
     int64_t time;
+#ifdef USE_PAPI
     int64_t instructions;
     int64_t cycles;
+#endif
 } CHayaiBenchmarkSingleRunResult;
 
 typedef struct CHayaiBenchmarkResult

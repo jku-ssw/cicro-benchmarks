@@ -279,6 +279,9 @@ def add_default_runtimes(harness):
             return BenchmarkingHarness.default_make(workdir, make_env, **kwargs)
 
     def wllvm_executor(filepath, workdir, tool, **kwargs):
+        assert os.path.isfile(filepath)
+        assert os.path.isdir(workdir)
+
         with tempfile.TemporaryDirectory() as tmp:
             bc_filename = os.path.splitext(os.path.basename(filepath))[0] + '.bc'
             bc_filepath = os.path.join(tmp, bc_filename)
@@ -308,7 +311,8 @@ def add_default_runtimes(harness):
 
     for config in glob.glob(os.path.join(CONFIG_DIR, '*.py')):
         with open(config) as f:
-            exec(f.read(), {'wllvm_make': wllvm_make, 'wllvm_executor': wllvm_executor, 'harness': harness})
+            exec(f.read(), {'wllvm_make': wllvm_make, 'wllvm_executor': wllvm_executor,
+                            'harness': harness, 'logger': logger})
 
 
 if __name__ == "__main__":

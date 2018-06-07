@@ -82,9 +82,13 @@ static void chayai_json_outputter_end_benchmark(
     fputs("\"runs\":[", OUTPUT_STREAM);
     for(unsigned int i=0; i < result->runs; i++) {
         const double runTimeSingleRunUs = result->singleRuns[i].time / 1e3;
+        fprintf(OUTPUT_STREAM, "{\"duration\":%f", runTimeSingleRunUs);
+#ifdef USE_PAPI
         const long instructions = result->singleRuns[i].instructions;
         const long cycles = result->singleRuns[i].cycles;
-        fprintf(OUTPUT_STREAM, "{\"duration\":%f, \"instructions\":%ld, \"cycles\":%ld}", runTimeSingleRunUs, instructions, cycles);
+        fprintf(OUTPUT_STREAM, ", \"instructions\":%ld, \"cycles\":%ld", instructions, cycles);
+#endif
+        fprintf(OUTPUT_STREAM, "}");
         if(i+1 < result->runs) {
             fputs(",", OUTPUT_STREAM);
         }
