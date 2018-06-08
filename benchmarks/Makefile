@@ -12,9 +12,16 @@ TEST_SUFFIX = test
 TEST_DIR = .
 
 C_HAYAI_DIR = ../C-Hayai
-C_HAYAI_LDFLAGS = -I $(C_HAYAI_DIR)/src -lm -lpapi
+C_HAYAI_LDFLAGS = -I $(C_HAYAI_DIR)/src -lm
 C_HAYAI_LIB = $(C_HAYAI_DIR)/build/src/libchayai.a
 C_HAYAI_CFLAGS = $(C_HAYAI_LIB)
+
+ifdef NO_PAPI
+    USE_PAPI_VALUE = OFF
+else
+	C_HAYAI_LDFLAGS += -lpapi
+	USE_PAPI_VALUE = ON
+endif
 
 # Projects to build
 
@@ -35,7 +42,8 @@ UNSTABLE_PROJECTS = orangeduck-tgc # runtime can vary by factor 100!
 all: $(PROJECTS:=_$(TEST_SUFFIX))
 
 clean: $(PROJECTS:=_clean)
-	rm -f .*.o
+	rm -f *.o .*.o
+	rm -f *.bc .*.bc
 	rm -rf $(C_HAYAI_DIR)/build
 
 test: $(addprefix exec_, $(PROJECTS:=_$(TEST_SUFFIX)))
@@ -52,7 +60,7 @@ exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 
 $(C_HAYAI_LIB): $(C_HAYAI_DIR)/src/*
 	mkdir -p $(C_HAYAI_DIR)/build
-	(cd $(C_HAYAI_DIR)/build && cmake ../ -DCMAKE_C_COMPILER='$(CC)' -DCMAKE_C_FLAGS='$(CFLAGS)' -DCMAKE_STATIC_LINKER_FLAGS='$(LDFLAGS)' -DUSE_PAPI=ON)
+	(cd $(C_HAYAI_DIR)/build && cmake ../ -DCMAKE_C_COMPILER='$(CC)' -DCMAKE_C_FLAGS='$(CFLAGS)' -DCMAKE_STATIC_LINKER_FLAGS='$(LDFLAGS)' -DUSE_PAPI=$(USE_PAPI_VALUE))
 	$(MAKE) -C $(C_HAYAI_DIR)/build -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)'
 
 #.PHONY: $(C_HAYAI_LIB)
@@ -365,7 +373,7 @@ snowballstem-snowball_$(TEST_SUFFIX): snowballstem-snowball snowballstem-snowbal
 
 snowballstem-snowball_clean:
 	(cd ./snowballstem-snowball && $(MAKE) clean)
-	rm -f "$(TEST_DIR)/snowballstem-snowball $(TEST_SUFFIX)"
+	rm -f "$(TEST_DIR)/snowballstem-snowball_$(TEST_SUFFIX)"
 
 ########## https://github.com/swenson/sort
 

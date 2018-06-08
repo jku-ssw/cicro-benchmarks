@@ -1,0 +1,5 @@
+harness.add_runtime('icc-O0', {"CC": "${ICC}", "AS": "as", "CFLAGS": "-O0"})
+harness.add_runtime('icc-O1', {"CC": "${ICC}", "AS": "as", "CFLAGS": "-O1"})
+harness.add_runtime('icc-O2', {"CC": "${ICC}", "AS": "as", "CFLAGS": "-O2"})
+harness.add_runtime('icc-O3', {"CC": "${ICC}", "AS": "as", "CFLAGS": "-O3"})
+harness.add_runtime('icc-Os', {"CC": "${ICC}", "AS": "as", "CFLAGS": "-O3"})
