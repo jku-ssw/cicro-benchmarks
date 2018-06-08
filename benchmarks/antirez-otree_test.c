@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 
 #include "chayai.h"
 
@@ -10,7 +12,12 @@ BENCHMARK(otree, alloc_free, 100, 10) {
     int count = 2000;
     uint64_t ptr;
 
-    bt = btree_open(NULL, "./btree.db", BTREE_CREAT); // TODO: store in tmp directory or even in RAM
+    char *filename = tempnam(NULL, "btree");
+    if (filename == NULL) {
+        abort();
+    }
+
+    bt = btree_open(NULL, filename, BTREE_CREAT);
     btree_clear_flags(bt, BTREE_FLAG_USE_WRITE_BARRIER);
     if (bt == NULL) {
         abort();
@@ -22,6 +29,8 @@ BENCHMARK(otree, alloc_free, 100, 10) {
     }
 
     btree_close(bt);
+    unlink(filename);
+    free(filename);
 }
 
 int main(int argc, char** argv) {
