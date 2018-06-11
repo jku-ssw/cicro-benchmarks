@@ -296,7 +296,7 @@ def add_default_runtimes(harness):
             warmup_iterations = kwargs.get('warmup_iterations', None)
             if warmup_iterations:
                 additional_args.append('--warmup=%d' % warmup_iterations)
-            with subprocess.Popen([os.path.expandvars(tool), bc_filepath, '--output=json'] + additional_args,
+            with subprocess.Popen(os.path.expandvars(tool).split(' ') + [bc_filepath, '--output=json'] + additional_args,
                                   cwd=workdir, stdout=subprocess.PIPE) as p:
                 stdout, _ = p.communicate(timeout=kwargs.get('timeout', 240))
 
