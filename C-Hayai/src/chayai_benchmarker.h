@@ -4,6 +4,7 @@
 #include "chayai_benchmark_descriptor.h"
 #include "chayai_benchmark_pp.h"
 #include "chayai_outputter.h"
+#include "chayai_main.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,7 +20,7 @@ void chayai_set_outputter(CHayaiOutputter* outputter);
 void chayai_set_warmup_iterations(unsigned int warmup);
 
 /// Run all registered benchmark
-void chayai_run_benchmarks();
+void chayai_run_benchmarks(CHayaiArguments* arguments);
 
 #ifdef __cplusplus
 }

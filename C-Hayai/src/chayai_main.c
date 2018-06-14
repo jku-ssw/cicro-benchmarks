@@ -9,6 +9,10 @@
 #include <stdlib.h>
 #include <argp.h>
 
+#ifdef USE_PAPI
+#include <papi.h>
+#endif
+
 #define OUTPUT_STREAM stdout
 
 #if defined(_WIN32)
@@ -25,6 +29,9 @@ static char chayai_args_doc[] = "[OPTIONS]";
 static struct argp_option chayai_options[] = {
         { "output", 'o', "console|json", OPTION_ARG_OPTIONAL, "Output results in a specific format."},
         { "warmup", 'w', "2", OPTION_ARG_OPTIONAL, "Number of warmup iterations"},
+#ifdef USE_PAPI
+        { "papi", 'p', "PAPI_TOT_CYC,PAPI_TOT_INS", OPTION_ARG_OPTIONAL, "Papi events to catch"},
+#endif
         { 0 }
 };
 
@@ -36,7 +43,7 @@ static error_t read_unsigned_int_arg(unsigned int *var, char *arg) {
     errno = 0;
     unsigned int parsed = (unsigned int) strtol(arg, &endptr, 10);
     if (errno == ERANGE || *endptr != '\0' || arg == endptr || parsed < 0) {
-        printf("Invalid number: \"%s\"\n", arg);
+        fprintf(stderr, "Invalid number: \"%s\" (%s:%d)\n", arg, __FILE__, __LINE__);
         return ARGP_ERR_UNKNOWN;
     }
     *var = parsed;
@@ -60,6 +67,30 @@ static error_t chayai_parse_opt(int key, char *arg, struct argp_state *state) {
         case 'w':
             return read_unsigned_int_arg(&(arguments->warmupIterations), arg);
 
+#ifdef USE_PAPI
+        case 'p': {
+            if (PAPI_library_init(PAPI_VER_CURRENT) != PAPI_VER_CURRENT) {
+                fprintf(stderr, "PAPI init error! (%s:%d)\n", __FILE__, __LINE__);
+                exit(2);
+            }
+
+            int retval;
+            if (arguments->papiEventSet == PAPI_NULL && (retval = PAPI_create_eventset(&(arguments->papiEventSet))) != PAPI_OK) {
+                fprintf(stderr, "PAPI error %d: %s (%s:%d)\n", retval, PAPI_strerror(retval), __FILE__, __LINE__);
+                exit(2);
+            }
+
+            char *token;
+            while ((token = strsep(&arg, ","))) {
+                if((retval = PAPI_add_named_event(arguments->papiEventSet, token)) != PAPI_OK) {
+                    fprintf(stderr, "PAPI error %d for \"%s\": %s (%s:%d)\n", retval, token, PAPI_strerror(retval), __FILE__, __LINE__);
+                    exit(2);
+                }
+            }
+        }
+            return 0;
+#endif
+
         case ARGP_KEY_ARG:
             return 0;
 
@@ -74,12 +105,32 @@ CHayaiArguments chayai_main_parse_args(int argv, char** argc) {
 
     CHayaiArguments arguments = {
         .outputterInit = chayai_console_outputter_init,
-        .warmupIterations = 2 // to do at least some caching by default before running the benchmark
+        .warmupIterations = 2, // to do at least some caching by default before running the benchmark
+#ifdef USE_PAPI
+        .papiEventSet = PAPI_NULL,
+#endif
     };
 
     argp_parse(&argp, argv, argc, 0, 0, &arguments);
 
     return arguments;
+}
+
+void chayai_main_cleanup_arguments(CHayaiArguments *arguments) {
+#ifdef USE_PAPI
+    if(arguments->papiEventSet != PAPI_NULL) {
+        int retval;
+        if((retval = PAPI_cleanup_eventset(arguments->papiEventSet)) != PAPI_OK) {
+            fprintf(stderr, "PAPI error %d: %s (%s:%d)\n", retval, PAPI_strerror(retval), __FILE__, __LINE__);
+            return;
+        }
+        if((retval = PAPI_destroy_eventset(&arguments->papiEventSet)) != PAPI_OK) {
+            fprintf(stderr, "PAPI error %d: %s (%s:%d)\n", retval, PAPI_strerror(retval), __FILE__, __LINE__);
+        }
+
+        PAPI_shutdown();
+    }
+#endif
 }
 
 // TODO: unused

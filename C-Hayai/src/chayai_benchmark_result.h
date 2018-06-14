@@ -7,8 +7,8 @@ typedef struct CHayaiBenchmarkSingleRunResult
 {
     int64_t time;
 #ifdef USE_PAPI
-    int64_t instructions;
-    int64_t cycles;
+    int papiEventSet; // has to be set before benchmark run
+    long long int *papiCounters; // has to be allocated before benchmark run
 #endif
 } CHayaiBenchmarkSingleRunResult;
 
