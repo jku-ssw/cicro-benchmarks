@@ -5,6 +5,10 @@
 
 #include "chayai_json_outputter.h"
 
+#ifdef USE_PAPI
+#include <papi.h>
+#endif
+
 #define OUTPUT_STREAM stdout
 
 static int numOfBenchmarks = 0; // required for correct json output
@@ -83,11 +87,21 @@ static void chayai_json_outputter_end_benchmark(
     for(unsigned int i=0; i < result->runs; i++) {
         const double runTimeSingleRunUs = result->singleRuns[i].time / 1e3;
         fprintf(OUTPUT_STREAM, "{\"duration\":%f", runTimeSingleRunUs);
+
 #ifdef USE_PAPI
-        const long instructions = result->singleRuns[i].instructions;
-        const long cycles = result->singleRuns[i].cycles;
-        fprintf(OUTPUT_STREAM, ", \"instructions\":%ld, \"cycles\":%ld", instructions, cycles);
+        if(result->singleRuns[i].papiEventSet != PAPI_NULL) {
+            int numberOfEvents = 128;
+            int events[128]; // should be easily big enough
+            PAPI_list_events(result->singleRuns[i].papiEventSet, events, &numberOfEvents);
+
+            for(int k = 0; k < numberOfEvents; k++) {
+                PAPI_event_info_t info;
+                PAPI_get_event_info(events[k], &info);
+                fprintf(OUTPUT_STREAM, ", \"%s\":%ld", info.symbol, result->singleRuns[i].papiCounters[k]);
+            }
+        }
 #endif
+
         fprintf(OUTPUT_STREAM, "}");
         if(i+1 < result->runs) {
             fputs(",", OUTPUT_STREAM);
@@ -114,4 +128,6 @@ static void chayai_json_outputter_end_benchmark(
     if(curBenchmarkNum < numOfBenchmarks) {
         fputs(",", OUTPUT_STREAM);
     }
+
+    fflush(OUTPUT_STREAM);
 }

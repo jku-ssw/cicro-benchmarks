@@ -101,6 +101,7 @@ CHayaiArguments _arguments = chayai_main_parse_args(argv, argc); \
 (*_arguments.outputterInit)(&_outputter); \
 chayai_set_outputter(&_outputter); \
 chayai_set_warmup_iterations(_arguments.warmupIterations); \
-chayai_run_benchmarks()
+chayai_run_benchmarks(&_arguments); \
+chayai_main_cleanup_arguments(&_arguments)
 
 #endif // CHAYAI_H

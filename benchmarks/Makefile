@@ -20,6 +20,7 @@ ifdef NO_PAPI
     USE_PAPI_VALUE = OFF
 else
 	C_HAYAI_LDFLAGS += -lpapi
+	C_HAYAI_CFLAGS += -DUSE_PAPI
 	USE_PAPI_VALUE = ON
 endif
 

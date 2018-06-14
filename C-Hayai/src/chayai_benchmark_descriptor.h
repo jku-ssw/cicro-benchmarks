@@ -3,9 +3,11 @@
 
 #include <stdint.h>
 
+#include "chayai_benchmark_result.h"
+
 typedef struct CHayaiBenchmarkDescriptor
 {
-    struct CHayaiBenchmarkSingleRunResult (*runFunction)(void);
+    void (*runFunction)(struct CHayaiBenchmarkSingleRunResult *result);
     const char* fixtureName;
     const char* benchmarkName;
     unsigned int runs;
