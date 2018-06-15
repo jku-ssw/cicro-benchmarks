@@ -41,6 +41,12 @@ runtime environments are specified.
 ./tools/bench.py my_results.json --filter-runtime=gcc-O3
 ```
 
+**Example**: run all clang runtimes and execute all harnesses where the name starts with ```a```. Furthermore instrument some hardware counters:
+
+```
+./tools/bench.py example_results.json --filter-harness="^a.*" --filter-runtime="clang-.*" --exec-args="--papi=PAPI_TOT_CYC,PAPI_TOT_INS,PAPI_BR_INS"
+```
+
 Please note it is important to configure the system in a way to have as least impact on the benchmarks as possible.
 This means for example disabling networking and all applications which are not mandatory for the run. Beside of that
 the script warns when the ```scaling_governor``` of the cpu is set to the wrong state. The benchmark executor warns when
