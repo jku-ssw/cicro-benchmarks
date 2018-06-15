@@ -3,7 +3,8 @@ import subprocess
 import json
 
 def execute_binary_analysis_tool(filepath, workdir, tool, **kwargs):
-    with subprocess.Popen(tool + [filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE) as process:
+    args = tool + [filepath, '--output=json'] + kwargs.get('exec_args', '').split(' ')
+    with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE) as process:
         stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
 
         if process.returncode != 0:

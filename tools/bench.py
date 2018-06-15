@@ -130,7 +130,8 @@ class BenchmarkingHarness(object):
         assert os.path.isfile(filepath)
         assert os.path.isdir(workdir)
 
-        with subprocess.Popen([filepath, '--output=json'], cwd=workdir, stdout=subprocess.PIPE) as process:
+        args = [filepath, '--output=json'] + kwargs.get('exec_args', '').split(' ')
+        with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE) as process:
             stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
 
             if process.returncode != 0:
@@ -292,7 +293,7 @@ def add_default_runtimes(harness):
 
             assert os.path.isfile(bc_filepath)
 
-            additional_args = []
+            additional_args = kwargs.get('exec_args', '').split(' ')
             warmup_iterations = kwargs.get('warmup_iterations', None)
             if warmup_iterations:
                 additional_args.append('--warmup=%d' % warmup_iterations)
@@ -335,6 +336,8 @@ if __name__ == "__main__":
                         help='timeout of a single benchmark run, given in seconds')
     parser.add_argument('--suffix', metavar='STRING', type=str, default="",
                         help='suffix which should be added to the runtime name')
+    parser.add_argument('--exec-args', metavar='STRING', type=str, default="",
+                        help='commandline arguments which should be added to the benchmark')
 
     parser.add_argument('--only-missing', action='store_true',
                         help='only execute benchmarks which are missing in the benchfile')
@@ -391,6 +394,7 @@ if __name__ == "__main__":
             'make_jobs': args.jobs,
             'timeout': args.timeout,
             'suffix': args.suffix,
+            'exec_args': args.exec_args,
             'allow_overwrite': not args.only_missing
         }
 
