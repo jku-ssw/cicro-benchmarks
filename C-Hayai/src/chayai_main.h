@@ -8,6 +8,7 @@
 typedef struct CHayaiArguments {
     void (*outputterInit)(CHayaiOutputter* outputter);
     unsigned int warmupIterations;
+    unsigned int benchmarkIterations;
     int papiEventSet; // this variable always exists so benchmarks using it do not depend on the USE_PAPI definition to be present
 } CHayaiArguments;
 

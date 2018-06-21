@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <limits.h>
 #include <assert.h>
+#include <string.h>
 
 #include "chayai_benchmark_descriptor.h"
 #include "chayai_benchmark_pp.h"
@@ -71,7 +72,7 @@ void chayai_run_benchmarks(CHayaiArguments* arguments)
     
     while (currentBenchmarkDescriptor != NULL) {
         result.warmupRuns = currentBenchmarkDescriptor->warmup;
-        result.runs = currentBenchmarkDescriptor->runs;
+        result.runs = arguments->benchmarkIterations > 0 ? arguments->benchmarkIterations : currentBenchmarkDescriptor->runs;
         result.iterations = currentBenchmarkDescriptor->iterations;
         result.timeTotal = 0;
         result.timeRunMin = INT64_MAX;
