@@ -196,7 +196,7 @@ class BenchmarkingHarness(object):
         exec_func = found_runtime['exec_func']
         clean_func = found_runtime['clean_func']
 
-        allow_overwrite = kwargs.get('allow_overwrite', False)   # TODO: overwrite handing?
+        only_missing = kwargs.get('only_missing', False)
 
         logger.info('start with the execution of the runtime enviroment "%s"', runtime)
 
@@ -220,31 +220,41 @@ class BenchmarkingHarness(object):
                     return False
 
             # execution step
-            for harness in self.find_all_harness():
-                harness_name = harness[:-len('_test')] if harness.endswith('_test') else harness
-                harness_path = os.path.join(self.testdir, harness)
+            for run_id in range(kwargs.get('runs', 1)):
+                logger.info('run %d of %d with the runtime enviroment "%s"', run_id+1, kwargs.get('runs', 1), runtime)
+                for harness in self.find_all_harness():
+                    harness_name = harness[:-len('_test')] if harness.endswith('_test') else harness
+                    harness_path = os.path.join(self.testdir, harness)
 
-                if not re.match(kwargs.get('filter_harness', '.*'), harness):
-                    logger.debug('ignore benchmark: "%s:%s" (did not match filter rule)', harness_name, runtime_name)
-                    continue
+                    if not re.match(kwargs.get('filter_harness', '.*'), harness):
+                        logger.debug('benchmark: "%s:%s" did not match filter rule', harness_name, runtime_name)
+                        continue
 
-                if not allow_overwrite and bench_results.is_run_present(harness_name, runtime_name):
-                    logger.warning('benchmark run of "%s:%s" already present, skip', harness_name, runtime_name)
-                    continue
+                    if only_missing and bench_results.is_run_present(harness_name, runtime_name):
+                        logger.warning('benchmark run of "%s:%s" already present, skip', harness_name, runtime_name)
+                        continue
 
-                try:
-                    logger.info('benchmark: "%s:%s"', harness_name, runtime_name)
-                    result_data = exec_func(harness_path, self.testdir, **kwargs)
-                    if type(result_data) is dict and len(result_data) != 0:
-                        bench_results.set_single_run(harness_name, runtime_name, result_data, overwrite=allow_overwrite)
-                    else:
-                        logger.error('benchmark run of "%s:%s" did not return valid data: "%s"',
-                                     harness_name, runtime_name, result_data)
-                except KeyboardInterrupt:
-                    raise
-                except:  # NOQA: E722
-                    logger.exception('Something went wrong while running the benchmark: "%s:%s"',
-                                     harness_name, runtime_name)
+                    try:
+                        logger.info('benchmark: "%s:%s"', harness_name, runtime_name)
+                        result_data = exec_func(harness_path, self.testdir, **kwargs)
+                        if type(result_data) is dict and len(result_data) != 0:
+                            # cleanup database entries
+                            if kwargs.get('replace_runs'):
+                                if run_id == 0:
+                                    bench_results.remove_all_runs(harness_name, runtime_name)
+
+                                bench_results.set_single_run(harness_name, runtime_name, result_data,
+                                                             overwrite=True, run_id=run_id)
+                            else:
+                                bench_results.append_single_run(harness_name, runtime_name, result_data)
+                        else:
+                            logger.error('benchmark run of "%s:%s" did not return valid data: "%s"',
+                                         harness_name, runtime_name, result_data)
+                    except KeyboardInterrupt:
+                        raise
+                    except:  # NOQA: E722
+                        logger.exception('Something went wrong while running the benchmark: "%s:%s"',
+                                         harness_name, runtime_name)
 
         except KeyboardInterrupt:
             raise
@@ -336,11 +346,15 @@ if __name__ == "__main__":
                         help='timeout of a single benchmark run, given in seconds')
     parser.add_argument('--suffix', metavar='STRING', type=str, default="",
                         help='suffix which should be added to the runtime name')
+    parser.add_argument('--runs', metavar='COUNT', type=int, default=1,
+                        help='number of times a benchmark should be repeated')
     parser.add_argument('--exec-args', metavar='STRING', type=str, default="",
                         help='commandline arguments which should be added to the benchmark')
 
     parser.add_argument('--only-missing', action='store_true',
                         help='only execute benchmarks which are missing in the benchfile')
+    parser.add_argument('--replace-runs', action='store_true',
+                        help='overwrite runs instead of appending to them')
     parser.add_argument('--list-runtimes', action=_ListAllRuntimeAction,
                         help='show a list of all runtimes which can be executed')
     # parser.add_argument('--no-color', action='store_true',
@@ -394,8 +408,10 @@ if __name__ == "__main__":
             'make_jobs': args.jobs,
             'timeout': args.timeout,
             'suffix': args.suffix,
+            'runs': args.runs,
+            'replace_runs': args.replace_runs,
             'exec_args': args.exec_args,
-            'allow_overwrite': not args.only_missing
+            'only_missing': args.only_missing
         }
 
         no_failures = harness.execute_runtimes(args.filter_runtime, results, **execution_kwargs)

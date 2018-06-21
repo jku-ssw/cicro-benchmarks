@@ -20,8 +20,9 @@ def preprocess(results, baseline, filter_runtime='.*', filter_benchmark='.*'):
 
             processed_data[benchmark_name] = {}
 
-            baseline_mean = runs[baseline]['mean']
-            baseline_std_dev = runs[baseline]['std_dev']
+            # TODO: add support for multiple runs
+            baseline_mean = runs[baseline][0]['mean']
+            baseline_std_dev = runs[baseline][0]['std_dev']
 
             assert baseline_mean != 0
             assert baseline_std_dev != 0
@@ -33,8 +34,8 @@ def preprocess(results, baseline, filter_runtime='.*', filter_benchmark='.*'):
                 if not re.match(filter_runtime, runtime):
                     continue
 
-                normalized_mean = data['mean'] / baseline_mean
-                normalized_std_dev = data['std_dev'] / baseline_std_dev
+                normalized_mean = data[0]['mean'] / baseline_mean
+                normalized_std_dev = data[0]['std_dev'] / baseline_std_dev
 
                 assert normalized_mean != 0
                 assert normalized_std_dev != 0
