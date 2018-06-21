@@ -29,6 +29,7 @@ static char chayai_args_doc[] = "[OPTIONS]";
 static struct argp_option chayai_options[] = {
         { "output", 'o', "console|json", OPTION_ARG_OPTIONAL, "Output results in a specific format."},
         { "warmup", 'w', "2", OPTION_ARG_OPTIONAL, "Number of warmup iterations"},
+        { "iterations", 'i', "0", OPTION_ARG_OPTIONAL, "Number of benchmark iterations"},
 #ifdef USE_PAPI
         { "papi", 'p', "PAPI_TOT_CYC,PAPI_TOT_INS", OPTION_ARG_OPTIONAL, "Papi events to catch"},
 #endif
@@ -66,6 +67,9 @@ static error_t chayai_parse_opt(int key, char *arg, struct argp_state *state) {
 
         case 'w':
             return read_unsigned_int_arg(&(arguments->warmupIterations), arg);
+
+        case 'i':
+            return read_unsigned_int_arg(&(arguments->benchmarkIterations), arg);
 
 #ifdef USE_PAPI
         case 'p': {
@@ -106,6 +110,7 @@ CHayaiArguments chayai_main_parse_args(int argv, char** argc) {
     CHayaiArguments arguments = {
         .outputterInit = chayai_console_outputter_init,
         .warmupIterations = 2, // to do at least some caching by default before running the benchmark
+        .benchmarkIterations = 0, // 0 means use number of iterations given by benchmark
 #ifdef USE_PAPI
         .papiEventSet = PAPI_NULL,
 #endif
