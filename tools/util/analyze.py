@@ -1,4 +1,7 @@
+import functools
 import re
+
+import numpy
 
 from util.color_logger import get_logger
 
@@ -20,9 +23,11 @@ def preprocess(results, baseline, filter_runtime='.*', filter_benchmark='.*'):
 
             processed_data[benchmark_name] = {}
 
-            # TODO: add support for multiple runs
-            baseline_mean = runs[baseline][0]['mean']
-            baseline_std_dev = runs[baseline][0]['std_dev']
+            baseline_full_arr = functools.reduce(list.__add__, [run['runs'] for run in runs[baseline]])
+            baseline_duration_arr = numpy.array([r['duration'] for r in baseline_full_arr])
+
+            baseline_mean = numpy.mean(baseline_duration_arr)
+            baseline_std_dev = numpy.std(baseline_duration_arr)
 
             assert baseline_mean != 0
             assert baseline_std_dev != 0
@@ -34,8 +39,11 @@ def preprocess(results, baseline, filter_runtime='.*', filter_benchmark='.*'):
                 if not re.match(filter_runtime, runtime):
                     continue
 
-                normalized_mean = data[0]['mean'] / baseline_mean
-                normalized_std_dev = data[0]['std_dev'] / baseline_std_dev
+                benchmark_full_arr = functools.reduce(list.__add__, [run['runs'] for run in data])
+                benchmark_duration_arr = numpy.array([r['duration'] for r in benchmark_full_arr])
+
+                normalized_mean = numpy.mean(benchmark_duration_arr) / baseline_mean
+                normalized_std_dev = numpy.std(benchmark_duration_arr) / baseline_std_dev
 
                 assert normalized_mean != 0
                 assert normalized_std_dev != 0
