@@ -196,6 +196,8 @@ class BenchmarkingHarness(object):
         exec_func = found_runtime['exec_func']
         clean_func = found_runtime['clean_func']
 
+        result_writer_func = kwargs['result_writer_func']
+
         only_missing = kwargs.get('only_missing', False)
 
         logger.info('start with the execution of the runtime enviroment "%s"', runtime)
@@ -256,11 +258,23 @@ class BenchmarkingHarness(object):
                         logger.exception('Something went wrong while running the benchmark: "%s:%s"',
                                          harness_name, runtime_name)
 
+                # write results after every run
+                if run_id + 1 < kwargs.get('runs', 1):
+                    try:
+                        result_writer_func()
+                    except:  # NOQA: E722
+                        logger.exception('Something went wrong while writing the results')
+
         except KeyboardInterrupt:
             raise
         except:  # NOQA: E722
             logger.exception('Something went wrong while executing the runtime enviroment "%s"', runtime)
             return False
+        finally:
+            try:
+                result_writer_func()
+            except:  # NOQA: E722
+                logger.exception('Something went wrong while writing the results')
 
         return True
 
@@ -398,6 +412,32 @@ if __name__ == "__main__":
             if not args.yes and query_yes_no(corrupted_msg, default="no") == 'no':
                 sys.exit()
 
+    def write_results():
+        """ atomic write of results into a file"""
+        logger.info('write results into benchmark file')
+        with tempfile.NamedTemporaryFile('w', dir=os.path.dirname(args.benchfile),
+                                         prefix=".bench_", suffix='.json', delete=False) as f:
+            # write results
+            results.store_file(f)
+            os.fsync(f.fileno())
+
+            # if the file exists, move it somewhere else
+            tmp_filename = args.benchfile + '.deleteme'
+            delete_tmp_file = False
+            if os.path.exists(args.benchfile):
+                assert not os.path.exists(tmp_filename)
+                os.link(args.benchfile, tmp_filename)
+                os.unlink(args.benchfile)
+                delete_tmp_file = True
+
+            # link new file
+            os.link(f.name, args.benchfile)
+            os.unlink(f.name)
+
+            # remove old file
+            if delete_tmp_file:
+                os.unlink(tmp_filename)
+
     no_failures = True
     try:
         execution_kwargs = {
@@ -411,7 +451,8 @@ if __name__ == "__main__":
             'runs': args.runs,
             'replace_runs': args.replace_runs,
             'exec_args': args.exec_args,
-            'only_missing': args.only_missing
+            'only_missing': args.only_missing,
+            'result_writer_func': write_results
         }
 
         no_failures = harness.execute_runtimes(args.filter_runtime, results, **execution_kwargs)
@@ -421,8 +462,6 @@ if __name__ == "__main__":
         no_failures = False
         logger.exception('Something went wrong while executing the testcases')
     finally:
-        logger.info('write results into benchmark file')
-        with open(args.benchfile, 'w') as f:
-            results.store_file(f)
+        # write_results()  # writing to file now happens in execute_single_runtime(...)
 
         sys.exit(0 if no_failures else 1)
