@@ -26,8 +26,8 @@ def boxplot(datapoints):
         label_values = []
         for value in datapoints.values():
             if label in value:
-                assert value[label]['mean'] != 0
-                label_values.append(value[label]['mean'])
+                assert value[label]['duration']['mean'] != 0
+                label_values.append(value[label]['duration']['mean'])
         values.append(label_values)
 
     fig = plt.figure()
