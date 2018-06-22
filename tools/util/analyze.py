@@ -9,6 +9,25 @@ from util.color_logger import get_logger
 logger = get_logger('plot')
 
 
+def calculate_stat_from_array(array):
+    if len(array) == 0:
+        return {}
+
+    res_dict = {}
+    for type in array[0]:
+        tmp_arr = numpy.array([r[type] for r in array])  # TODO: support runs with different types
+
+        tmp_mean = numpy.mean(tmp_arr)
+
+        if tmp_mean == 0:
+            logger.error('no correct baseline calculated for', type)
+            continue
+
+        res_dict[type] = {'mean': tmp_mean}
+
+    return res_dict
+
+
 def preprocess(results, baseline, filter_runtime='.*', filter_benchmark='.*'):
     processed_data = {}
     for benchmark_name in results.get_all_benchmark_names():
@@ -24,13 +43,8 @@ def preprocess(results, baseline, filter_runtime='.*', filter_benchmark='.*'):
             processed_data[benchmark_name] = {}
 
             baseline_full_arr = functools.reduce(list.__add__, [run['runs'] for run in runs[baseline]])
-            baseline_duration_arr = numpy.array([r['duration'] for r in baseline_full_arr])
 
-            baseline_mean = numpy.mean(baseline_duration_arr)
-            baseline_std_dev = numpy.std(baseline_duration_arr)
-
-            assert baseline_mean != 0
-            assert baseline_std_dev != 0
+            baseline_dict = calculate_stat_from_array(baseline_full_arr)
 
             for runtime, data in runs.items():
                 if runtime == baseline:
@@ -40,16 +54,21 @@ def preprocess(results, baseline, filter_runtime='.*', filter_benchmark='.*'):
                     continue
 
                 benchmark_full_arr = functools.reduce(list.__add__, [run['runs'] for run in data])
-                benchmark_duration_arr = numpy.array([r['duration'] for r in benchmark_full_arr])
 
-                normalized_mean = numpy.mean(benchmark_duration_arr) / baseline_mean
-                normalized_std_dev = numpy.std(benchmark_duration_arr) / baseline_std_dev
+                benchmark_dict = calculate_stat_from_array(benchmark_full_arr)
 
-                assert normalized_mean != 0
-                assert normalized_std_dev != 0
+                processed_data[benchmark_name][runtime] = {}
+                for type in benchmark_dict:
+                    if type not in baseline_dict:
+                        logger.warning('no baseline found for ', type)
+                        continue
 
-                processed_data[benchmark_name][runtime] = {'mean': normalized_mean,
-                                                           'std_dev': normalized_std_dev}
+                    normalized_mean = benchmark_dict[type]['mean'] / baseline_dict[type]['mean']
+
+                    assert normalized_mean != 0
+
+                    processed_data[benchmark_name][runtime][type] = {'mean': normalized_mean}
+
         except:  # NOQA: E722
             logger.exception('exception occured while preprocessing benchmark "%s"', benchmark_name)
 

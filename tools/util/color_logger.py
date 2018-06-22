@@ -22,7 +22,7 @@ class ColoredFormatter(logging.Formatter):
         lvl_name = record.levelname
         if lvl_name in ColoredFormatter.COLORS:
             record.levelname = self.COLOR_SEQ % (self.COLORS[lvl_name]) + record.levelname + self.RESET_SEQ
-            record.msg = self.COLOR_SEQ % (self.COLORS[lvl_name]) + record.msg + self.RESET_SEQ
+            record.msg = self.COLOR_SEQ % (self.COLORS[lvl_name]) + str(record.msg) + self.RESET_SEQ
         return logging.Formatter.format(self, record)
 
     def formatException(self, ei):

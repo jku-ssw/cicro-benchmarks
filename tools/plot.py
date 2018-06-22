@@ -13,7 +13,7 @@ from util.analyze import preprocess
 logger = get_logger('plot')
 
 
-def boxplot(datapoints):
+def boxplot(datapoints, type='duration'):
     # get all valid labels
     labels = set()
     for value in datapoints.values():
@@ -26,14 +26,16 @@ def boxplot(datapoints):
         label_values = []
         for value in datapoints.values():
             if label in value:
-                assert value[label]['mean'] != 0
-                label_values.append(value[label]['mean'])
+                assert value[label][type]['mean'] != 0
+                label_values.append(value[label][type]['mean'])
         values.append(label_values)
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
     ax.boxplot(values, vert=False, notch=1, labels=labels)
+
+    plt.title(type)
 
     plt.show()
 
@@ -81,10 +83,19 @@ if __name__ == "__main__":
                                 filter_runtime=args.filter_runtime,
                                 filter_benchmark=args.filter_benchmark)
 
+    # combine datapoints to sinple metrics which we can use for boxplots
     if not processed_data:
         logger.error('no data to plot!')
         sys.exit()
 
-    logger.debug(str(processed_data))
+    logger.debug(processed_data)
 
-    boxplot(processed_data)
+    # find out which types can be plotted
+    types = set()
+    for benchmark in processed_data.values():
+        for runtime in benchmark.values():
+            types.update(runtime.keys())
+
+    # plot various types
+    for t in types:
+        boxplot(processed_data, type=t)
