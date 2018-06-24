@@ -1,1 +1,1 @@
-harness.add_runtime('compcert', {"CC": "${COMPCERT}", "AS": "as", "CFLAGS": "-fstruct-passing"})
+harness.add_runtime('compcert', {"CC": "${COMPCERT}", "AS": "as", "CFLAGS": "-fstruct-passing -fbitfields"})
