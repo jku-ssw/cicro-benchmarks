@@ -154,7 +154,7 @@ clean:
 	rmdir $(jsx_output_dir) || true
 
 snowball: $(COMPILER_OBJECTS)
-	$(CC) -o $@ $^
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^
 
 $(COMPILER_OBJECTS): $(COMPILER_HEADERS)
 
@@ -176,7 +176,7 @@ libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) -cru $@ $^
 
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
-	$(CC) -o $@ $^
+	$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ $^
 
 jsx_stemwords: $(JSX_STEMWORDS_SOURCE) $(JSX_SOURCES)
 	jsx --executable node --output $@ --add-search-path $(jsx_output_dir) --add-search-path $(jsx_runtime_src_dir) $(JSX_STEMWORDS_SOURCE)
