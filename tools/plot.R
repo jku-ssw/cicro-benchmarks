@@ -1,12 +1,14 @@
 #!/usr/bin/env Rscript
 
-#library(ggplot2)
+library(tidyverse)
 library(jsonlite)
 library(optparse)
 
 option_list = list(
   make_option(c("-b", "--benchfile"), type="character", default=NA,
-              help="preprocessed .json file to plot", metavar="character")
+              help="preprocessed .json file to plot", metavar="character"),
+  make_option(c("-r", "--base-runtime"), type="character", default=NA,
+              help="runtime which specifies the base", metavar="character")
 );
 
 opt_parser = OptionParser(option_list=option_list);
@@ -23,11 +25,56 @@ if (!is.na(opt$benchfile)) {
   stop("--benchfile parameter must be provided. See script usage (--help)")
 }
 
-for(type in names(raw)) {
-  df <- t(do.call(rbind.data.frame, raw[[type]]))  # TODO: only works when every runtime has the same benchmarks (and no missing ones)
-
-  boxplot(df, horizontal=T, notch=T, varwidth=T, main=type)
-
-  #p <- ggplot(df, aes(variable, value))
-  #p + geom_boxplot(notch = TRUE, varwidth=TRUE) + coord_flip()
+if (!is.na(opt$'base-runtime')) {
+  BASE_RUNTIME <- opt$'base-runtime'
+} else {
+  stop("--base-runtime parameter must be provided. See script usage (--help)")
 }
+
+flatten_data <- function(raw) {
+  res <- data.frame()
+  for(benchmark in names(raw)) {
+    raw_benchmark <- raw[[benchmark]]
+    df_benchmark <- data.frame()
+    for (config in names(raw_benchmark)) {
+      df_benchmark_config <- raw_benchmark[[config]] %>%
+        select(-mean, -std_dev, -iterations_per_run, -disabled) %>%
+        unnest() %>%
+        mutate(config=config)
+      df_benchmark <- bind_rows(df_benchmark, df_benchmark_config)
+    }
+    res <- bind_rows(res, df_benchmark) # %>% mutate(benchmark=benchmark))
+  }
+  res
+}
+
+df = flatten_data(raw)
+
+print("runtimes in the dataset:")
+df$config %>% unique()
+
+# create a long table to allow the following operations
+df_long = df %>%
+  gather(key=metric_name, value=value, -fixture, -name, -harness, -config)
+
+# calculate mean over all runs
+df_long_summary = df_long %>%
+  group_by(fixture, name, config, metric_name) %>%
+  summarise(value_mean=mean(value)) %>%
+  ungroup()
+
+# add baseline to allow plotting relative to baseline
+df_long_baseline = df_long_summary  %>%
+  group_by(fixture, name, metric_name) %>%
+  mutate(baseline=value_mean[config==BASE_RUNTIME ]) %>%
+  ungroup()
+
+#for(plot_name in df_long_baseline$metric_name %>% unique()) {
+plot_name='duration'
+  print(plot_name)
+  ggplot(df_long_baseline %>%filter(metric_name == plot_name), aes(x=config, y=value_mean/baseline)) +
+    geom_boxplot(notch = TRUE) +
+    scale_x_discrete(name = "runtimes") +
+    #geom_jitter() +
+    ggtitle(plot_name)
+#}
