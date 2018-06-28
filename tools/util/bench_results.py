@@ -29,7 +29,7 @@ class BenchmarkingResults(object):
 
         self.conn.execute(create_table)
 
-    def load_file(self, file):
+    def load_file(self, file, append=False, verbose=False):
         """Load files which contains the benchmarking data
 
         data is stored in the following format:
@@ -44,12 +44,16 @@ class BenchmarkingResults(object):
 
         for runtime_data in file_data.values():
             for runtime, data in runtime_data.items():
-                if type(data) is list:
-                    for entry in data:
+                if type(data) is not list:
+                    data = [data]  # old file structure
+
+                run_id = 0
+                for entry in data:
+                    if append:
                         self.append_benchmark(entry, runtime)
-                else:
-                    # old file structure
-                    self.append_benchmark(data, runtime)
+                    else:
+                        self.add_benchmark(entry, runtime, overwrite=False, verbose=verbose, run_id=run_id)
+                    run_id += 1
 
     def store_file(self, file):
         file_data = {}
@@ -87,14 +91,17 @@ class BenchmarkingResults(object):
         for benchmark in data.get('benchmarks', []):
             self.append_benchmark(benchmark, runtime, harness_name)
 
-    def add_benchmark(self, data, runtime, harness=None, overwrite=False, run_id=0):
+    def add_benchmark(self, data, runtime, harness=None, overwrite=False, verbose=True, run_id=0):
         bench_name = get_benchmark_name(data)
         harness = harness if harness is not None else data.get('harness')
 
         if self.is_benchmark_present(bench_name, runtime, run_id):
             if not overwrite:
                 logger.error('benchmark run of "%s:%s" already present, skip writing', bench_name, runtime)
-                logger.info('data: %s', data)
+                if verbose:
+                    logger.info('data: %s', data)
+                else:
+                    logger.debug('data: %s', data)
                 return
 
             logger.warning('benchmark run of "%s:%s" already present, overwrite data', bench_name, runtime)
