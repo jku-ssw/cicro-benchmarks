@@ -154,7 +154,7 @@ clean:
 	rmdir $(jsx_output_dir) || true
 
 snowball: $(COMPILER_OBJECTS)
-	$(CC) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^
 
 $(COMPILER_OBJECTS): $(COMPILER_HEADERS)
 
@@ -176,7 +176,7 @@ libstemmer.o: libstemmer/libstemmer.o $(RUNTIME_OBJECTS) $(C_LIB_OBJECTS)
 	$(AR) -cru $@ $^
 
 stemwords: $(STEMWORDS_OBJECTS) libstemmer.o
-	$(CC) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^
 
 jsx_stemwords: $(JSX_STEMWORDS_SOURCE) $(JSX_SOURCES)
 	jsx --executable node --output $@ --add-search-path $(jsx_output_dir) --add-search-path $(jsx_runtime_src_dir) $(JSX_STEMWORDS_SOURCE)
@@ -328,12 +328,13 @@ dist_libstemmer_c: \
 	 ls include/*.h >> MANIFEST) && \
         cp -a libstemmer/mkinc.mak libstemmer/mkinc_utf8.mak $${dest}/ && \
 	echo 'include mkinc.mak' >> $${dest}/Makefile && \
-	echo 'CFLAGS=-Iinclude' >> $${dest}/Makefile && \
+	echo 'CFLAGS=-O2' >> $${dest}/Makefile && \
++	echo 'CPPFLAGS=-Iinclude' >> $${dest}/Makefile && \
 	echo 'all: libstemmer.o stemwords' >> $${dest}/Makefile && \
 	echo 'libstemmer.o: $$(snowball_sources:.c=.o)' >> $${dest}/Makefile && \
 	echo '	$$(AR) -cru $$@ $$^' >> $${dest}/Makefile && \
 	echo 'stemwords: examples/stemwords.o libstemmer.o' >> $${dest}/Makefile && \
-	echo '	$$(CC) -o $$@ $$^' >> $${dest}/Makefile && \
+	echo '	$$(CC) $$(CFLAGS) -o $$@ $$^' >> $${dest}/Makefile && \
 	echo 'clean:' >> $${dest}/Makefile && \
 	echo '	rm -f stemwords *.o $(c_src_dir)/*.o runtime/*.o libstemmer/*.o' >> $${dest}/Makefile && \
 	(cd dist && tar zcf $${destname}.tgz $${destname}) && \
