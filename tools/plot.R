@@ -83,4 +83,4 @@ for(plot_name in df_long_baseline$metric_name %>% unique()) {
 
 #library(plotly)
 #p_interactive <- p + geom_point(aes(text=paste(fixture, name, sep=".")), colour="grey", alpha=1/4)
-#ggplotly(p_interactive)
+#ggplotly(p_interactive, dynamicTicks=TRUE)
