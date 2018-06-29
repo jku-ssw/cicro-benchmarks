@@ -414,6 +414,8 @@ implemented
 
 Implemented, but way to tight loop at the moment to do good benchmarking
 
+Asan Fixed: [snowballstem/snowball/pull/84](https://github.com/snowballstem/snowball/pull/84)
+
 # https://github.com/bashrc/libdeep (2017.19.12)
 
 Implemented
