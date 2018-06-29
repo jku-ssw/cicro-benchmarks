@@ -69,12 +69,18 @@ df_long_baseline = df_long_summary  %>%
   mutate(baseline=value_mean[config==BASE_RUNTIME ]) %>%
   ungroup()
 
-#for(plot_name in df_long_baseline$metric_name %>% unique()) {
-plot_name='duration'
+for(plot_name in df_long_baseline$metric_name %>% unique()) {
   print(plot_name)
-  ggplot(df_long_baseline %>%filter(metric_name == plot_name), aes(x=config, y=value_mean/baseline)) +
-    geom_boxplot(notch = TRUE) +
+  p <- ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=config, y=value_mean/baseline)) +
+    geom_boxplot(notch = TRUE, varwidth=TRUE) +
     scale_x_discrete(name = "runtimes") +
-    #geom_jitter() +
+    scale_y_continuous(name = "factor") +
     ggtitle(plot_name)
-#}
+  print(p)
+}
+
+# interactive plot is also possible:
+
+#library(plotly)
+#p_interactive <- p + geom_point(aes(text=paste(fixture, name, sep=".")), colour="grey", alpha=1/4)
+#ggplotly(p_interactive)
