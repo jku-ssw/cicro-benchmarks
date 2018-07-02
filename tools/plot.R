@@ -55,7 +55,8 @@ df$config %>% unique()
 
 # create a long table to allow the following operations
 df_long = df %>%
-  gather(key=metric_name, value=value, -fixture, -name, -harness, -config)
+  gather(key=metric_name, value=value, -fixture, -name, -harness, -config) %>%
+  filter(!is.na(value))
 
 # calculate mean and sum over all runs
 df_long_summary = df_long %>%
