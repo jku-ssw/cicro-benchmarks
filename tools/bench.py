@@ -123,6 +123,13 @@ class BenchmarkingHarness(object):
                 logger.error('"make" exited with non zero return code!')
                 return False
 
+        # check if all benchmarks were compiled (important if we ignore errors)
+        dir_content = os.listdir(workdir)
+        orig_test_files = [elem for elem in dir_content if elem.endswith('_test.c')]
+        for test_file in sorted(orig_test_files):
+            if test_file[:-2] not in dir_content:
+                logger.warning('%s was not compiled!', test_file)
+
         return True
 
     @staticmethod
