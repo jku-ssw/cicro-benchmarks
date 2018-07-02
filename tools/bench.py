@@ -138,8 +138,11 @@ class BenchmarkingHarness(object):
         assert os.path.isdir(workdir)
 
         args = [filepath, '--output=json'] + kwargs.get('exec_args', '').split(' ')
-        with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE) as process:
-            stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
+        with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+            stdout, stderr = process.communicate(timeout=kwargs.get('timeout', 240))
+
+            if stderr:
+                logger.warning("benchmark harness had some output on stderr:\n%s", stderr.decode('utf-8'))
 
             if process.returncode != 0:
                 return None
@@ -333,8 +336,11 @@ def add_default_runtimes(harness):
             if warmup_iterations:
                 additional_args.append('--warmup=%d' % warmup_iterations)
             args = os.path.expandvars(tool).split(' ') + [bc_filepath, '--output=json'] + additional_args
-            with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE) as p:
-                stdout, _ = p.communicate(timeout=kwargs.get('timeout', 240))
+            with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
+                stdout, stderr = p.communicate(timeout=kwargs.get('timeout', 240))
+
+                if stderr:
+                    logger.warning("benchmark harness had some output on stderr:\n%s", stderr.decode('utf-8'))
 
                 if p.returncode != 0:
                     return None

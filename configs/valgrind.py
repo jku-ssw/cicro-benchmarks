@@ -4,8 +4,11 @@ import json
 
 def execute_binary_analysis_tool(filepath, workdir, tool, **kwargs):
     args = tool + [filepath, '--output=json'] + kwargs.get('exec_args', '').split(' ')
-    with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE) as process:
-        stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
+    with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+        stdout, stderr = process.communicate(timeout=kwargs.get('timeout', 240))
+
+        if stderr:
+            logger.warning("benchmark harness had some output on stderr:\n%s", stderr.decode('utf-8'))
 
         if process.returncode != 0:
             return None
