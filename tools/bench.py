@@ -171,13 +171,17 @@ class BenchmarkingHarness(object):
                 found_harness.append(harness)
         return found_harness
 
-    def execute_runtimes(self, filter, bench_results, **kwargs):
-        no_failures = True
+    def filtered_runtime_iterator(self, filter):
         for runtime in self.registered_runtimes.keys():
             if re.match(filter, runtime):
-                if self.execute_single_runtime(runtime, bench_results, **kwargs) is not True:
-                    logger.error("%s did not finish", runtime)
-                    no_failures = False
+                yield runtime
+
+    def execute_runtimes(self, filter, bench_results, **kwargs):
+        no_failures = True
+        for runtime in self.filtered_runtime_iterator(filter):
+            if self.execute_single_runtime(runtime, bench_results, **kwargs) is not True:
+                logger.error("%s did not finish", runtime)
+                no_failures = False
 
         return no_failures
 
@@ -391,14 +395,19 @@ if __name__ == "__main__":
     if not args.verbose:
         logging.disable(logging.DEBUG)  # we want to set all loggers
 
-    if not is_system_ready_for_benchmarking():
-        if not args.yes and query_yes_no('Do you want to continue with the benchmarks?') == 'no':
-            sys.exit()
-
     # Initialize Benchmarking Harness
     harness = BenchmarkingHarness(args.testdir)
 
     add_default_runtimes(harness)
+
+    runtimes_to_execute = list(harness.filtered_runtime_iterator(args.filter_runtime))
+    if len(runtimes_to_execute) == 0:
+        logger.error('no runtimes found which is matching the filter: "%s"', args.filter_runtime)
+        sys.exit(1)
+    else:
+        logger.info('Following runtimes will be executed:')
+        for runtime in runtimes_to_execute:
+            logger.info(' * %s', runtime)
 
     results = BenchmarkingResults()
 
@@ -438,23 +447,27 @@ if __name__ == "__main__":
             if delete_tmp_file:
                 os.unlink(tmp_filename)
 
+    execution_kwargs = {
+        'skip_clean': args.skip_clean or args.skip_compilation,
+        'skip_compilation': args.skip_compilation,
+        'filter_harness': args.filter_harness,
+        'ignore_errors': args.ignore_errors,
+        'make_jobs': args.jobs,
+        'timeout': args.timeout,
+        'suffix': args.suffix,
+        'runs': args.runs,
+        'replace_runs': args.replace_runs,
+        'exec_args': args.exec_args,
+        'only_missing': args.only_missing,
+        'result_writer_func': write_results
+    }
+
+    if not is_system_ready_for_benchmarking():
+        if not args.yes and query_yes_no('Do you want to continue with the benchmarks?') == 'no':
+            sys.exit()
+
     no_failures = True
     try:
-        execution_kwargs = {
-            'skip_clean': args.skip_clean or args.skip_compilation,
-            'skip_compilation': args.skip_compilation,
-            'filter_harness': args.filter_harness,
-            'ignore_errors': args.ignore_errors,
-            'make_jobs': args.jobs,
-            'timeout': args.timeout,
-            'suffix': args.suffix,
-            'runs': args.runs,
-            'replace_runs': args.replace_runs,
-            'exec_args': args.exec_args,
-            'only_missing': args.only_missing,
-            'result_writer_func': write_results
-        }
-
         no_failures = harness.execute_runtimes(args.filter_runtime, results, **execution_kwargs)
     except KeyboardInterrupt:
         pass
