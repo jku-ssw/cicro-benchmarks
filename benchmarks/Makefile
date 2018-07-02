@@ -16,12 +16,16 @@ C_HAYAI_LDFLAGS = -I $(C_HAYAI_DIR)/src -lm
 C_HAYAI_LIB = $(C_HAYAI_DIR)/build/src/libchayai.a
 C_HAYAI_CFLAGS = $(C_HAYAI_LIB)
 
-ifdef NO_PAPI
-    USE_PAPI_VALUE = OFF
-else
+USE_PAPI_VALUE = ON
+ifdef PAPI
+ifeq '$(PAPI)' '0'
+	USE_PAPI_VALUE = OFF
+endif
+endif
+
+ifeq '$(USE_PAPI_VALUE)' 'ON'
 	C_HAYAI_LDFLAGS += -lpapi
 	C_HAYAI_CFLAGS += -DUSE_PAPI
-	USE_PAPI_VALUE = ON
 endif
 
 # Projects to build

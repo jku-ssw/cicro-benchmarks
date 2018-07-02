@@ -79,8 +79,23 @@ for(plot_name in df_long_baseline$metric_name %>% unique()) {
   print(p)
 }
 
+
 # interactive plot is also possible:
 
 #library(plotly)
-#p_interactive <- p + geom_point(aes(text=paste(fixture, name, sep=".")), colour="grey", alpha=1/4)
-#ggplotly(p_interactive)
+#p_boxplot <- p + geom_point(aes(text=paste(fixture, name, sep=".")), colour="grey", alpha=1/4)
+#ggplotly(p_boxplot, dynamicTicks=TRUE)
+
+
+# interactive barchart to visualize all benchmarks with all runtimes
+
+#p_barchart = ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=name, y=value_mean/baseline, fill=config)) +
+#  geom_bar(stat="identity", position=position_dodge())
+#ggplotly(p_barchart, dynamicTicks=TRUE)
+
+
+# matrix visualisation of all plots, to show patterns and outliers
+my_breaks = c(0.1, 0.5, 1, 1.5, 2, 5, 10, 50, 100, 200, 500, 1000)
+ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=name, fill=value_mean/baseline, y=config)) +
+  geom_tile(aes(fill = value_mean/baseline), colour = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue", na.value = "grey50", trans="log1p", breaks=my_breaks, labels=my_breaks, guide="legend")

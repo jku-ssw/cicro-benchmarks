@@ -25,6 +25,6 @@ def callgrind_executor(filepath, workdir, **kwargs):
 def drmemory_executor(filepath, workdir, **kwargs):
     return execute_binary_analysis_tool(filepath, workdir, ['{$DR_MEMORY}', '--'], **kwargs)
 
-harness.add_runtime('valgrind-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "NO_PAPI":1}, exec_func=valgrind_executor)
-harness.add_runtime('callgrind-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "NO_PAPI":1}, exec_func=callgrind_executor)
+harness.add_runtime('valgrind-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "PAPI":0}, exec_func=valgrind_executor)
+harness.add_runtime('callgrind-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "PAPI":0}, exec_func=callgrind_executor)
 harness.add_runtime('drmemory-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, exec_func=drmemory_executor)
