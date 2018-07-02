@@ -322,8 +322,8 @@ ndevilla-iniparser_$(TEST_SUFFIX): ndevilla-iniparser ndevilla-iniparser_test.c 
 
 ########## https://github.com/orangeduck/tgc
 
-orangeduck-tgc_$(TEST_SUFFIX): orangeduck-tgc orangeduck-tgc_test.c $(C_HAYAI_LIB)
-	$(CC) $(CFLAGS) orangeduck-tgc_test.c orangeduck-tgc/tgc.c $(C_HAYAI_CFLAGS) \
+orangeduck-tgc_$(TEST_SUFFIX): orangeduck-tgc orangeduck-tgc_test.ignored.c $(C_HAYAI_LIB)
+	$(CC) $(CFLAGS) orangeduck-tgc_test.ignored.c orangeduck-tgc/tgc.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/orangeduck-tgc_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 ########## https://github.com/paladin-t/my_basic
