@@ -138,16 +138,22 @@ class BenchmarkingHarness(object):
         assert os.path.isdir(workdir)
 
         args = [filepath, '--output=json'] + kwargs.get('exec_args', '').split(' ')
-        with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE) as process:
-            stdout, _ = process.communicate(timeout=kwargs.get('timeout', 240))
+        with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+            stdout, stderr = process.communicate(timeout=kwargs.get('timeout', 240))
+
+            stdout_decoded = stdout.decode('utf-8') if stdout else None
+            stderr_decoded = stderr.decode('utf-8') if stderr else None
+
+            if stderr_decoded:
+                logger.warning("benchmark harness had some output on stderr:\n%s", stderr_decoded)
 
             if process.returncode != 0:
-                return None
+                return None, stderr_decoded
 
             try:
-                return json.loads(stdout.decode('utf-8'))
+                return json.loads(stdout_decoded), stderr_decoded
             except json.JSONDecodeError:
-                logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
+                logger.error('invalid benchmark result: \'%s\'', stdout_decoded)
                 raise
 
     def add_runtime(self, name, make_env,
@@ -213,6 +219,8 @@ class BenchmarkingHarness(object):
 
         logger.info('start with the execution of the runtime enviroment "%s"', runtime)
 
+        result_harness_data = {}  # TODO: add system informations
+
         try:
             # clean step
             if kwargs.get('skip_clean', False):
@@ -232,6 +240,12 @@ class BenchmarkingHarness(object):
                     logger.error('compilation step for "%s" failed', runtime)
                     return False
 
+                if 'make_env' in found_runtime:
+                    result_harness_data['make_env'] = {}
+                    for key, value in found_runtime['make_env'].items():
+                        exp_value = os.path.expandvars(value) if type(value) is str else value
+                        result_harness_data['make_env'][key] = exp_value
+
             # execution step
             for run_id in range(kwargs.get('runs', 1)):
                 logger.info('run %d of %d with the runtime enviroment "%s"', run_id+1, kwargs.get('runs', 1), runtime)
@@ -249,7 +263,18 @@ class BenchmarkingHarness(object):
 
                     try:
                         logger.info('benchmark: "%s:%s"', harness_name, runtime_name)
-                        result_data = exec_func(harness_path, self.testdir, **kwargs)
+                        exec_ret = exec_func(harness_path, self.testdir, **kwargs)
+
+                        # either we only return the data, or stderr as second element
+                        if type(exec_ret) is tuple:
+                            result_data = exec_ret[0]
+                            result_stderr = exec_ret[1]
+
+                            if result_stderr:
+                                result_harness_data['stderr'] = result_stderr
+                        else:
+                            result_data = exec_ret
+
                         if type(result_data) is dict and len(result_data) != 0:
                             # cleanup database entries
                             if kwargs.get('replace_runs'):
@@ -257,9 +282,11 @@ class BenchmarkingHarness(object):
                                     bench_results.remove_all_runs(harness_name, runtime_name)
 
                                 bench_results.set_single_run(harness_name, runtime_name, result_data,
+                                                             harness_data=result_harness_data,
                                                              overwrite=True, run_id=run_id)
                             else:
-                                bench_results.append_single_run(harness_name, runtime_name, result_data)
+                                bench_results.append_single_run(harness_name, runtime_name, result_data,
+                                                                harness_data=result_harness_data)
                         else:
                             logger.error('benchmark run of "%s:%s" did not return valid data: "%s"',
                                          harness_name, runtime_name, result_data)
@@ -333,16 +360,22 @@ def add_default_runtimes(harness):
             if warmup_iterations:
                 additional_args.append('--warmup=%d' % warmup_iterations)
             args = os.path.expandvars(tool).split(' ') + [bc_filepath, '--output=json'] + additional_args
-            with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE) as p:
-                stdout, _ = p.communicate(timeout=kwargs.get('timeout', 240))
+            with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
+                stdout, stderr = p.communicate(timeout=kwargs.get('timeout', 240))
+
+                stdout_decoded = stdout.decode('utf-8') if stdout else None
+                stderr_decoded = stderr.decode('utf-8') if stderr else None
+
+                if stderr_decoded:
+                    logger.warning("benchmark harness had some output on stderr:\n%s", stderr_decoded)
 
                 if p.returncode != 0:
-                    return None
+                    return None, stderr_decoded
 
                 try:
-                    return json.loads(stdout.decode('utf-8'))
+                    return json.loads(stdout_decoded), stderr_decoded
                 except json.JSONDecodeError:
-                    logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
+                    logger.error('invalid benchmark result: \'%s\'', stdout_decoded)
                     raise
 
     for config in glob.glob(os.path.join(CONFIG_DIR, '*.py')):

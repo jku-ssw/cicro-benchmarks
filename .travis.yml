@@ -4,6 +4,7 @@ before_install:
 script:
   # test code formatting
   - flake8 ./tools
+  - flake8 ./configs --max-line-length=200 --ignore=F821
 
   # execute clang-O0 benchmark for all harnesses starting with 'a'
   - echo "CLANG=clang" > configs/env

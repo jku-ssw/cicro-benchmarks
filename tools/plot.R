@@ -48,25 +48,32 @@ flatten_data <- function(raw) {
   res
 }
 
-df = flatten_data(raw)
+if ("benchmark_data" %in% names(raw)) {
+  benchmark_data = raw[['benchmark_data']]
+} else {
+  benchmark_data = raw  # support old format as well
+}
+
+df = flatten_data(benchmark_data)
 
 print("runtimes in the dataset:")
 df$config %>% unique()
 
 # create a long table to allow the following operations
 df_long = df %>%
-  gather(key=metric_name, value=value, -fixture, -name, -harness, -config)
+  gather(key=metric_name, value=value, -fixture, -name, -harness, -config) %>%
+  filter(!is.na(value))
 
-# calculate mean over all runs
+# calculate mean and sum over all runs
 df_long_summary = df_long %>%
   group_by(fixture, name, config, metric_name) %>%
-  summarise(value_mean=mean(value)) %>%
+  summarise(runs=n(), value_mean=mean(value), value_sum=sum(value)) %>%
   ungroup()
 
 # add baseline to allow plotting relative to baseline
 df_long_baseline = df_long_summary  %>%
   group_by(fixture, name, metric_name) %>%
-  mutate(baseline=value_mean[config==BASE_RUNTIME ]) %>%
+  mutate(baseline=value_mean[config==BASE_RUNTIME ], baseline_runs=runs[config==BASE_RUNTIME ]) %>%
   ungroup()
 
 for(plot_name in df_long_baseline$metric_name %>% unique()) {
@@ -77,6 +84,13 @@ for(plot_name in df_long_baseline$metric_name %>% unique()) {
     scale_y_continuous(name = "factor") +
     ggtitle(plot_name)
   print(p)
+
+  my_breaks = c(0.1, 0.5, 1, 1.5, 2, 5, 10, 50, 100, 200, 500, 1000)
+  p2 = ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=name, fill=value_mean/baseline, y=config)) +
+    geom_tile(aes(fill = value_mean/baseline), colour = "white") +
+    scale_fill_gradient(low = "white", high = "steelblue", na.value = "grey50", trans="log1p", breaks=my_breaks, labels=my_breaks, guide="legend") +
+    ggtitle(plot_name)
+  print(p2)
 }
 
 
@@ -95,7 +109,14 @@ for(plot_name in df_long_baseline$metric_name %>% unique()) {
 
 
 # matrix visualisation of all plots, to show patterns and outliers
-my_breaks = c(0.1, 0.5, 1, 1.5, 2, 5, 10, 50, 100, 200, 500, 1000)
-ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=name, fill=value_mean/baseline, y=config)) +
-  geom_tile(aes(fill = value_mean/baseline), colour = "white") +
-  scale_fill_gradient(low = "white", high = "steelblue", na.value = "grey50", trans="log1p", breaks=my_breaks, labels=my_breaks, guide="legend")
+
+# calculate absolute runtime
+ggplot(df_long_summary %>% filter(metric_name == 'duration'), aes(x=name, fill=value_sum/1000000, y=config)) +
+  geom_tile(aes(fill = value_sum/1000000), colour = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue", na.value = "grey50", trans="log1p", guide="legend") +
+  ggtitle('absolute runtime in seconds')
+
+ggplot(df_long_baseline %>% filter(metric_name == 'duration'), aes(x=name, fill=runs/baseline_runs, y=config)) +
+  geom_tile(aes(fill = runs/baseline_runs), colour = "white") +
+  scale_fill_gradient(low = "white", high = "steelblue", na.value = "grey50", guide="legend") + #, trans="log1p"
+  ggtitle('number of runs relative to baseline')
