@@ -234,7 +234,12 @@ class BenchmarkingHarness(object):
                        'cpu': {'cores_logical': os.cpu_count()}}}
 
         if psutil_imported:
-            result_harness_data['system']['cpu']['cores_physical'] = psutil.cpu_count(logical=False)
+            try:
+                result_harness_data['system']['cpu']['cores_physical'] = psutil.cpu_count(logical=False)
+            except KeyboardInterrupt:
+                raise
+            except:  # NOQA: E722
+                logger.exception('cannot extract system informations with psutil')
 
         try:
             # clean step
@@ -278,14 +283,20 @@ class BenchmarkingHarness(object):
 
                     # get some additional statistics which could be of interest
                     if psutil_imported:
-                        result_harness_data['system']['cpu']['percent'] = psutil.cpu_percent(interval=0.5, percpu=True)
-                        result_harness_data['system']['cpu']['freq'] = psutil.cpu_freq(percpu=True)
+                        try:
+                            result_harness_data['system']['cpu']['percent'] = psutil.cpu_percent(interval=0.5,
+                                                                                                 percpu=True)
+                            result_harness_data['system']['cpu']['freq'] = psutil.cpu_freq(percpu=True)
 
-                        virtual_memory = psutil.virtual_memory()
-                        result_harness_data['system']['memory'] = {'total': virtual_memory.total,
-                                                                   'available': virtual_memory.available,
-                                                                   'used': virtual_memory.used,
-                                                                   'free': virtual_memory.free}
+                            virtual_memory = psutil.virtual_memory()
+                            result_harness_data['system']['memory'] = {'total': virtual_memory.total,
+                                                                       'available': virtual_memory.available,
+                                                                       'used': virtual_memory.used,
+                                                                       'free': virtual_memory.free}
+                        except KeyboardInterrupt:
+                            raise
+                        except:  # NOQA: E722
+                            logger.exception('cannot extract system informations with psutil')
                     result_harness_data['datetime'] = datetime.datetime.now().isoformat()
 
                     try:
@@ -327,6 +338,8 @@ class BenchmarkingHarness(object):
                 if run_id + 1 < kwargs.get('runs', 1):
                     try:
                         result_writer_func()
+                    except KeyboardInterrupt:
+                        raise
                     except:  # NOQA: E722
                         logger.exception('Something went wrong while writing the results')
 
@@ -338,6 +351,8 @@ class BenchmarkingHarness(object):
         finally:
             try:
                 result_writer_func()
+            except KeyboardInterrupt:
+                raise
             except:  # NOQA: E722
                 logger.exception('Something went wrong while writing the results')
 
