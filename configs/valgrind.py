@@ -8,16 +8,19 @@ def execute_binary_analysis_tool(filepath, workdir, tool, **kwargs):
     with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
         stdout, stderr = process.communicate(timeout=kwargs.get('timeout', 240))
 
-        if stderr:
-            logger.warning("benchmark harness had some output on stderr:\n%s", stderr.decode('utf-8'))
+        stdout_decoded = stdout.decode('utf-8') if stdout else None
+        stderr_decoded = stderr.decode('utf-8') if stderr else None
+
+        if stderr_decoded:
+            logger.warning("benchmark harness had some output on stderr:\n%s", stderr_decoded)
 
         if process.returncode != 0:
-            return None
+            return None, stderr_decoded
 
         try:
-            return json.loads(stdout.decode('utf-8'))
+            return json.loads(stdout_decoded), stderr_decoded
         except json.JSONDecodeError:
-            logger.error('invalid benchmark result: \'%s\'', stdout.decode('utf-8'))
+            logger.error('invalid benchmark result: \'%s\'', stdout_decoded)
             raise
 
 

@@ -69,13 +69,14 @@ class BenchmarkingResults(object):
 
                 run_id = 0
                 for entry in data:
-                    entry_h_data = harness_data.get(entry['harness'], {}).get(runtime) if 'harness' in entry else None
+                    entry_h_data = harness_data.get(entry['harness'], {}).get(runtime) if 'harness' in entry else []
+                    h_data = entry_h_data[run_id] if len(entry_h_data) > run_id else None
 
                     if append:
-                        self.append_benchmark(entry, runtime, harness_data=entry_h_data)
+                        self.append_benchmark(entry, runtime, harness_data=h_data)
                     else:
                         self.add_benchmark(entry, runtime,
-                                           harness_data=entry_h_data, overwrite=False, verbose=verbose, run_id=run_id)
+                                           harness_data=h_data, overwrite=False, verbose=verbose, run_id=run_id)
                     run_id += 1
 
     def store_file(self, file):
@@ -142,8 +143,8 @@ class BenchmarkingResults(object):
         bench_name = get_benchmark_name(data)
         harness = harness if harness is not None else data.get('harness')
 
-        sql_data = json.dumps(data) if data is not None else None
-        sql_harness_data = json.dumps(harness_data) if harness_data is not None else None
+        sql_data = json.dumps(data) if data else None
+        sql_harness_data = json.dumps(harness_data) if harness_data else None
 
         if self.is_benchmark_present(bench_name, runtime, run_id):
             if not overwrite:
@@ -183,8 +184,8 @@ class BenchmarkingResults(object):
         bench_name = get_benchmark_name(data)
         harness = harness if harness is not None else data.get('harness')
 
-        sql_data = json.dumps(data) if data is not None else None
-        sql_harness_data = json.dumps(harness_data) if harness_data is not None else None
+        sql_data = json.dumps(data) if data else None
+        sql_harness_data = json.dumps(harness_data) if harness_data else None
 
         query = """INSERT INTO `BENCHMARKS` (
             `NAME`,
