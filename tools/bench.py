@@ -2,10 +2,12 @@
 
 import argparse
 import collections
+import datetime
 import glob
 import json
 import logging
 import os
+import platform
 import re
 import subprocess
 import sys
@@ -17,6 +19,14 @@ from util.console import query_yes_no
 
 
 logger = get_logger('bench')
+
+
+try:
+    import psutil
+    psutil_imported = True
+except ImportError:
+    psutil_imported = False
+    logger.warning("psutil not installed, will skip system related metadata")
 
 
 BASE_DIR = os.path.abspath(os.path.join(sys.path[0], '..'))
@@ -219,7 +229,12 @@ class BenchmarkingHarness(object):
 
         logger.info('start with the execution of the runtime enviroment "%s"', runtime)
 
-        result_harness_data = {}  # TODO: add system informations
+        result_harness_data = {
+            'system': {'platform': platform.platform(True),
+                       'cpu': {'cores_logical': os.cpu_count()}}}
+
+        if psutil_imported:
+            result_harness_data['system']['cpu']['cores_physical'] = psutil.cpu_count(logical=False)
 
         try:
             # clean step
@@ -260,6 +275,18 @@ class BenchmarkingHarness(object):
                     if only_missing and bench_results.is_run_present(harness_name, runtime_name):
                         logger.warning('benchmark run of "%s:%s" already present, skip', harness_name, runtime_name)
                         continue
+
+                    # get some additional statistics which could be of interest
+                    if psutil_imported:
+                        result_harness_data['system']['cpu']['percent'] = psutil.cpu_percent(interval=0.5, percpu=True)
+                        result_harness_data['system']['cpu']['freq'] = psutil.cpu_freq(percpu=True)
+
+                        virtual_memory = psutil.virtual_memory()
+                        result_harness_data['system']['memory'] = {'total': virtual_memory.total,
+                                                                   'available': virtual_memory.available,
+                                                                   'used': virtual_memory.used,
+                                                                   'free': virtual_memory.free}
+                    result_harness_data['datetime'] = datetime.datetime.now().isoformat()
 
                     try:
                         logger.info('benchmark: "%s:%s"', harness_name, runtime_name)
@@ -423,7 +450,7 @@ if __name__ == "__main__":
                         help='skip the compilation step when benchmarking')
     parser.add_argument('--ignore-errors', '-i', action='store_true',
                         help='ignore all errors in the make step to do at least a partial benchmark')
-    parser.add_argument('--jobs', '-j', type=int, default=2,
+    parser.add_argument('--jobs', '-j', type=int, default=int(os.cpu_count()/2) + 1,
                         help='number of jobs used for make')
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='enable debug output')
