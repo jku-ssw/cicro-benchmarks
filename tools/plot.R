@@ -48,7 +48,13 @@ flatten_data <- function(raw) {
   res
 }
 
-df = flatten_data(raw)
+if ("benchmark_data" %in% names(raw)) {
+  benchmark_data = raw[['benchmark_data']]
+} else {
+  benchmark_data = raw  # support old format as well
+}
+
+df = flatten_data(benchmark_data)
 
 print("runtimes in the dataset:")
 df$config %>% unique()
