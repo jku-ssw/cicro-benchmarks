@@ -2,6 +2,7 @@ import json
 import sqlite3
 
 from .color_logger import get_logger
+from .auto_extend_list import auto_extend_list
 
 logger = get_logger('bench_results')
 
@@ -24,6 +25,7 @@ class BenchmarkingResults(object):
             `RUN_ID` INTEGER NOT NULL,
             `HARNESS` TEXT,
             `DATA` BLOB,
+            `HARNESS_DATA` BLOB,
             PRIMARY KEY(`NAME`, `RUNTIME`, `RUN_ID`)
         )"""
 
@@ -34,44 +36,88 @@ class BenchmarkingResults(object):
 
         data is stored in the following format:
 
-        "benchmark": {
-            "runtime" : {
-                # json data outputted by harness
+        {
+            "benchmark_data": {
+                "benchmark": {
+                    "runtime": [
+                        {} # json data outputted by benchmark
+                    ]
+                }
+            },
+            "harness_data": {
+                "harness": {
+                    "runtime": [
+                        {} # json data outputted by harness
+                    ]
+                }
             }
         }
         """
         file_data = json.load(file)
 
-        for runtime_data in file_data.values():
+        harness_data = {}
+        if 'benchmark_data' in file_data:
+            benchmark_data = file_data['benchmark_data']
+            harness_data = file_data.get('harness_data', {})
+        else:
+            benchmark_data = file_data  # old file structure
+
+        for runtime_data in benchmark_data.values():
             for runtime, data in runtime_data.items():
                 if type(data) is not list:
                     data = [data]  # old file structure
 
                 run_id = 0
                 for entry in data:
+                    entry_h_data = harness_data.get(entry['harness'], {}).get(runtime) if 'harness' in entry else None
+
                     if append:
-                        self.append_benchmark(entry, runtime)
+                        self.append_benchmark(entry, runtime, harness_data=entry_h_data)
                     else:
-                        self.add_benchmark(entry, runtime, overwrite=False, verbose=verbose, run_id=run_id)
+                        self.add_benchmark(entry, runtime,
+                                           harness_data=entry_h_data, overwrite=False, verbose=verbose, run_id=run_id)
                     run_id += 1
 
     def store_file(self, file):
-        file_data = {}
+        benchmark_data = {}
+        harness_data = {}
 
         for row in self.get_all():
             name = row['name']
             runtime = row['runtime']
+            run_id = row['run_id']
             harness = row['harness']
             data = row['data']
+            h_data = row['harness_data']
 
-            if name not in file_data:
-                file_data[name] = {}
+            if data is not None:
+                if name not in benchmark_data:
+                    benchmark_data[name] = {}
 
-            if runtime not in file_data[name]:
-                file_data[name][runtime] = []
+                if runtime not in benchmark_data[name]:
+                    benchmark_data[name][runtime] = auto_extend_list(None)
 
-            data['harness'] = harness
-            file_data[name][runtime].append(data)
+                data['harness'] = harness
+                benchmark_data[name][runtime][run_id] = data
+
+            try:
+                if h_data is not None:
+                    if harness not in harness_data:
+                        harness_data[harness] = {}
+
+                    if runtime not in harness_data[harness]:
+                        harness_data[harness][runtime] = auto_extend_list(None)
+
+                    if run_id < len(harness_data[harness][runtime]):
+                        present_data = harness_data[harness][runtime][run_id]
+                        if present_data is not None and data != present_data:
+                            raise AssertionError('harness_data is different for the same run!')
+
+                    harness_data[harness][runtime][run_id] = h_data
+            except AssertionError:
+                logger.exception('Unexpected error while creating harness datastructure')
+
+        file_data = {'benchmark_data': benchmark_data, 'harness_data': harness_data}
 
         json.dump(file_data, file)
 
@@ -83,17 +129,21 @@ class BenchmarkingResults(object):
     def is_benchmark_present(self, benchmark_name, runtime, run_id=0):
         return self.get_benchmark(benchmark_name, runtime, run_id) is not None
 
-    def set_single_run(self, harness_name, runtime, data, overwrite=False, run_id=0):
+    def set_single_run(self, harness_name, runtime, data, harness_data=None, overwrite=False, run_id=0):
         for benchmark in data.get('benchmarks', []):
-            self.add_benchmark(benchmark, runtime, harness_name, overwrite=overwrite, run_id=run_id)
+            self.add_benchmark(benchmark, runtime, harness_name,
+                               harness_data=harness_data, overwrite=overwrite, run_id=run_id)
 
-    def append_single_run(self, harness_name, runtime, data):
+    def append_single_run(self, harness_name, runtime, data, harness_data=None):
         for benchmark in data.get('benchmarks', []):
-            self.append_benchmark(benchmark, runtime, harness_name)
+            self.append_benchmark(benchmark, runtime, harness_name, harness_data=harness_data)
 
-    def add_benchmark(self, data, runtime, harness=None, overwrite=False, verbose=True, run_id=0):
+    def add_benchmark(self, data, runtime, harness=None, harness_data=None, overwrite=False, verbose=True, run_id=0):
         bench_name = get_benchmark_name(data)
         harness = harness if harness is not None else data.get('harness')
+
+        sql_data = json.dumps(data) if data is not None else None
+        sql_harness_data = json.dumps(harness_data) if harness_data is not None else None
 
         if self.is_benchmark_present(bench_name, runtime, run_id):
             if not overwrite:
@@ -106,9 +156,9 @@ class BenchmarkingResults(object):
 
             logger.warning('benchmark run of "%s:%s" already present, overwrite data', bench_name, runtime)
 
-            query = """UPDATE `BENCHMARKS` SET `HARNESS`=?,`DATA`=? WHERE `NAME`=? AND `RUNTIME`=?"""
+            query = """UPDATE `BENCHMARKS` SET `HARNESS`=?,`DATA`=? `HARNESS_DATA`=? WHERE `NAME`=? AND `RUNTIME`=?"""
             try:
-                self.c.execute(query, (harness, json.dumps(data), bench_name, runtime))
+                self.c.execute(query, (harness, sql_data, sql_harness_data, bench_name, runtime))
                 self.conn.commit()
             except sqlite3.IntegrityError as e:
                 logger.exception("SQL ERROR: ", e)
@@ -119,29 +169,34 @@ class BenchmarkingResults(object):
                 `RUNTIME`,
                 `RUN_ID`,
                 `HARNESS`,
-                `DATA`
-            ) VALUES (?, ?, ?, ?, ?)
+                `DATA`,
+                `HARNESS_DATA`
+            ) VALUES (?, ?, ?, ?, ?, ?)
             """
             try:
-                self.c.execute(query, (bench_name, runtime, run_id, harness, json.dumps(data)))
+                self.c.execute(query, (bench_name, runtime, run_id, harness, sql_data, sql_harness_data))
                 self.conn.commit()
             except sqlite3.IntegrityError as e:
                 logger.exception("SQL ERROR: ", e)
 
-    def append_benchmark(self, data, runtime, harness=None):
+    def append_benchmark(self, data, runtime, harness=None, harness_data=None):
         bench_name = get_benchmark_name(data)
         harness = harness if harness is not None else data.get('harness')
+
+        sql_data = json.dumps(data) if data is not None else None
+        sql_harness_data = json.dumps(harness_data) if harness_data is not None else None
 
         query = """INSERT INTO `BENCHMARKS` (
             `NAME`,
             `RUNTIME`,
             `RUN_ID`,
             `HARNESS`,
-            `DATA`
-        ) VALUES (?, ?, (SELECT COALESCE(MAX(`RUN_ID`)+1, 0) FROM `BENCHMARKS` WHERE `NAME`=? AND `RUNTIME`=?), ?, ?)
+            `DATA`,
+            `HARNESS_DATA`
+        ) VALUES (?, ?, (SELECT COALESCE(MAX(`RUN_ID`)+1, 0) FROM `BENCHMARKS` WHERE `NAME`=? AND `RUNTIME`=?), ?, ?, ?)
         """
         try:
-            self.c.execute(query, (bench_name, runtime, bench_name, runtime, harness, json.dumps(data)))
+            self.c.execute(query, (bench_name, runtime, bench_name, runtime, harness, sql_data, sql_harness_data))
             self.conn.commit()
         except sqlite3.IntegrityError as e:
             logger.exception("SQL ERROR: ", e)
@@ -156,12 +211,17 @@ class BenchmarkingResults(object):
         self.c.execute('DELETE FROM `BENCHMARKS` WHERE `RUNTIME`=? AND `HARNESS`=?', (runtime, harness))
 
     def get_all(self):
-        self.c.execute('SELECT `NAME`, `RUNTIME`, `RUN_ID`, `HARNESS`, `DATA` FROM `BENCHMARKS` ORDER BY `NAME`')
+        self.c.execute("""SELECT `NAME`, `RUNTIME`, `RUN_ID`, `HARNESS`, `DATA`, `HARNESS_DATA`
+            FROM `BENCHMARKS`
+            ORDER BY `NAME`, `RUN_ID`
+        """)
         return [{'name': result[0],
                  'runtime': result[1],
                  'run_id': result[2],
                  'harness': result[3],
-                 'data': json.loads(result[4])} for result in self.c.fetchall()]
+                 'data': json.loads(result[4]) if result[4] is not None else None,
+                 'harness_data': json.loads(result[5]) if result[5] is not None else None
+                 } for result in self.c.fetchall()]
 
     def get_all_benchmarks_of_runtime(self, runtime):
         self.c.execute('SELECT `NAME` FROM `BENCHMARKS` WHERE `RUNTIME`=? ORDER BY `NAME`', (runtime,))
