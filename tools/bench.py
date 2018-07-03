@@ -369,7 +369,7 @@ def add_default_runtimes(harness):
                 if stderr_decoded:
                     logger.warning("benchmark harness had some output on stderr:\n%s", stderr_decoded)
 
-                if process.returncode != 0:
+                if p.returncode != 0:
                     return None, stderr_decoded
 
                 try:
