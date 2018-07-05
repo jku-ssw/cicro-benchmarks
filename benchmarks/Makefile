@@ -32,13 +32,15 @@ endif
 
 PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antirez-rax armon-libart bashrc-libdeep\
 		   camgunz-cmp chokkan-liblbfgs chrismoos-hash-ring cloudwu-cstring codeplea-genann codeplea-tinyexpr ctz-cifra\
-		   dbalmain-ferret dcjones-hat-trie dhess-c-ringbuf fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
+		   dcjones-hat-trie dhess-c-ringbuf fabianishere-brainfuck faragon-libsrt ferreiradaselva-mathc flame-blis\
 		   imneme-pcg-c-basic jtsiomb-kdtree josephg-librope Kazade-kazmath kbranigan-cJSON khovratovich-Argon2 kuba---zip\
 		   kylophone-spectrophoto lacker-ikalman lemire-simdcomp liteserver-binn lucasb-eyer-heatmap ludocode-mpack mbrossard-threadpool\
 		   mongodb-libbson mrubyc-mrubyc msteinbeck-tinyspline ndevilla-iniparser paladin-t-my_basic prideout-heman\
 		   quartzjer-js0n richgel999-miniz RoaringBitmap-CRoaring rxi-vec skeeto-branchless-utf8 snowballstem-snowball\
 		   swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl veorq-SipHash vmg-crustache wbhart-bsdnt websnarf-bstrlib\
 		   wolkykim-qlibc xamarin-flex yinqiwen-geohash-int yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
+
+IGNORED_PROJECTS = dbalmain-ferret # project which contains dependencies
 
 UNSTABLE_PROJECTS = orangeduck-tgc # runtime can vary by factor 100!
 
@@ -156,8 +158,8 @@ ctz-cifra_$(TEST_SUFFIX): ctz-cifra ctz-cifra_test.c $(C_HAYAI_LIB)
 
 ########## https://github.com/dbalmain/ferret
 
-dbalmain-ferret_$(TEST_SUFFIX): dbalmain-ferret dbalmain-ferret_test.c $(C_HAYAI_LIB)
-	$(CC) $(CFLAGS) dbalmain-ferret_test.c dbalmain-ferret/c/src/*c dbalmain-ferret/c/lib/bzlib/*.c \
+dbalmain-ferret_$(TEST_SUFFIX): dbalmain-ferret dbalmain-ferret_test.ignored.c $(C_HAYAI_LIB)
+	$(CC) $(CFLAGS) dbalmain-ferret_test.ignored.c dbalmain-ferret/c/src/*c dbalmain-ferret/c/lib/bzlib/*.c \
 	 dbalmain-ferret/c/lib/libstemmer_c/libstemmer/libstemmer.c dbalmain-ferret/c/lib/libstemmer_c/src_c/*.c \
 	 dbalmain-ferret/c/lib/libstemmer_c/runtime/*.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/dbalmain-ferret_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lm -lpthread -I dbalmain-ferret/c/include -I dbalmain-ferret/c/lib/libstemmer_c/include
