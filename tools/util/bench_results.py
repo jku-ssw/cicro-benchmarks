@@ -111,7 +111,9 @@ class BenchmarkingResults(object):
 
                     if run_id < len(harness_data[harness][runtime]):
                         present_data = harness_data[harness][runtime][run_id]
-                        if present_data is not None and data != present_data:
+                        if present_data is not None and h_data != present_data:
+                            logger.error("current harness data: %s", present_data)
+                            logger.error("new harness data: %s", h_data)
                             raise AssertionError('harness_data is different for the same run!')
 
                     harness_data[harness][runtime][run_id] = h_data
