@@ -61,7 +61,7 @@ void index_callback(int index, void* context) {
 }
 
 BENCHMARK(yosefk, checkedthreads, 10, 1) {
-    int array[N]={0};
+    int* array = calloc(N, sizeof(int));
 
     ct_init(0);
 
@@ -81,6 +81,8 @@ BENCHMARK(yosefk, checkedthreads, 10, 1) {
     assert(array[0] == 0x00 && array[20000] == 0x2B &&  array[40000] == 0x56 && array[50000] == 0x6C);
 
     ct_fini();
+
+    free(array);
 }
 
 int main(int argc, char** argv) {
