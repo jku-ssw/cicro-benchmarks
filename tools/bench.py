@@ -118,12 +118,19 @@ class BenchmarkingHarness(object):
 
         make_params = ['-j', str(kwargs.get('make_jobs', 1))]  # -j = number of jobs to run simultaneously
 
+        for key in make_env:
+            make_params.append('{}={}'.format(key, make_env[key]))
+
+        with subprocess.Popen(['make', "../C-Hayai/build/src/libchayai.a"] + make_params, cwd=args.testdir) as process:
+            process.communicate()
+
+            if process.returncode != 0:
+                logger.error('"make" of benchmark harness exited with non zero return code!')
+                return False
+
         if kwargs.get('ignore_errors', False):
             make_params.append('-i')  # -i = ignore-errors
             logger.warning('errors during "make" will be ignored')
-
-        for key in make_env:
-            make_params.append('{}={}'.format(key, make_env[key]))
 
         logger.info('build benchmarks with "%s"', ' '.join(make_params))
         with subprocess.Popen(['make'] + make_params, cwd=args.testdir) as process:
