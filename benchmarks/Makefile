@@ -467,7 +467,7 @@ yinqiwen-geohash-int_$(TEST_SUFFIX): yinqiwen-geohash-int yinqiwen-geohash-int_t
 ########## https://github.com/yosefk/checkedthreads
 
 yosefk-checkedthreads_$(TEST_SUFFIX): yosefk-checkedthreads yosefk-checkedthreads_test.c $(C_HAYAI_LIB)
-	(cd ./yosefk-checkedthreads && python2 ./configure)
+	echo "#define CT_PTHREADS /* enable pthreads */" > yosefk-checkedthreads/include/checkedthreads_config.h
 	$(CC) $(CFLAGS) yosefk-checkedthreads_test.c yosefk-checkedthreads/src/*.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/yosefk-checkedthreads_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS) -lpthread -I yosefk-checkedthreads/include
 
