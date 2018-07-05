@@ -82,8 +82,8 @@ void chayai_run_benchmarks(CHayaiArguments* arguments)
         currentOutputter->beginBenchmark(
             currentBenchmarkDescriptor->fixtureName,
             currentBenchmarkDescriptor->benchmarkName,
-            currentBenchmarkDescriptor->warmup,
-            currentBenchmarkDescriptor->runs,
+            result.warmupRuns,
+            result.runs,
             currentBenchmarkDescriptor->iterations);
 
         for(unsigned int i=0; i < result.warmupRuns; i++) {
