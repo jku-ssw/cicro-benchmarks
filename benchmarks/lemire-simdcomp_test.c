@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -23,18 +24,14 @@ BENCHMARK(lemire, simdcomp, 10, 1) {
             for (i = 0; i < N; ++i) {
                 backdata[i] = 0;
             }
-            bb = simdpack_shortlength(data, length, (__m128i *) buffer,
-                                      bit);
-            if((bb - (__m128i *) buffer) * sizeof(__m128i) != (unsigned) simdpack_compressedbytes(length,bit)) {
-                return;
-            }
-            simdunpack_shortlength((__m128i *) buffer, length,
-                                   backdata, bit);
-            for (i = 0; i < length; ++i) {
+            bb = simdpack_shortlength(data, length, (__m128i *) buffer, bit);
 
-                if (data[i] != backdata[i]) {
-                    return;
-                }
+            assert((bb - (__m128i *) buffer) * sizeof(__m128i) == (unsigned) simdpack_compressedbytes(length,bit));
+
+            simdunpack_shortlength((__m128i *) buffer, length, backdata, bit);
+
+            for (i = 0; i < length; ++i) {
+                assert(data[i] == backdata[i]);
             }
         }
         free(data);
