@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -10,12 +11,16 @@
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
 
+volatile uint8_t *input = (uint8_t *) LOREM_IPSUM1000;
+volatile size_t input_size = sizeof(LOREM_IPSUM1000);
+
 BENCHMARK(veorq, SipHash, 10, 1) {
     volatile uint8_t out[16], k[16] = {0};
-    for (int i = 0; i < sizeof(LOREM_IPSUM1000); i += sizeof(LOREM_IPSUM1000)/256) {
+    for (int i = 0; i < input_size; i += input_size/256) {
         k[0] = i;
-        siphash((uint8_t *) LOREM_IPSUM1000, i, (const uint8_t*)k, (uint8_t*)out, sizeof(out));
+        siphash((const uint8_t *)input, i, (const uint8_t*)k, (uint8_t*)out, sizeof(out));
     }
+    assert(out[0] == 0x53 && out[8] == 0x40 && out[15] == 0xA3);
 }
 
 int main(int argc, char** argv) {
