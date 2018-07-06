@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -73,13 +74,9 @@ BENCHMARK(mrubyc, mrubyc, 10, 1) {
     init_static();
 
     vm = mrbc_vm_open(NULL);
-    if (vm == NULL) {
-        printf("VM open Error\n");
-        abort();
-    }
+    assert(vm != NULL);
 
     if (mrbc_load_mrb(vm, mrubyc_mrubyc_mrb) != 0) {
-        fprintf(stderr, "Error: Illegal bytecode.\n");
         abort();
     }
 

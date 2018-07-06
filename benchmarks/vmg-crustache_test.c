@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -50,9 +51,7 @@ BENCHMARK(vmg, crustache, 100, 10) {
     };
 
     int error = crustache_new(&templt, &api, TEMPLATE, sizeof(TEMPLATE));
-    if(error < 0) {
-        abort();
-    }
+    assert(error == 0);
 
     struct buf *buf = bufnew(128);
 
@@ -63,10 +62,9 @@ BENCHMARK(vmg, crustache, 100, 10) {
 
     for(int i = 0; i < 5000; i++) {
         error = crustache_render(buf, templt, &var);
-        if(error < 0) {
-            abort();
-        }
+        assert(error == 0);
     }
+    assert(buf->size == 670000);
 
     bufrelease(buf);
 
