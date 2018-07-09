@@ -49,6 +49,7 @@ void benchmark_cleanup (void) {
 }
 
 int main(int argc, char** argv) {
+
     REGISTER_BENCHMARK(otree, alloc_free); // a simple btree implementation
 
     atexit(benchmark_cleanup);

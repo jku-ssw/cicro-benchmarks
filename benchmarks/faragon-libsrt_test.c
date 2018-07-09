@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -6,15 +7,17 @@
 
 volatile long sum_length = 0;
 
-BENCHMARK(faragon, libsrt, 100, 1) {
-
+BENCHMARK(faragon, libsrt, 10, 1) {
     sv_t *vec = sv_alloc(sizeof(int), 0, NULL);
 
     for(int i = 0; i < 20000; i+=2) {
-        sv_push(&vec, &i);
+        size_t n = sv_push(&vec, &i);
+        assert(n == 1);
     }
+
     for(int i = 0; i < 20000; i++) {
-        sv_find(vec, 0, &i);
+        size_t s = sv_find(vec, 0, &i);
+        assert(i % 2 == 0 ? s >= 0 : s == S_NPOS);
     }
 
     sv_free(&vec);

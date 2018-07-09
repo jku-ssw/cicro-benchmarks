@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -14,7 +15,8 @@ BENCHMARK(jtsiomb, kdtree, 100, 1) {
         y = (i*433)%439;
         z = (i*401)%409;
 
-        kd_insert3(kd, x, y, z, 0);
+        int ret = kd_insert3(kd, x, y, z, 0);
+        assert(ret == 0);
     }
 
     for(int i=0; i<20000; i+= 10) {
@@ -23,6 +25,7 @@ BENCHMARK(jtsiomb, kdtree, 100, 1) {
         y = (i * 433) % 439 - (i % 7);
         z = (i * 401) % 409 + (i % 5);
         void *set = kd_nearest_range3(kd, x, y, z, 40);
+        assert(set != NULL);
         kd_res_free(set);
     }
 
