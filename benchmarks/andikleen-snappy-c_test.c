@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -10,20 +11,26 @@
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
 
+volatile int source_len = sizeof(LOREM_IPSUM1000);
+volatile char *source = LOREM_IPSUM1000;
+
 BENCHMARK(snappy_c, compress_uncompress, 100, 100) {
     struct snappy_env env;
-    snappy_init_env(&env);
-    int source_len = sizeof(LOREM_IPSUM1000);
-    char *source = LOREM_IPSUM1000;
+    int res = snappy_init_env(&env);
+    assert(res == 0);
 
     size_t compressed_max_len = snappy_max_compressed_length(source_len);
+    assert(compressed_max_len == 1034866);
     char *compressed = malloc(sizeof(char) * compressed_max_len);
 
     size_t compressed_len;
-    snappy_compress(&env, source, source_len, compressed, &compressed_len);
+    snappy_compress(&env, (const char *)source, source_len, compressed, &compressed_len);
+    assert(compressed_len == 45148);
+    assert(compressed[0] == -39 && compressed[256] == 116 && compressed[512] == 3);
 
     size_t uncompressed_len;
     snappy_uncompressed_length(compressed, compressed_len, &uncompressed_len);
+    assert(uncompressed_len == 887001);
     char *uncompressed = malloc(sizeof(char) * uncompressed_len);
 
     snappy_uncompress(compressed, compressed_max_len, uncompressed);
