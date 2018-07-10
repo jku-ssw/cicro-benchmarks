@@ -64,7 +64,6 @@ unsigned char mrubyc_mrubyc_mrb[] = {
 
 #define MEMORY_SIZE (1024*32)
 static uint8_t memory_pool[MEMORY_SIZE];
-static struct VM *vm;
 
 BENCHMARK(mrubyc, mrubyc, 10, 1) {
     struct VM *vm;
@@ -76,12 +75,13 @@ BENCHMARK(mrubyc, mrubyc, 10, 1) {
     vm = mrbc_vm_open(NULL);
     assert(vm != NULL);
 
-    if (mrbc_load_mrb(vm, mrubyc_mrubyc_mrb) != 0) {
-        abort();
-    }
+    int ret = mrbc_load_mrb(vm, mrubyc_mrubyc_mrb);
+    assert(ret == 0);
 
     mrbc_vm_begin(vm);
-    mrbc_vm_run(vm);
+    ret = mrbc_vm_run(vm);
+    assert(ret == -1);
+
     mrbc_vm_end(vm);
     mrbc_vm_close(vm);
 

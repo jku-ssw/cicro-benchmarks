@@ -1,5 +1,5 @@
-#include <string.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -19,9 +19,11 @@ BENCHMARK(lucasb, heatmap, 10, 1) {
 
     unsigned char *imgbuf = malloc(sizeof(unsigned char)*MAPSIZE*MAPSIZE*4);
 
-    heatmap_render_to(hm, heatmap_cs_default, &imgbuf[0]);
+    heatmap_render_to(hm, heatmap_cs_default, imgbuf);
 
-    heatmap_render_saturated_to(hm, heatmap_cs_default, 0.5f, &imgbuf[0]);
+    heatmap_render_saturated_to(hm, heatmap_cs_default, 0.5f, imgbuf);
+
+    assert(imgbuf[0] == 0x9E && imgbuf[1] == 0x01 && imgbuf[2] == 0x42); // TODO: could be not exact due to floating point
 
     free(imgbuf);
     heatmap_free(hm);

@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "chayai.h"
 
 /* We need to directly insert the .c file in order to test the */
@@ -46,9 +48,9 @@ BENCHMARK(ndevilla, iniparser, 10, 1) {
     int i, j;
     char sec_name[32];
     char key_name[64];
-    dictionary *dic;
 
-    dic = dictionary_new(DICTMINSZ);
+    dictionary *dic = dictionary_new(DICTMINSZ);
+    assert(dic != NULL);
 
     /* Makes the dictionary grow */
     for (i = 1 ; i < 5001; ++i) {
@@ -59,6 +61,8 @@ BENCHMARK(ndevilla, iniparser, 10, 1) {
         }
     }
 
+    assert(dic->n == 5000);
+
     /* Shrink the dictionary */
     for (i = 1000 ; i > 0; --i) {
         sprintf(sec_name, "sec%d", i);
@@ -68,6 +72,8 @@ BENCHMARK(ndevilla, iniparser, 10, 1) {
         }
         dictionary_unset(dic, sec_name);
     }
+
+    assert(dic->n == 4000);
 
     dictionary_del(dic);
 }

@@ -1,7 +1,4 @@
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -13,16 +10,17 @@
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
 
 BENCHMARK(liteserver, binn, 100, 1) {
-    binn *list;
-
     // create a new list
-    list = binn_list();
+    binn *list = binn_list();
+    assert(list != NULL);
 
     // add values to it
     for(int i = 0; i < 100; i++) {
         binn_list_add_int32(list, i);
         binn_list_add_str(list, LOREM_IPSUM1000);
     }
+
+    assert(list->size == 0 && list->count == 200);
 
     // release the buffer
     binn_free(list);

@@ -1,3 +1,7 @@
+#include <stdlib.h>
+#include <unistd.h>
+#include <assert.h>
+
 #include "chayai.h"
 
 #include "kuba---zip/src/zip.h"
@@ -7,8 +11,10 @@
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
 
+char *filename = "./tmp/foo.zip";
+
 BENCHMARK(kuba, zip, 10, 1) {
-    struct zip_t *zip = zip_open("foo.zip", ZIP_DEFAULT_COMPRESSION_LEVEL, 'w');
+    struct zip_t *zip = zip_open(filename, ZIP_DEFAULT_COMPRESSION_LEVEL, 'w');
 
     zip_entry_open(zip, "foo-1.txt");
     {
@@ -22,12 +28,20 @@ BENCHMARK(kuba, zip, 10, 1) {
     }
     zip_entry_close(zip);
 
+    assert(zip_total_entries(zip) == 1);
+
     zip_close(zip);
+}
+
+void benchmark_cleanup (void) {
+    unlink(filename); // remove file
 }
 
 int main(int argc, char** argv) {
 
     REGISTER_BENCHMARK(kuba, zip); // simple zip library
+
+    atexit(benchmark_cleanup);
 
     RUN_BENCHMARKS(argc, argv);
 
