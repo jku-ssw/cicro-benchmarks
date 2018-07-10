@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -88,11 +89,13 @@ BENCHMARK(skeeto, branchless_utf8, 100, 1) {
     unsigned char *end = buffer_fill(buffer, z - 4);
 
     for(int i= 0; i < 1000; i++) {
-        unsigned char *p = buffer;
         int e = 0;
         uint32_t c;
-        utf8_decode(p, &c, &e);
+        utf8_decode(buffer, &c, &e);
+        assert(e == 0);
     }
+
+    assert(buffer[0] == 0xC5 && buffer[1024] == 0xA6);
 
     free(buffer);
 }

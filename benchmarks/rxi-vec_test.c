@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "chayai.h"
 
 #include "rxi-vec/src/vec.h"
@@ -16,16 +18,23 @@ BENCHMARK(rxi, vec, 100, 1) {
         vec_push(&v, i);
     }
 
+    assert(v.length == 100000);
+
     // delete some elementss
     for(int i = 0; i < 10000; i++) {
         vec_splice(&v, 42 + i*3, 3);
     }
+
+    assert(v.length == 70000);
+    assert(v.data[1024] == 2008 && v.data[2048] == 4055);
 
     // sort
     vec_sort(&v, intptrcmp);
 
     // reverse
     vec_reverse(&v);
+
+    assert(v.data[1024] == 98975 && v.data[2048] == 97951);
 
     vec_deinit(&v);
 }

@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -19,6 +19,8 @@ BENCHMARK(troydhanson, tpl, 10, 1) {
     tn = tpl_map("A(is)", &id, &name);
     tnl = tpl_map("A(is)", &id, &name);
 
+    assert(tn != NULL && tnl != NULL);
+
     name = LOREM_IPSUM1000;
     for(id=0; id < 1024; id++) {
         for (int i = 0; i < 8; i++, id++) {
@@ -31,8 +33,10 @@ BENCHMARK(troydhanson, tpl, 10, 1) {
     void* addr;
     size_t len;
     tpl_dump(tn, TPL_MEM, &addr, &len);
+    assert(len == 804594234);
 
-    tpl_load(tnl, TPL_MEM, addr, len);
+    int ret = tpl_load(tnl, TPL_MEM, addr, len);
+    assert(ret == 0);
 
     while ( tpl_unpack(tnl,1) > 0 ) {
         free(name);
