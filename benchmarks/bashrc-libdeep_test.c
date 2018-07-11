@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "chayai.h"
 
@@ -41,9 +42,17 @@ BENCHMARK(libdeep, learn, 10, 1) {
     deeplearn_free(&learner);
 }
 
+void benchmark_cleanup (void) {
+    unlink("training.png");
+    unlink("weight_gradients_std.png");
+    unlink("weight_gradients_mean.png");
+}
+
 int main(int argc, char** argv) {
 
     REGISTER_BENCHMARK(libdeep, learn); // A deep learning library for C/C++
+
+    atexit(benchmark_cleanup);
 
     RUN_BENCHMARKS(argc, argv);
 
