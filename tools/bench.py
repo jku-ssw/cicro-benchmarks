@@ -37,9 +37,9 @@ ENV_FILE = os.path.join(CONFIG_DIR, 'env')
 ENV_EXAMPLE_FILE = os.path.join(CONFIG_DIR, 'env.example')
 
 
-class _TestDirType(object):
+class _DirType(object):
     def __init__(self):
-        """Checks if the given directory exists and contains a Makefile"""
+        """Checks if the given directory exists"""
         pass
 
     def __call__(self, string):
@@ -47,6 +47,17 @@ class _TestDirType(object):
             raise argparse.ArgumentTypeError("path does not exist: '%s'".format(string))
         if not os.path.isdir(string):
             raise argparse.ArgumentTypeError("path is not a directory:'%s'".format(string))
+
+        return string
+
+
+class _TestDirType(_DirType):
+    def __init__(self):
+        """Checks if the given directory exists and contains a Makefile"""
+        super(_TestDirType, self).__init__()
+
+    def __call__(self, string):
+        super(_TestDirType, self).__call__(string)
         if not os.path.isfile(os.path.join(string, 'Makefile')):
             raise argparse.ArgumentTypeError("Makefile not found in: '%s'".format(string))
 
@@ -450,6 +461,8 @@ if __name__ == "__main__":
 
     parser.add_argument('--testdir', metavar='TESTDIR', type=_TestDirType(), default=BENCHMARK_DIR,
                         help='directory where the tests and the Makefile is contained')
+    parser.add_argument('--workdir', metavar='TESTDIR', type=_DirType(), default=None,
+                        help='directory where temporary files will be stored')
     parser.add_argument('--filter-runtime', metavar='REGEX', type=str, default='.*',
                         help='regular expression to select which runtimes should be used')
     parser.add_argument('--filter-harness', metavar='REGEX', type=str, default='.*',
@@ -504,6 +517,9 @@ if __name__ == "__main__":
             logger.info(' * %s', runtime)
 
     results = BenchmarkingResults()
+
+    if args.workdir:
+        os.environ["CHAYAI_WORKDIR"] = os.path.abspath(args.workdir)
 
     if os.path.isfile(args.benchfile):
         try:

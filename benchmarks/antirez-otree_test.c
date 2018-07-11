@@ -52,6 +52,8 @@ int main(int argc, char** argv) {
 
     REGISTER_BENCHMARK(otree, alloc_free); // a simple btree implementation
 
+    // we don't want to clutter our directories
+    chdir(chayai_util_get_tmp_dir());
     atexit(benchmark_cleanup);
 
     RUN_BENCHMARKS(argc, argv);

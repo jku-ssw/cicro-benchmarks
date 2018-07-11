@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -11,14 +13,18 @@
 #define TITLE     "Concrete Slump Training"
 #define DATA_FILE "bashrc-libdeep/examples/concreteslump/slump_test.data"
 
+static char *data_file_path = NULL;
+
 BENCHMARK(libdeep, learn, 10, 1) {
+    assert(data_file_path != NULL);
+
     int no_of_outputs = 4;
     int output_field_index[] = { 7,8,9,10 };
     float error_threshold_percent[] = { 10.5f, 10.5f, 10.5f, 40.0f };
     unsigned int random_seed = 123;
 
     deeplearn learner;
-    deeplearndata_read_csv(DATA_FILE,
+    deeplearndata_read_csv(data_file_path,
                            &learner,
                            4*4, 3,
                            no_of_outputs,
@@ -41,11 +47,29 @@ BENCHMARK(libdeep, learn, 10, 1) {
     deeplearn_free(&learner);
 }
 
+void benchmark_cleanup (void) {
+    unlink("training.png");
+    unlink("weight_gradients_std.png");
+    unlink("weight_gradients_mean.png");
+}
+
 int main(int argc, char** argv) {
 
     REGISTER_BENCHMARK(libdeep, learn); // A deep learning library for C/C++
 
+    // get realpath
+    data_file_path = malloc(1024*sizeof(char));
+    assert(data_file_path != NULL);
+    char *path = realpath(DATA_FILE, data_file_path); // TODO: support different working directories
+    assert(path == data_file_path);
+
+    // we don't want to clutter our directories
+    chdir(chayai_util_get_tmp_dir());
+    atexit(benchmark_cleanup);
+
     RUN_BENCHMARKS(argc, argv);
+
+    free(data_file_path);
 
     return 0;
 }

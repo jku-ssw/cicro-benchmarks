@@ -11,9 +11,11 @@
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
 
-char *filename = "./tmp/foo.zip";
+#define FILENAME "foo.zip"
+char *filename = NULL;
 
 BENCHMARK(kuba, zip, 10, 1) {
+    assert(filename != NULL);
     struct zip_t *zip = zip_open(filename, ZIP_DEFAULT_COMPRESSION_LEVEL, 'w');
 
     zip_entry_open(zip, "foo-1.txt");
@@ -35,12 +37,16 @@ BENCHMARK(kuba, zip, 10, 1) {
 
 void benchmark_cleanup (void) {
     unlink(filename); // remove file
+
+    free(filename);
 }
 
 int main(int argc, char** argv) {
 
     REGISTER_BENCHMARK(kuba, zip); // simple zip library
 
+    filename = malloc(1024*sizeof(char));
+    sprintf(filename, "%s/%s", chayai_util_get_tmp_dir(), FILENAME);
     atexit(benchmark_cleanup);
 
     RUN_BENCHMARKS(argc, argv);

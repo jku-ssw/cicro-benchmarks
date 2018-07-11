@@ -40,15 +40,15 @@ PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antir
 		   swenson-sort Themaister-libfmsynth tkengo-highway troydhanson-tpl veorq-SipHash vmg-crustache wbhart-bsdnt websnarf-bstrlib\
 		   wolkykim-qlibc xamarin-flex yinqiwen-geohash-int yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
-IGNORED_PROJECTS = dbalmain-ferret # project which contains dependencies
-
-UNSTABLE_PROJECTS = orangeduck-tgc # runtime can vary by factor 100!
+# dbalmain-ferret: contains dependencies
+# orangeduck-tgc: runtime can vary by factor 100!
+IGNORED_PROJECTS = dbalmain-ferret orangeduck-tg
 
 # Global commands
 
 all: $(PROJECTS:=_$(TEST_SUFFIX))
 
-clean: $(PROJECTS:=_clean)
+clean: $(PROJECTS:=_clean) $(IGNORED_PROJECTS:=_clean)
 	rm -f *.o .*.o
 	rm -f *.bc .*.bc
 	rm -rf $(C_HAYAI_DIR)/build
@@ -70,7 +70,7 @@ $(C_HAYAI_LIB): $(C_HAYAI_DIR)/src/*
 	(cd $(C_HAYAI_DIR)/build && cmake ../ -DCMAKE_C_COMPILER='$(CC)' -DCMAKE_C_FLAGS='$(CFLAGS)' -DCMAKE_STATIC_LINKER_FLAGS='$(LDFLAGS)' -DUSE_PAPI=$(USE_PAPI_VALUE))
 	$(MAKE) -C $(C_HAYAI_DIR)/build -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)'
 
-#.PHONY: $(C_HAYAI_LIB)
+.PHONY: all clean
 
 ########## https://github.com/100/Cranium
 
