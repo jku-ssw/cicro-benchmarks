@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -9,7 +10,6 @@
 #include "zedshaw-liblcthw/src/lcthw/hashmap.h"
 
 int cmp_node(void *a, void *b) {
-
     return (*(int*)b) - (*(int*)a);
 }
 
@@ -17,15 +17,13 @@ uint32_t hash(void *key) {
     return *(int*)key;
 }
 
-static int free_bstree_node(BSTreeNode * node)
-{
+static int free_bstree_node(BSTreeNode * node) {
     free(node->key);
     free(node->data);
     return 0;
 }
 
-static int free_hashmap_node(HashmapNode * node)
-{
+static int free_hashmap_node(HashmapNode * node) {
     free(node->key);
     free(node->data);
     return 0;
@@ -33,6 +31,7 @@ static int free_hashmap_node(HashmapNode * node)
 
 BENCHMARK(zedshaw_liblcthw, bstree, 100, 1) {
     BSTree *map = BSTree_create(cmp_node);
+    assert(map != NULL);
 
     for(int i = 0; i < 5000; i++) {
         int *key = malloc(sizeof(int));
@@ -41,7 +40,8 @@ BENCHMARK(zedshaw_liblcthw, bstree, 100, 1) {
         *key = i;
         *value = i;
 
-        BSTree_set(map, key, value);
+        int ret = BSTree_set(map, key, value);
+        assert(ret == 0);
     }
 
     BSTree_traverse(map, free_bstree_node);
@@ -51,6 +51,7 @@ BENCHMARK(zedshaw_liblcthw, bstree, 100, 1) {
 
 BENCHMARK(zedshaw_liblcthw, hashmap, 100, 1) {
     Hashmap *map = Hashmap_create(cmp_node, hash);
+    assert(map != NULL);
 
     for(int i = 0; i < 50000; i++) {
         int *key = malloc(sizeof(int));
@@ -59,14 +60,13 @@ BENCHMARK(zedshaw_liblcthw, hashmap, 100, 1) {
         *key = i;
         *value = i;
 
-        Hashmap_set(map, key, value);
+        int ret = Hashmap_set(map, key, value);
+        assert(ret == 0);
     }
 
     for(int i = 0; i < 50000; i+=10) {
         int *value = Hashmap_get(map, &i);
-        if ((*value) % 5 != 0) {
-            abort(); // should never happen,
-        }
+        assert((*value) % 5 == 0);
     }
 
     Hashmap_traverse(map, free_hashmap_node);

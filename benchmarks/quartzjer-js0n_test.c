@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <string.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -30,7 +30,8 @@ BENCHMARK(quartzjer, js0n, 100, 100) {
     size_t len;
 
     for(int i = 0; i < 200; i++) {
-        const char *rc = js0n("blabla", 1, JSON, strlen(JSON), &len);
+        const char *rc = js0n("bob", 0, JSON, sizeof(JSON), &len);
+        assert(rc != NULL && len == 159 && rc[0] == '{');
     }
 }
 

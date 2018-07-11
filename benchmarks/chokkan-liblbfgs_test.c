@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -14,10 +15,9 @@ static lbfgsfloatval_t evaluate(
         const lbfgsfloatval_t step
 )
 {
-    int i;
     lbfgsfloatval_t fx = 0.0;
 
-    for (i = 0;i < n;i += 2) {
+    for (int i = 0;i < n;i += 2) {
         lbfgsfloatval_t t1 = 1.0 - x[i];
         lbfgsfloatval_t t2 = 10.0 * (x[i+1] - x[i] * x[i]);
         g[i+1] = 20.0 * t2;
@@ -28,21 +28,22 @@ static lbfgsfloatval_t evaluate(
 }
 
 BENCHMARK(liblbfgs, evaluate, 100, 5) {
-    int i, ret = 0;
     lbfgsfloatval_t fx;
     lbfgsfloatval_t *x = lbfgs_malloc(N);
+    assert(x !=  NULL);
+
     lbfgs_parameter_t param;
 
-        /* Initialize the variables. */
-        for (i = 0;i < N;i += 2) {
-            x[i] = -1.2;
-            x[i+1] = 1.0;
-        }
+    /* Initialize the variables. */
+    for (int i = 0;i < N;i += 2) {
+        x[i] = -1.2;
+        x[i+1] = 1.0;
+    }
 
-        lbfgs_parameter_init(&param);
+    lbfgs_parameter_init(&param);
 
-
-        lbfgs(N, x, &fx, evaluate, NULL, NULL, &param);
+    int ret = lbfgs(N, x, &fx, evaluate, NULL, NULL, &param);
+    assert(ret == LBFGS_SUCCESS);
 
     lbfgs_free(x);
 }

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -11,6 +12,7 @@ BENCHMARK(lacker, ikalman, 100, 1) {
     }
 
     double bearing = get_bearing(f);
+    assert((int)(bearing*1000.) == 354375);
 
     free_filter(f);
 }

@@ -210,7 +210,7 @@ class BenchmarkingHarness(object):
         no_failures = True
         for runtime in self.filtered_runtime_iterator(filter):
             if self.execute_single_runtime(runtime, bench_results, **kwargs) is not True:
-                logger.error("%s did not finish", runtime)
+                logger.error('runtime "%s" did not finish successful', runtime)
                 no_failures = False
 
         return no_failures
@@ -220,7 +220,7 @@ class BenchmarkingHarness(object):
 
         if runtime not in self.registered_runtimes:
             logger.error('runtime not found: "%s"', runtime)
-            return {}
+            return False
 
         runtime_name = runtime + kwargs.get('suffix', '')
 
@@ -233,6 +233,8 @@ class BenchmarkingHarness(object):
         result_writer_func = kwargs['result_writer_func']
 
         only_missing = kwargs.get('only_missing', False)
+
+        no_error = True
 
         logger.info('start with the execution of the runtime enviroment "%s"', runtime)
 
@@ -335,11 +337,13 @@ class BenchmarkingHarness(object):
                         else:
                             logger.error('benchmark run of "%s:%s" did not return valid data: "%s"',
                                          harness_name, runtime_name, result_data)
+                            no_error = False
                     except KeyboardInterrupt:
                         raise
                     except:  # NOQA: E722
                         logger.exception('Something went wrong while running the benchmark: "%s:%s"',
                                          harness_name, runtime_name)
+                        no_error = False
 
                 # write results after every run
                 if run_id + 1 < kwargs.get('runs', 1):
@@ -349,6 +353,7 @@ class BenchmarkingHarness(object):
                         raise
                     except:  # NOQA: E722
                         logger.exception('Something went wrong while writing the results')
+                        no_error = False
 
         except KeyboardInterrupt:
             raise
@@ -363,7 +368,7 @@ class BenchmarkingHarness(object):
             except:  # NOQA: E722
                 logger.exception('Something went wrong while writing the results')
 
-        return True
+        return no_error
 
 
 def add_default_runtimes(harness):

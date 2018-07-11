@@ -1,4 +1,5 @@
 #include <string.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -8,9 +9,13 @@
 BENCHMARK(fabianishere, brainfuck, 100, 1) {
     BrainfuckState *state = brainfuck_state();
     BrainfuckExecutionContext *context = brainfuck_context(BRAINFUCK_TAPE_SIZE);
-    BrainfuckInstruction *instruction = brainfuck_parse_string("+[->-[->-[->-[-]<]<]<]");
+
+    BrainfuckInstruction *instruction = brainfuck_parse_string("+[->-[->-[->-[-]<]<]<]>-");
     brainfuck_add(state, instruction);
+
     brainfuck_execute(state->root, context);
+    assert(context->tape_index == 1 && context->tape[0] == 0 && context->tape[1] == 255);
+
     brainfuck_destroy_context(context);
     brainfuck_destroy_state(state);
 }

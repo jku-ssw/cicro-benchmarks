@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "chayai.h"
 
 #include "xamarin-flex/flex.h"
@@ -24,13 +26,18 @@ BENCHMARK(xamarin, flex, 10, 1) {
     flex_item_set_grow(child3, 1.5);
     flex_item_add(root, child3);
 
+    double y_sum = 0;
+
     for(int x=0; x < 1920; x++) {
         flex_item_set_width(root, x);
         for(int y=0; y < 1080; y++) {
             flex_item_set_height(root, y);
             flex_layout(root);
+            y_sum += flex_item_get_frame_y(child3);
         }
     }
+
+    assert((long)y_sum == 459663360);
 
     flex_item_free(root);
 }

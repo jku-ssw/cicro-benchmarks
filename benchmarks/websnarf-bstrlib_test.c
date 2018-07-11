@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -9,8 +9,6 @@
 #define LOREM_IPSUM10 LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM LOREM_IPSUM
 #define LOREM_IPSUM100 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10 LOREM_IPSUM10
 #define LOREM_IPSUM1000 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100 LOREM_IPSUM100
-
-volatile long sum_length = 0;
 
 BENCHMARK(websnarf, bstrlib, 10, 1) {
 
@@ -26,7 +24,8 @@ BENCHMARK(websnarf, bstrlib, 10, 1) {
         bdestroy (b64);
     }
 
-    sum_length += blength(bStr);
+    assert(blength(bStr) == 11948587);
+    assert(bchar(bStr, 0) == 'M' && bchar(bStr, 1024) == '#');
 
     bdestroy (bStr);
 }

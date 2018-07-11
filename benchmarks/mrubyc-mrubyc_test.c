@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -63,7 +64,6 @@ unsigned char mrubyc_mrubyc_mrb[] = {
 
 #define MEMORY_SIZE (1024*32)
 static uint8_t memory_pool[MEMORY_SIZE];
-static struct VM *vm;
 
 BENCHMARK(mrubyc, mrubyc, 10, 1) {
     struct VM *vm;
@@ -73,18 +73,15 @@ BENCHMARK(mrubyc, mrubyc, 10, 1) {
     init_static();
 
     vm = mrbc_vm_open(NULL);
-    if (vm == NULL) {
-        printf("VM open Error\n");
-        abort();
-    }
+    assert(vm != NULL);
 
-    if (mrbc_load_mrb(vm, mrubyc_mrubyc_mrb) != 0) {
-        fprintf(stderr, "Error: Illegal bytecode.\n");
-        abort();
-    }
+    int ret = mrbc_load_mrb(vm, mrubyc_mrubyc_mrb);
+    assert(ret == 0);
 
     mrbc_vm_begin(vm);
-    mrbc_vm_run(vm);
+    ret = mrbc_vm_run(vm);
+    assert(ret == -1);
+
     mrbc_vm_end(vm);
     mrbc_vm_close(vm);
 

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -17,13 +18,26 @@
 "next n                                                 \n"
 
 BENCHMARK(paladin, my_basic, 10, 1) {
-    struct mb_interpreter_t* bas = NULL;
-	mb_init();
-	mb_open(&bas);
-	mb_load_string(bas, EXAMPLE_CODE, true);
-	mb_run(bas, true);
-	mb_close(&bas);
-	mb_dispose();
+	int ret;
+	struct mb_interpreter_t* bas = NULL;
+
+	ret = mb_init();
+	assert(ret == MB_FUNC_OK);
+
+	ret = mb_open(&bas);
+	assert(ret == MB_FUNC_OK);
+
+	ret = mb_load_string(bas, EXAMPLE_CODE, true);
+	assert(ret == MB_FUNC_OK);
+
+	ret = mb_run(bas, true);
+	assert(ret == MB_FUNC_OK);
+
+	ret = mb_close(&bas);
+	assert(ret == MB_FUNC_OK);
+
+	ret = mb_dispose();
+	assert(ret == MB_FUNC_OK);
 }
 
 int main(int argc, char** argv) {

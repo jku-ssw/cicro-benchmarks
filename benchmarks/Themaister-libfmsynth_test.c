@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -7,6 +8,7 @@
 
 BENCHMARK(Themaister, libfmsynth, 10, 1) {
     fmsynth_t *fm = fmsynth_new(44100.0f, 64);
+    assert(fm != NULL);
 
     for (unsigned i = 0; i < 8; i++)
     {
@@ -19,7 +21,8 @@ BENCHMARK(Themaister, libfmsynth, 10, 1) {
 
     for (unsigned i = 0; i < 64; i++)
     {
-        fmsynth_note_on(fm, i + 20, 127);
+        fmsynth_status_t status = fmsynth_note_on(fm, i + 20, 127);
+        assert(status == FMSYNTH_STATUS_OK);
     }
 
     float left[256];
@@ -28,7 +31,8 @@ BENCHMARK(Themaister, libfmsynth, 10, 1) {
     {
         memset(left, 0, sizeof(left));
         memset(right, 0, sizeof(right));
-        fmsynth_render(fm, left, right, 256);
+        unsigned voices = fmsynth_render(fm, left, right, 256);
+        assert(voices == 64);
     }
 
     fmsynth_free(fm);

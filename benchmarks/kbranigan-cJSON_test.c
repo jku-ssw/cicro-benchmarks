@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -63,24 +64,6 @@ char text5[] =
         "\t }\n"
         "\t ]";
 
-char text6[] =
-        "<!DOCTYPE html>"
-        "<html>\n"
-        "<head>\n"
-        "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
-        "  <style type=\"text/css\">\n"
-        "    html, body, iframe { margin: 0; padding: 0; height: 100%; }\n"
-        "    iframe { display: block; width: 100%; border: none; }\n"
-        "  </style>\n"
-        "<title>Application Error</title>\n"
-        "</head>\n"
-        "<body>\n"
-        "  <iframe src=\"//s3.amazonaws.com/heroku_pages/error.html\">\n"
-        "    <p>Application Error</p>\n"
-        "  </iframe>\n"
-        "</body>\n"
-        "</html>\n";
-
 
 /* Parse text to JSON, then render back to text, and print! */
 void doit(char *text)
@@ -89,8 +72,11 @@ void doit(char *text)
     cJSON *json = NULL;
 
     json = cJSON_Parse(text);
+    assert(json != NULL);
 
     out = cJSON_Print(json);
+    assert(out != NULL);
+
     cJSON_Delete(json);
     free(out);
 }
@@ -103,7 +89,6 @@ BENCHMARK(kbranigan, cJSON, 100, 100) {
         doit(text3);
         doit(text4);
         doit(text5);
-        doit(text6);
     }
 }
 

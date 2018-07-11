@@ -9,4 +9,4 @@ script:
 
   # execute clang-O0 benchmark for all harnesses starting with 'a'
   - echo "CLANG=clang" > configs/env
-  - ./tools/bench.py -y my_results.json --filter-runtime=clang-O0 --filter-harness="^a.*"
+  - ./tools/bench.py -y my_results.json --filter-runtime=clang-O1 --exec-args="--warmup=0 --iterations=1"

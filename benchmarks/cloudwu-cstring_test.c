@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -19,7 +20,14 @@ BENCHMARK(cloudwu, cstring, 100, 1) {
     CSTRING_BUFFER(b);
 
     cstring_printf(b, "%s", LOREM_IPSUM1000);
-    cstring_equal(CSTRING(a), CSTRING(b));
+    int ret = cstring_equal(CSTRING(a), CSTRING(b));
+    assert(ret == 0);
+
+    uint32_t hash_a = cstring_hash(CSTRING(a));
+    assert(hash_a == 0xDB3B5790);
+
+    uint32_t hash_b = cstring_hash(CSTRING(b));
+    assert(hash_b == 0xF352F174);
 
     CSTRING_CLOSE(b);
     CSTRING_CLOSE(a);

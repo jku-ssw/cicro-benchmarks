@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "chayai.h"
 
 #include "imneme-pcg-c-basic/pcg_basic.h"
@@ -21,6 +23,8 @@ BENCHMARK(imneme, pcg_random, 100, 10) {
         r = pcg32_random_r(&rng);
         r = pcg32_random_r(&rng);
     }
+
+    assert(r == 3911378973);
 }
 
 int main(int argc, char** argv) {

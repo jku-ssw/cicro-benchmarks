@@ -1,3 +1,5 @@
+#include <assert.h>
+
 #include "chayai.h"
 
 #include <bson.h>
@@ -23,7 +25,6 @@ BENCHMARK(mongodb, libbson, 100, 10) {
                     "]",
                     "}",
                     "}");
-        bson_reinit(&bson);
 
         bson_append_document_begin(&bson, "foo", -1, &foo);
         bson_append_document_begin(&foo, "bar", -1, &bar);
@@ -34,9 +35,9 @@ BENCHMARK(mongodb, libbson, 100, 10) {
         bson_append_array_end(&bar, &baz);
         bson_append_document_end(&foo, &bar);
         bson_append_document_end(&bson, &foo);
-
-        bson_reinit(&bson);
     }
+
+    assert(bson.len == 204005);
 
     bson_destroy (&bson);
 }

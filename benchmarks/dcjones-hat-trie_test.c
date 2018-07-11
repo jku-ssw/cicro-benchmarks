@@ -1,4 +1,5 @@
 #include <string.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -15,6 +16,8 @@ void randstr(char* x, size_t len)
 
 BENCHMARK(dcjones, hat_trie, 100, 1) {
     hattrie_t* T = hattrie_create();
+    assert(T != NULL);
+
     const size_t n = 10000;  // how many strings
     const size_t m_low  = 50;  // minimum length of each string
     const size_t m_high = 1000; // maximum length of each string
@@ -26,6 +29,8 @@ BENCHMARK(dcjones, hat_trie, 100, 1) {
         randstr(x, m);
         *hattrie_get(T, x, m) = 1;
     }
+
+    assert(hattrie_size(T) == 10000);
 
     hattrie_iter_t* it;
     clock_t t0, t;
