@@ -10,7 +10,6 @@
 #include "zedshaw-liblcthw/src/lcthw/hashmap.h"
 
 int cmp_node(void *a, void *b) {
-
     return (*(int*)b) - (*(int*)a);
 }
 
@@ -18,15 +17,13 @@ uint32_t hash(void *key) {
     return *(int*)key;
 }
 
-static int free_bstree_node(BSTreeNode * node)
-{
+static int free_bstree_node(BSTreeNode * node) {
     free(node->key);
     free(node->data);
     return 0;
 }
 
-static int free_hashmap_node(HashmapNode * node)
-{
+static int free_hashmap_node(HashmapNode * node) {
     free(node->key);
     free(node->data);
     return 0;

@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <assert.h>
 
 #include "chayai.h"
 
@@ -11,7 +11,8 @@ BENCHMARK(zserge, partcl, 10, 1) {
     struct tcl tcl;
     tcl_init(&tcl);
 
-    tcl_eval(&tcl, TCL_BENCH, sizeof(TCL_BENCH));
+    int ret = tcl_eval(&tcl, TCL_BENCH, sizeof(TCL_BENCH));
+    assert(ret == FNORMAL);
 
     tcl_destroy(&tcl);
 }
