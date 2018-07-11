@@ -5,6 +5,7 @@
 #include "chayai_console_outputter.h"
 #include "chayai_json_outputter.h"
 #include "chayai_main.h"
+#include "chayai_util.h"
 
 
 // BENCHMARK

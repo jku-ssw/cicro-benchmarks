@@ -5,6 +5,7 @@ add_library(chayai
     chayai_console_outputter.c
     chayai_json_outputter.c
     chayai_main.c
+    chayai_util.c
 )
 
 target_link_libraries(chayai m)
