@@ -97,7 +97,7 @@ static void chayai_json_outputter_end_benchmark(
             for(int k = 0; k < numberOfEvents; k++) {
                 PAPI_event_info_t info;
                 PAPI_get_event_info(events[k], &info);
-                fprintf(OUTPUT_STREAM, ", \"%s\":%ld", info.symbol, result->singleRuns[i].papiCounters[k]);
+                fprintf(OUTPUT_STREAM, ", \"%s\":%lld", info.symbol, result->singleRuns[i].papiCounters[k]);
             }
         }
 #endif
