@@ -175,8 +175,8 @@ class BenchmarkingHarness(object):
             if stdout_decoded:
                 try:
                     return json.loads(stdout_decoded), stderr_decoded
-                except json.JSONDecodeError:
-                    logger.error('invalid benchmark result: \'%s\'', stdout_decoded)
+                except ValueError:
+                    logger.exception('invalid benchmark result: \'%s\'', stdout_decoded)
 
             return None, stderr_decoded
 
@@ -432,8 +432,8 @@ def add_default_runtimes(harness):
                 if stdout_decoded:
                     try:
                         return json.loads(stdout_decoded), stderr_decoded
-                    except json.JSONDecodeError:
-                        logger.error('invalid benchmark result: \'%s\'', stdout_decoded)
+                    except ValueError:
+                        logger.exception('invalid benchmark result: \'%s\'', stdout_decoded)
 
                 return None, stderr_decoded
 

@@ -14,8 +14,8 @@ def execute_binary_analysis_tool(filepath, workdir, tool, **kwargs):
         if stdout_decoded:
             try:
                 return json.loads(stdout_decoded), stderr_decoded
-            except json.JSONDecodeError:
-                logger.error('invalid benchmark result: \'%s\'', stdout_decoded)
+            except ValueError:
+                logger.exception('invalid benchmark result: \'%s\'', stdout_decoded)
 
         return None, stderr_decoded
 
