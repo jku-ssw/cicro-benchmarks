@@ -9,4 +9,14 @@ script:
 
   # execute clang-O0 benchmark for all harnesses starting with 'a'
   - echo "CLANG=clang" > configs/env
-  - ./tools/bench.py -y my_results.json --filter-runtime=asan-O3 --exec-args="--warmup=0 --iterations=1"
+  - echo "GCC=gcc" >> configs/env
+  - echo "WLLVM_DIR=/usr/bin" >> configs/env
+  - ./tools/bench.py -y my_results.json --filter-runtime=$FILTER_RUNTIME --exec-args="--warmup=0 --iterations=1" -j=4 $ARGS
+matrix:
+  include:
+  - env: FILTER_RUNTIME='clang-O1'
+  - env: FILTER_RUNTIME='gcc-O1'
+#  - env: FILTER_RUNTIME='lli-O3'
+  - env: FILTER_RUNTIME='asan-O3' $ARGS='--ignore-errors'
+after_failure:
+  - ls --color ./benchmarks
