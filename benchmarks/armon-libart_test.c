@@ -19,7 +19,7 @@ BENCHMARK(libart, tree, 100, 10) {
 
     for(int i = 0; i < max_len; i+=100) {
         unsigned char *key = (unsigned char *) text+i;
-        art_insert(&t, key, max_len - i + 1, NULL);
+        art_insert(&t, key, max_len - i, NULL);
     }
 
     assert(t.size == 888);

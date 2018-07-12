@@ -2,11 +2,6 @@
 
 #include "100-Cranium/src/cranium.h"
 
-// override printf function, because Cranium outputs by default to it
-int printf(const char * format, ...) {
-    return 0;
-}
-
 BENCHMARK(Cranium, train, 100, 10) {
     int i;
     float **data = (float **) malloc(sizeof(float *) * 4);

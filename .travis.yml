@@ -14,9 +14,7 @@ script:
   - ./tools/bench.py -y my_results.json --filter-runtime=$FILTER_RUNTIME --exec-args="--warmup=0 --iterations=1" -j=4 $ARGS
 matrix:
   include:
-  - env: FILTER_RUNTIME='clang-O1'
-  - env: FILTER_RUNTIME='gcc-O1'
-#  - env: FILTER_RUNTIME='lli-O3'
-  - env: FILTER_RUNTIME='asan-O3' $ARGS='--ignore-errors'
+  - env: FILTER_RUNTIME='bugfinder-gcc-O2'
+  - env: FILTER_RUNTIME='bugfinder-clang-O2'
 after_failure:
   - ls --color ./benchmarks
