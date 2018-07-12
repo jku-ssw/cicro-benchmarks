@@ -172,17 +172,13 @@ class BenchmarkingHarness(object):
             stdout_decoded = stdout.decode('utf-8') if stdout else None
             stderr_decoded = stderr.decode('utf-8') if stderr else None
 
-            if stderr_decoded:
-                logger.warning("benchmark harness had some output on stderr:\n%s", stderr_decoded)
+            if stdout_decoded:
+                try:
+                    return json.loads(stdout_decoded), stderr_decoded
+                except json.JSONDecodeError:
+                    logger.error('invalid benchmark result: \'%s\'', stdout_decoded)
 
-            if process.returncode != 0:
-                return None, stderr_decoded
-
-            try:
-                return json.loads(stdout_decoded), stderr_decoded
-            except json.JSONDecodeError:
-                logger.error('invalid benchmark result: \'%s\'', stdout_decoded)
-                raise
+            return None, stderr_decoded
 
     def add_runtime(self, name, make_env,
                     make_func=default_make.__get__(object),
@@ -329,7 +325,9 @@ class BenchmarkingHarness(object):
                             result_stderr = exec_ret[1]
 
                             if result_stderr:
+                                logger.warning("benchmark harness had some output on stderr:\n%s", result_stderr)
                                 result_harness_data['stderr'] = result_stderr
+                                no_error = False
                         else:
                             result_data = exec_ret
 
@@ -431,17 +429,13 @@ def add_default_runtimes(harness):
                 stdout_decoded = stdout.decode('utf-8') if stdout else None
                 stderr_decoded = stderr.decode('utf-8') if stderr else None
 
-                if stderr_decoded:
-                    logger.warning("benchmark harness had some output on stderr:\n%s", stderr_decoded)
+                if stdout_decoded:
+                    try:
+                        return json.loads(stdout_decoded), stderr_decoded
+                    except json.JSONDecodeError:
+                        logger.error('invalid benchmark result: \'%s\'', stdout_decoded)
 
-                if p.returncode != 0:
-                    return None, stderr_decoded
-
-                try:
-                    return json.loads(stdout_decoded), stderr_decoded
-                except json.JSONDecodeError:
-                    logger.error('invalid benchmark result: \'%s\'', stdout_decoded)
-                    raise
+                return None, stderr_decoded
 
     for config in glob.glob(os.path.join(CONFIG_DIR, '*.py')):
         with open(config) as f:
