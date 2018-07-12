@@ -1,3 +1,5 @@
+dist: trusty
+sudo: required
 language: c
 before_install:
   - sudo apt-get install -y libpapi-dev python3-flake8 python3-pip
@@ -10,7 +12,7 @@ script:
   # execute clang-O0 benchmark for all harnesses starting with 'a'
   - echo "CLANG=clang" > configs/env
   - echo "GCC=gcc" >> configs/env
-  - echo "ASAN_SYMBOLIZER_PATH=/usr/bin/llvm-symbolizer" >> configs/env
+  - echo "ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-3.4/bin/llvm-symbolizer" >> configs/env
   - echo "ASAN_OPTIONS=symbolize=1" >> configs/env
   - ./tools/bench.py -y my_results.json --filter-runtime=$FILTER_RUNTIME --exec-args="--warmup=0 --iterations=1" -j=4 $ARGS
 matrix:
