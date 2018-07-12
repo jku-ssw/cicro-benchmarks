@@ -1,7 +1,7 @@
 # those tests are intended to find bugs in the benchmarks itself
 
 gcc_cflags = [
-    "-std=gnu99"  # otherwise our CI does not finish
+    "-std=gnu99",  # otherwise our CI does not finish
     "-Wno-everything",  # no warnings
     "-O2",  # some optimizations
     "-g",  # debug symbols
