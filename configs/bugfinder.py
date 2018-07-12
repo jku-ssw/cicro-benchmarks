@@ -10,7 +10,7 @@ gcc_cflags = [
     "-Wl,-z,relro,-z,now",  # full RELRO
     "-fstack-protector-all"
 ]
-harness.add_runtime('bugfinder-gcc-O2', {"CC": "${GCC}", "AS": "as", "CFLAGS":  " ".join(gcc_cflags)})
+harness.add_runtime('bugfinder-gcc-O2', {"CC": "${GCC}", "AS": "as", "CFLAGS": " ".join(gcc_cflags)})
 
 clang_cflags = [
     "-Wno-everything",  # no warnings
