@@ -1,9 +1,9 @@
 #include <unistd.h>
+#include <pthread.h>
 #include <assert.h>
 
 #include "chayai.h"
 
-#include <pthread.h>
 #include "mbrossard-threadpool/src/threadpool.h"
 
 

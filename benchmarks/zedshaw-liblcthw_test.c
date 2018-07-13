@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdarg.h>
 #include <assert.h>
 
 #include "chayai.h"
