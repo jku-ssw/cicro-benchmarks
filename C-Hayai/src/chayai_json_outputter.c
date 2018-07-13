@@ -53,6 +53,8 @@ static void chayai_json_outputter_end(unsigned int bechmarksCount)
 {
     fputs("]", OUTPUT_STREAM);  // end benchmarks
     fputs("}", OUTPUT_STREAM); // end outer dict
+
+    fflush(OUTPUT_STREAM);
 }
 
 
