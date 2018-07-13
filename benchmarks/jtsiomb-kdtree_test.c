@@ -1,5 +1,4 @@
-#include <string.h>
-#include <stdlib.h>
+#include <stddef.h>
 #include <assert.h>
 
 #include "chayai.h"
