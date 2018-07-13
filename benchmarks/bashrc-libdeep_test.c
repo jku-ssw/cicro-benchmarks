@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <limits.h>
 #include <assert.h>
 
 #include "chayai.h"
@@ -58,7 +59,7 @@ int main(int argc, char** argv) {
     REGISTER_BENCHMARK(libdeep, learn); // A deep learning library for C/C++
 
     // get realpath
-    data_file_path = malloc(1024*sizeof(char));
+    data_file_path = malloc(PATH_MAX*sizeof(char));
     assert(data_file_path != NULL);
     char *path = realpath(DATA_FILE, data_file_path); // TODO: support different working directories
     assert(path == data_file_path);
