@@ -32,7 +32,7 @@ BENCHMARK(snappy_c, compress_uncompress, 100, 100) {
     assert(uncompressed_len == 887001);
     char *uncompressed = malloc(sizeof(char) * uncompressed_len);
 
-    snappy_uncompress(compressed, compressed_max_len, uncompressed);
+    snappy_uncompress(compressed, compressed_len, uncompressed);
 
     free(uncompressed);
     free(compressed);
