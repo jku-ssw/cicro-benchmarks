@@ -17,10 +17,16 @@ script:
   - ./tools/bench.py -y my_results.json --filter-runtime=$FILTER_RUNTIME --exec-args="--warmup=0 --iterations=1" -j=4
 matrix:
   include:
-  - env: FILTER_RUNTIME='bugfinder-gcc-O2'
-  - env: FILTER_RUNTIME='bugfinder-clang-O2'
+  - env: FILTER_RUNTIME='bugfinder-asan-gcc-O2'
+  - env: FILTER_RUNTIME='bugfinder-asan-clang-O2'
+  - env: FILTER_RUNTIME='bugfinder-msan-clang-O3'
+  - env: FILTER_RUNTIME='bugfinder-ubsan-clang-O3'
+  - env: FILTER_RUNTIME='bugfinder-tsan-clang-O3'
   - env: FILTER_RUNTIME='valgrind-O3'
   allow_failures:
+  - env: FILTER_RUNTIME='bugfinder-msan-clang-O3'
+  - env: FILTER_RUNTIME='bugfinder-ubsan-clang-O3'
+  - env: FILTER_RUNTIME='bugfinder-tsan-clang-O3'
   - env: FILTER_RUNTIME='valgrind-O3'
 after_failure:
   - ls --color ./benchmarks
