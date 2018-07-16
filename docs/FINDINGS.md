@@ -690,6 +690,8 @@ Implemented
 
 Implemented
 
+Reported Multithreading issue: [mbrossard/threadpool/pull/13](https://github.com/mbrossard/threadpool/pull/13)
+
 
 # 2018.02.12: Valgrind problems found:
 

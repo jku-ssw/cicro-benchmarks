@@ -20,7 +20,7 @@ matrix:
   - env: FILTER_RUNTIME='bugfinder-asan-gcc-O2'
   - env: FILTER_RUNTIME='bugfinder-asan-clang-O2'
   - env: FILTER_RUNTIME='bugfinder-msan-clang-O3'
-  - env: FILTER_RUNTIME='bugfinder-ubsan-clang-O3'
+#  - env: FILTER_RUNTIME='bugfinder-ubsan-clang-O3'
   - env: FILTER_RUNTIME='bugfinder-tsan-clang-O3'
   - env: FILTER_RUNTIME='valgrind-O3'
   allow_failures:
