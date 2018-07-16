@@ -14,19 +14,17 @@ script:
   - echo "GCC=gcc" >> configs/env
   - echo "ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-3.4/bin/llvm-symbolizer" >> configs/env
   - echo "ASAN_OPTIONS=symbolize=1" >> configs/env
-  - ./tools/bench.py -y my_results.json --filter-runtime=$FILTER_RUNTIME --exec-args="--warmup=0 --iterations=1" -j=4
+  - ./tools/bench.py -y my_results.json --filter-runtime=$FILTER_RUNTIME --filter-harness=$FILTER_HARNESS --exec-args="--warmup=0 --iterations=1" -j=4
 matrix:
   include:
-  - env: FILTER_RUNTIME='bugfinder-asan-gcc-O2'
-  - env: FILTER_RUNTIME='bugfinder-asan-clang-O2'
-  - env: FILTER_RUNTIME='bugfinder-msan-clang-O3'
-#  - env: FILTER_RUNTIME='bugfinder-ubsan-clang-O3'
-  - env: FILTER_RUNTIME='bugfinder-tsan-clang-O3'
-  - env: FILTER_RUNTIME='valgrind-O3'
+  - env: FILTER_RUNTIME='bugfinder-asan-gcc-O2' FILTER_HARNESS='.*'
+  - env: FILTER_RUNTIME='bugfinder-asan-clang-O2' FILTER_HARNESS='.*'
+  - env: FILTER_RUNTIME='bugfinder-msan-clang-O3' FILTER_HARNESS='(?!(chrismoos-hash-ring))'
+#  - env: FILTER_RUNTIME='bugfinder-ubsan-clang-O3' FILTER_HARNESS='.*'
+  - env: FILTER_RUNTIME='bugfinder-tsan-clang-O3' FILTER_HARNESS='(?!(troydhanson-tpl))'  # "troydhanson-tpl" only fails on gate?
+  - env: FILTER_RUNTIME='valgrind-O3' FILTER_HARNESS='.*'
   allow_failures:
-  - env: FILTER_RUNTIME='bugfinder-msan-clang-O3'
-  - env: FILTER_RUNTIME='bugfinder-ubsan-clang-O3'
-  - env: FILTER_RUNTIME='bugfinder-tsan-clang-O3'
-  - env: FILTER_RUNTIME='valgrind-O3'
+  - env: FILTER_RUNTIME='bugfinder-ubsan-clang-O3' FILTER_HARNESS='.*'
+  - env: FILTER_RUNTIME='valgrind-O3' FILTER_HARNESS='.*'
 after_failure:
   - ls --color ./benchmarks
