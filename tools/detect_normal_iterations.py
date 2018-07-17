@@ -18,18 +18,23 @@ BENCHMARK_DIR = os.path.join(BASE_DIR, 'benchmarks')
 def evaluate_benchmark(workdir, harness):
     filepath = os.path.join(workdir, harness)
 
-    benchmarks = {}
+    normal_iterations = None
 
     with open(filepath, 'r') as f:
         for line in f:
             m = re.match(r'BENCHMARK\s*\(\s*(\w+)\s*,\s*(\w+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)', line)
             if m:
-                name = '{}-{}'.format(m.group(1), m.group(2))
+                # name = '{}-{}'.format(m.group(1), m.group(2))
                 iterations = int(m.group(3))
 
-                benchmarks[name] = {'iterations': iterations}
+                if normal_iterations is None:
+                    normal_iterations = iterations
+                elif normal_iterations != iterations:
+                    logger.error('iteration count has to be equal for all benchmarks in a file!')
+                    logger.error('problematic file: "%s"', filepath)
+                    sys.exit(1)
 
-    return benchmarks
+    return normal_iterations
 
 
 if __name__ == "__main__":
