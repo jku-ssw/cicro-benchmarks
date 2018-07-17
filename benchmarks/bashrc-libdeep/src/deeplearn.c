@@ -94,6 +94,8 @@ int deeplearn_init(deeplearn * learner,
     learner->no_of_input_fields = 0;
     learner->field_length = 0;
 
+    learner->training_ctr = 0;
+
     deeplearn_history_init(&learner->history, "training.png",
                            "Training History",
                            "Time Step", "Training Error %");
