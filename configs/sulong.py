@@ -1,15 +1,13 @@
 from functools import partial
 
 
-def sulong_graalvm_executor(filepath, workdir, warmup, **kwargs):
-    kwargs['warmup_iterations'] = warmup
-    return wllvm_executor(filepath, workdir, '$GRAALVM_DIR/lli', **kwargs)
+def sulong_graalvm_executor(filepath, workdir, exec_args, warmup, **kwargs):
+    return wllvm_executor(filepath, workdir, '$GRAALVM_DIR/lli', exec_args + ["--warmup?={}".format(warmup)], **kwargs)
 
 
-def sulong_latest_executor(filepath, workdir, warmup, **kwargs):
-    kwargs['warmup_iterations'] = warmup
+def sulong_latest_executor(filepath, workdir, exec_args, warmup, **kwargs):
     kwargs['timeout'] = 10000
-    return wllvm_executor(filepath, workdir, '$SULONG_LATEST_CMD', **kwargs)
+    return wllvm_executor(filepath, workdir, '$SULONG_LATEST_CMD', exec_args + ["--warmup?={}".format(warmup)], **kwargs)
 
 
 sulong_env = {

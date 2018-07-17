@@ -161,11 +161,11 @@ class BenchmarkingHarness(object):
         return True
 
     @staticmethod
-    def default_executor(filepath, workdir, **kwargs):
+    def default_executor(filepath, workdir, exec_args, **kwargs):
         assert os.path.isfile(filepath)
         assert os.path.isdir(workdir)
 
-        args = [filepath, '--output=json'] + kwargs.get('exec_args', '').split(' ')
+        args = [filepath, '--output=json'] + exec_args
         with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
             stdout, stderr = process.communicate(timeout=kwargs.get('timeout', 240))
 
@@ -228,6 +228,9 @@ class BenchmarkingHarness(object):
         if runtime not in self.registered_runtimes:
             logger.error('runtime not found: "%s"', runtime)
             return False
+
+        exec_kwargs = kwargs.copy()
+        del exec_kwargs['exec_args']
 
         runtime_name = runtime + kwargs.get('suffix', '')
 
@@ -316,8 +319,20 @@ class BenchmarkingHarness(object):
                     result_harness_data['datetime'] = datetime.datetime.now().isoformat()
 
                     try:
+                        exec_args = [x for x in kwargs.get('exec_args', '').split(' ') if x]
+
+                        iteration_overwrite = kwargs.get('iterdata', {}).get(harness + ".c")
+                        if iteration_overwrite is not None:
+                            if type(iteration_overwrite) is int:
+                                exec_args.append("--iterations={}".format(iteration_overwrite))
+                            else:
+                                logger.error('"%s" is not of type int, ignore iteration overwrite', iteration_overwrite)
+
                         logger.info('benchmark: "%s:%s"', harness_name, runtime_name)
-                        exec_ret = exec_func(harness_path, self.testdir, **kwargs)
+                        if exec_args:
+                            logger.info(' * additional args set: "%s"', " ".join(exec_args))
+
+                        exec_ret = exec_func(harness_path, self.testdir, exec_args, **exec_kwargs)
 
                         # either we only return the data, or stderr as second element
                         if type(exec_ret) is tuple:
@@ -404,7 +419,7 @@ def add_default_runtimes(harness):
 
             return BenchmarkingHarness.default_make(workdir, make_env, **kwargs)
 
-    def wllvm_executor(filepath, workdir, tool, **kwargs):
+    def wllvm_executor(filepath, workdir, tool, exec_args, **kwargs):
         assert os.path.isfile(filepath)
         assert os.path.isdir(workdir)
 
@@ -418,11 +433,7 @@ def add_default_runtimes(harness):
 
             assert os.path.isfile(bc_filepath)
 
-            additional_args = kwargs.get('exec_args', '').split(' ')
-            warmup_iterations = kwargs.get('warmup_iterations', None)
-            if warmup_iterations:
-                additional_args.append('--warmup=%d' % warmup_iterations)
-            args = os.path.expandvars(tool).split(' ') + [bc_filepath, '--output=json'] + additional_args
+            args = os.path.expandvars(tool).split(' ') + [bc_filepath, '--output=json'] + exec_args
             with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
                 stdout, stderr = p.communicate(timeout=kwargs.get('timeout', 240))
 
@@ -469,6 +480,8 @@ if __name__ == "__main__":
                         help='number of times a benchmark should be repeated')
     parser.add_argument('--exec-args', metavar='STRING', type=str, default="",
                         help='commandline arguments which should be added to the benchmark')
+    parser.add_argument('--iterfile', metavar='ITERFILE', nargs='?', type=argparse.FileType('r'),
+                        help='file which overwrites the number of iterations per harness')
 
     parser.add_argument('--only-missing', action='store_true',
                         help='only execute benchmarks which are missing in the benchfile')
@@ -525,6 +538,13 @@ if __name__ == "__main__":
             if not args.yes and query_yes_no(corrupted_msg, default="no") == 'no':
                 sys.exit()
 
+    if args.iterfile:
+        logger.warning("benchmark iteration count will be forced to your specified value")
+        iterdata = json.load(args.iterfile)
+        logger.info(iterdata)
+    else:
+        iterdata = {}
+
     def write_results():
         """ atomic write of results into a file"""
         logger.info('write results into benchmark file')
@@ -562,6 +582,7 @@ if __name__ == "__main__":
         'runs': args.runs,
         'replace_runs': args.replace_runs,
         'exec_args': args.exec_args,
+        'iterdata': iterdata,
         'only_missing': args.only_missing,
         'result_writer_func': write_results
     }
