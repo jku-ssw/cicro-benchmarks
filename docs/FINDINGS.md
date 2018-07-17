@@ -290,7 +290,9 @@ cp btree_example.bc ../../../java-llvm-ir-builder-dev/sulong/btree_example.bc
 time mx --jdk jvmci --dynamicimports=/compiler lli btree_example.bc allocfree 10000000000 200000 -Dgraal.TraceTruffleCompilation=true -Dgraal.TraceTruffleCompilation=true
 ```
 
-Reported: [antirez/otree/pull/3](https://github.com/antirez/otree/pull/3) (Use-after-free error fix)
+Reported:
+* [antirez/otree/pull/3](https://github.com/antirez/otree/pull/3) (Use-after-free error fix)
+* [antirez/otree/pull/4](https://github.com/antirez/otree/pull/4) (Uninitialized byte)
 
 # chrismoos/hash-ring (2017.30.11)
 
