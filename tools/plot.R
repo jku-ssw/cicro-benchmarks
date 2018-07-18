@@ -70,6 +70,28 @@ df_long_summary = df_long %>%
   summarise(runs=n(), value_mean=mean(value), value_sum=sum(value)) %>%
   ungroup()
 
+if('PAPI_TOT_INS' %in% df_long_summary$metric_name) {
+  # print instruction mix of our benchmarks
+  df_long_baseline_papi = df_long_summary  %>%
+    filter(grepl('^PAPI_.*_INS$', metric_name)) %>%
+    group_by(fixture, name, config) %>%
+    mutate(total_instruction_mean=value_mean[metric_name=='PAPI_TOT_INS' ]) %>%
+    filter(metric_name!='PAPI_TOT_INS') %>%
+    mutate(instruction_percent = value_mean/total_instruction_mean) %>%
+    select(-runs, -value_mean, -value_sum, -total_instruction_mean) %>%
+    ungroup()
+
+  for(config_name in df_long_baseline_papi$config %>% unique()) {
+    df_long_baseline_papi_of_config = df_long_baseline_papi %>% filter(config == config_name)
+    if(length(df_long_baseline_papi_of_config$metric_name) > 0) {
+      p <- ggplot(df_long_baseline_papi_of_config, aes(x=metric_name, y=instruction_percent)) +
+        geom_boxplot(notch = TRUE, varwidth=TRUE) +
+        ggtitle(paste("instruction mix of:", config_name, " "))
+      print(p)
+    }
+  }
+}
+
 # add baseline to allow plotting relative to baseline
 df_long_baseline = df_long_summary  %>%
   group_by(fixture, name, metric_name) %>%
