@@ -44,7 +44,7 @@ runtime environments are specified.
 **Example**: run all clang runtimes and execute all harnesses where the name starts with ```a```. Furthermore instrument some hardware counters:
 
 ```
-./tools/bench.py example_results.json --filter-harness="^a.*" --filter-runtime="clang-.*" --exec-args="--papi=PAPI_TOT_CYC,PAPI_TOT_INS,PAPI_BR_INS"
+./tools/bench.py example_results.json --filter-harness="^a.*" --filter-runtime="clang-.*" --exec-args="--papi=PAPI_LD_INS,PAPI_SR_INS,PAPI_BR_INS,PAPI_TOT_INS"
 ```
 
 Please note it is important to configure the system in a way to have as least impact on the benchmarks as possible.
@@ -63,7 +63,30 @@ This tool prints some basic informations which could be usefull to find missing 
 ### Plot Benchmark Results
 
 ```
-./tools/plot.py my_results.json gcc-O3
+./tools/plot.R --benchfile=example_results.json --base-runtime=clang-O0
 ```
 
 Please note, currently plotting requires a baseline, and thus at least two runs are required to actual plot something!
+
+## Some notes about hardware counters
+
+When you are interested about measuring hardware counters, you first need to know which counters are available:
+
+```bash
+papi_avail
+```
+
+It is recommended to check, if the selected hardware counters can be combinded together. If they cannot be combinded,
+you are required to do multiple runs with different counters, to get all measurements:
+
+```bash
+papi_command_line PAPI_LD_INS PAPI_SR_INS PAPI_BR_INS PAPI_TOT_INS PAPI_TOT_CYC
+```
+
+To enable the counters, you need to pass a list of them to the benchmark harness. It should be pointed out that counter
+results are only visible in the json output, not in the default console output. You can run benchmarks without the
+harness runner to try out the settings:
+
+```bash
+./my_benchmark_test --output=json --papi=PAPI_LD_INS,PAPI_SR_INS,PAPI_BR_INS,PAPI_TOT_INS
+```
