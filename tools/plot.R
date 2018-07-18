@@ -86,6 +86,7 @@ if('PAPI_TOT_INS' %in% df_long_summary$metric_name) {
     if(length(df_long_baseline_papi_of_config$metric_name) > 0) {
       p <- ggplot(df_long_baseline_papi_of_config, aes(x=metric_name, y=instruction_percent)) +
         geom_boxplot(notch = TRUE, varwidth=TRUE) +
+        scale_y_continuous(limits = c(-0, 1)) +
         ggtitle(paste("instruction mix of:", config_name, " "))
       print(p)
     }
