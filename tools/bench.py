@@ -181,6 +181,7 @@ class BenchmarkingHarness(object):
             return None, stderr_decoded
 
     def add_runtime(self, name, make_env,
+                    build_system_func=None,
                     make_func=default_make.__get__(object),
                     exec_func=default_executor.__get__(object),
                     clean_func=default_clean.__get__(object)):
@@ -189,6 +190,7 @@ class BenchmarkingHarness(object):
 
         logger.debug('register runtime to benchmark harness: "%s"', name)
         self.registered_runtimes[name] = {'make_env': make_env,  # enviroment variables required for make
+                                          'build_system_func': build_system_func,  # function to get system informations
                                           'make_func': make_func,  # function executed to build all benchmarks
                                           'exec_func': exec_func,  # function to execute a single benchmark
                                           'clean_func': clean_func}  # function executed after running all benchmarks
@@ -236,6 +238,7 @@ class BenchmarkingHarness(object):
 
         found_runtime = self.registered_runtimes[runtime]
 
+        build_system_func = found_runtime['build_system_func']
         make_func = found_runtime['make_func']
         exec_func = found_runtime['exec_func']
         clean_func = found_runtime['clean_func']
@@ -284,6 +287,18 @@ class BenchmarkingHarness(object):
                     for key, value in found_runtime['make_env'].items():
                         exp_value = os.path.expandvars(value) if type(value) is str else value
                         result_harness_data['make_env'][key] = exp_value
+
+                if build_system_func:
+                    try:
+                        # Use our expanded enviroment variables
+                        build_system_data = build_system_func(result_harness_data.get('make_env', {}))
+                        if build_system_data:
+                            logger.debug('build system extracted: %s', build_system_data)
+                            result_harness_data['build_system'] = build_system_data
+                    except KeyboardInterrupt:
+                        raise
+                    except:  # NOQA: E722
+                        logger.exception('cannot extract build system informations')
 
             # execution step
             for run_id in range(kwargs.get('runs', 1)):
@@ -428,7 +443,7 @@ def add_default_runtimes(harness):
             bc_filepath = os.path.join(tmp, bc_filename)
             logger.debug('extract bitcode file to: "%s"', bc_filepath)
 
-            with subprocess.Popen([os.path.expandvars("$WLLVM_DIR/extract-bc"), filepath, '-o', bc_filepath]) as p:
+            with subprocess.Popen([os.path.expandvars("${WLLVM_DIR}/extract-bc"), filepath, '-o', bc_filepath]) as p:
                 p.wait(timeout=30)  # 30 Seconds should be way enough time to do the bitcode extraction
 
             assert os.path.isfile(bc_filepath)
@@ -448,9 +463,35 @@ def add_default_runtimes(harness):
 
                 return None, stderr_decoded
 
+    def build_system_executor(make_env, cc_version, as_version):
+        result = {}
+
+        my_env = os.environ.copy()
+        my_env['LC_ALL'] = 'C'  # Force results in default language
+
+        if 'CC' in make_env and cc_version:
+            with subprocess.Popen([make_env['CC'], cc_version], stdout=subprocess.PIPE, env=my_env) as p:
+                stdout, _ = p.communicate(timeout=1)
+
+                stdout_decoded = stdout.decode('utf-8').rstrip() if stdout else None
+                if p.returncode == 0 and stdout_decoded:
+                    result['CC_version'] = stdout_decoded
+
+        if 'AS' in make_env and as_version:
+            with subprocess.Popen([make_env['AS'], cc_version], stdout=subprocess.PIPE, env=my_env) as p:
+                stdout, _ = p.communicate(timeout=1)
+
+                stdout_decoded = stdout.decode('utf-8').rstrip() if stdout else None
+                if p.returncode == 0 and stdout_decoded:
+                    result['AS_version'] = stdout_decoded
+
+        return result
+
     for config in glob.glob(os.path.join(CONFIG_DIR, '*.py')):
         with open(config) as f:
-            exec(f.read(), {'wllvm_make': wllvm_make, 'wllvm_executor': wllvm_executor,
+            exec(f.read(), {'wllvm_make': wllvm_make,
+                            'wllvm_executor': wllvm_executor,
+                            'build_system_executor': build_system_executor,
                             'harness': harness, 'logger': logger})
 
 
