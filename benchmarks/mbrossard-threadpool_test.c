@@ -8,7 +8,7 @@
 
 
 #define THREAD 1
-#define SIZE   8192 //*8192
+#define SIZE   16384
 
 int left;
 pthread_mutex_t lock;
@@ -19,7 +19,7 @@ void dummy_task(void *arg) {
     pthread_mutex_unlock(&lock);
 }
 
-BENCHMARK(mbrossard, threadpool, 100, 100) {
+BENCHMARK(mbrossard, threadpool, 100, 10) {
     int ret, i, copy=1;
 
     pthread_mutex_init(&lock, NULL);
