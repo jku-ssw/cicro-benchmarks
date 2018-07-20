@@ -40,8 +40,7 @@ PROJECTS = 100-Cranium adamdunkels-ubasic andikleen-snappy-c antirez-otree antir
 		   wolkykim-qlibc xamarin-flex yinqiwen-geohash-int yosefk-checkedthreads zedshaw-liblcthw zhemao-libds zserge-partcl
 
 # dbalmain-ferret: contains dependencies
-# orangeduck-tgc: runtime can vary by factor 100!
-IGNORED_PROJECTS = dbalmain-ferret orangeduck-tg
+IGNORED_PROJECTS = dbalmain-ferret
 
 # Global commands
 
@@ -320,12 +319,6 @@ msteinbeck-tinyspline_$(TEST_SUFFIX): msteinbeck-tinyspline msteinbeck-tinysplin
 ndevilla-iniparser_$(TEST_SUFFIX): ndevilla-iniparser ndevilla-iniparser_test.c $(C_HAYAI_LIB)
 	$(CC) $(CFLAGS) ndevilla-iniparser_test.c ndevilla-iniparser/src/*.c $(C_HAYAI_CFLAGS) \
 	 -o "$(TEST_DIR)/ndevilla-iniparser_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
-
-########## https://github.com/orangeduck/tgc
-
-orangeduck-tgc_$(TEST_SUFFIX): orangeduck-tgc orangeduck-tgc_test.ignored.c $(C_HAYAI_LIB)
-	$(CC) $(CFLAGS) orangeduck-tgc_test.ignored.c orangeduck-tgc/tgc.c $(C_HAYAI_CFLAGS) \
-	 -o "$(TEST_DIR)/orangeduck-tgc_$(TEST_SUFFIX)" $(LDFLAGS) $(C_HAYAI_LDFLAGS)
 
 ########## https://github.com/paladin-t/my_basic
 
