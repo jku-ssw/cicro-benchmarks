@@ -70,8 +70,30 @@ df_long_summary = df_long %>%
   summarise(runs=n(), value_mean=mean(value), value_sum=sum(value)) %>%
   ungroup()
 
+# print IPC
+if('PAPI_TOT_INS' %in% df_long_summary$metric_name && 'PAPI_TOT_CYC' %in% df_long_summary$metric_name ) {
+  print("plot instructions per cycle")
+  df_long_baseline_ipc = df_long_summary %>%
+    group_by(fixture, name, config) %>%
+    transmute(ipc=value_mean[metric_name=='PAPI_TOT_INS']/value_mean[metric_name=='PAPI_TOT_CYC']) %>%
+    unique() %>%
+    ungroup()
+
+  p <- ggplot(df_long_baseline_ipc, aes(x=config, y=ipc)) +
+    geom_boxplot(notch = TRUE, varwidth=TRUE) +
+    ggtitle("instructions per cycle")
+  print(p)
+
+  p2 = ggplot(df_long_baseline_ipc, aes(fill=ipc, x=name, y=config)) +
+    geom_tile(aes(fill = ipc), colour = "white") +
+    scale_fill_gradient(low = "white", high = "steelblue", na.value = "grey50", trans="log1p", guide="legend") +
+    ggtitle("instructions per cycle")
+  print(p2)
+}
+
+# print instructino mix
 if('PAPI_TOT_INS' %in% df_long_summary$metric_name) {
-  # print instruction mix of our benchmarks
+  print("plot instruction mix")
   df_long_baseline_papi = df_long_summary  %>%
     filter(grepl('^PAPI_.*_INS$', metric_name)) %>%
     group_by(fixture, name, config) %>%
@@ -100,7 +122,7 @@ df_long_baseline = df_long_summary  %>%
   ungroup()
 
 for(plot_name in df_long_baseline$metric_name %>% unique()) {
-  print(plot_name)
+  print(paste("plot comparison of:", plot_name, " "))
   p <- ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=config, y=value_mean/baseline)) +
     geom_boxplot(notch = TRUE, varwidth=TRUE) +
     scale_x_discrete(name = "runtimes") +
