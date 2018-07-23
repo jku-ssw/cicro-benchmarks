@@ -68,7 +68,7 @@ df_long = df %>%
 # calculate mean and sum over all runs
 df_long_summary = df_long %>%
   group_by(benchmark, config, metric_name) %>%
-  summarise(runs=n(), value_mean=mean(value), value_sum=sum(value)) %>%
+  summarise(runs=n(), value_mean=mean(value), value_sum=sum(value), value_sd=sd(value)) %>%
   ungroup()
 
 # print IPC
@@ -123,12 +123,14 @@ if('PAPI_TOT_INS' %in% df_long_summary$metric_name) {
 # add baseline to allow plotting relative to baseline
 df_long_baseline = df_long_summary  %>%
   group_by(benchmark, metric_name) %>%
-  mutate(baseline=value_mean[config==BASE_RUNTIME ], baseline_runs=runs[config==BASE_RUNTIME ]) %>%
+  mutate(baseline_runs=runs[config==BASE_RUNTIME]) %>%
+  mutate(value_mean_factor=value_mean/value_mean[config==BASE_RUNTIME]) %>%
+  mutate(value_sd_factor=value_sd/value_mean[config==BASE_RUNTIME]) %>%  # TODO: correct?
   ungroup()
 
 for(plot_name in df_long_baseline$metric_name %>% unique()) {
   print(paste("plot comparison of:", plot_name, " "))
-  p <- ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=config, y=value_mean/baseline)) +
+  p <- ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=config, y=value_mean_factor)) +
     geom_boxplot(notch = TRUE, varwidth=TRUE) +
     scale_x_discrete("runtime") +
     scale_y_continuous("factor") +
@@ -136,8 +138,8 @@ for(plot_name in df_long_baseline$metric_name %>% unique()) {
   print(p)
 
   my_breaks = c(0.1, 0.5, 1, 1.5, 2, 5, 10, 50, 100, 200, 500, 1000)
-  p2 = ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=benchmark, fill=value_mean/baseline, y=config)) +
-    geom_tile(aes(fill = value_mean/baseline), colour = "white") +
+  p2 = ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=benchmark, fill=value_mean_factor, y=config)) +
+    geom_tile(aes(fill = value_mean_factor), colour = "white") +
     scale_fill_gradient(low = "white", high = "steelblue", na.value = "grey50", trans="log1p", breaks=my_breaks, labels=my_breaks, guide="legend") +
     scale_x_discrete('benchmark', expand = c(0, 0)) +
     scale_y_discrete('runtime', expand = c(0, 0)) +
@@ -145,12 +147,14 @@ for(plot_name in df_long_baseline$metric_name %>% unique()) {
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
   print(p2)
 
-  p_barchart = ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=benchmark, y=value_mean/baseline, fill=config)) +
+  p_barchart = ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=benchmark, y=value_mean_factor, fill=config)) +
     geom_bar(stat="identity", position=position_dodge()) +
+    geom_errorbar(aes(ymin=value_mean_factor-value_sd_factor, ymax=value_mean_factor+value_sd_factor), position = position_dodge(width = .9)) +
     scale_x_discrete('benchmark', expand = c(0, 0)) +
     scale_y_continuous('runtime', expand = c(0, 0, 0.05, 0)) +
     ggtitle(plot_name) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
+
   print(p_barchart)
 }
 
