@@ -95,7 +95,8 @@ def is_system_ready_for_benchmarking():
             line = f.read().splitlines()[0]
             logger.debug('%s is set to \"%s\"', governor, line)
             if line != 'performance':
-                logger.warning('please set all scaling_governor to \"performance\" (using "sudo ./ondemand.sh start")')
+                logger.warning('please set all scaling_governor to "performance" '
+                               '(using "sudo ./tools/ondemand.sh start")')
                 return False
 
     return True
