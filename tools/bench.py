@@ -2,7 +2,6 @@
 
 import argparse
 import collections
-import datetime
 import glob
 import json
 import logging
@@ -12,6 +11,8 @@ import re
 import subprocess
 import sys
 import tempfile
+
+from datetime import datetime, timezone
 
 from util.bench_results import BenchmarkingResults
 from util.color_logger import get_logger
@@ -98,6 +99,15 @@ def is_system_ready_for_benchmarking():
                 return False
 
     return True
+
+
+def is_papi_installed():
+    """Check if PAPI is installed for performance counter measurements"""
+
+    with subprocess.Popen(('ldconfig', '-p'), stdout=subprocess.PIPE) as p:
+        with subprocess.Popen(('grep', 'libpapi.so'), stdin=p.stdout, stdout=subprocess.PIPE) as pg:
+            stdout, _ = pg.communicate()
+            return len(stdout) != 0
 
 
 class BenchmarkingHarness(object):
@@ -237,6 +247,10 @@ class BenchmarkingHarness(object):
         runtime_name = runtime + kwargs.get('suffix', '')
 
         found_runtime = self.registered_runtimes[runtime]
+        make_env = found_runtime.get('make_env', {}).copy()
+
+        if kwargs['no_papi']:
+            make_env["PAPI"] = 0
 
         build_system_func = found_runtime['build_system_func']
         make_func = found_runtime['make_func']
@@ -278,15 +292,14 @@ class BenchmarkingHarness(object):
                 logger.warning('compilation step skipped for "%s"', runtime)
             else:
                 logger.info('execute compilation step for "%s"', runtime)
-                if not make_func(self.testdir, found_runtime['make_env'], **kwargs):
+                if not make_func(self.testdir, make_env, **kwargs):
                     logger.error('compilation step for "%s" failed', runtime)
                     return False
 
-                if 'make_env' in found_runtime:
-                    result_harness_data['make_env'] = {}
-                    for key, value in found_runtime['make_env'].items():
-                        exp_value = os.path.expandvars(value) if type(value) is str else value
-                        result_harness_data['make_env'][key] = exp_value
+                result_harness_data['make_env'] = {}
+                for key, value in make_env.items():
+                    exp_value = os.path.expandvars(value) if type(value) is str else value
+                    result_harness_data['make_env'][key] = exp_value
 
                 if build_system_func:
                     try:
@@ -331,7 +344,8 @@ class BenchmarkingHarness(object):
                             raise
                         except:  # NOQA: E722
                             logger.exception('cannot extract system informations with psutil')
-                    result_harness_data['datetime'] = datetime.datetime.now().isoformat()
+
+                    result_harness_data['datetime'] = datetime.now(timezone.utc).astimezone().isoformat()
 
                     try:
                         exec_args = [x for x in kwargs.get('exec_args', '').split(' ') if x]
@@ -524,6 +538,8 @@ if __name__ == "__main__":
     parser.add_argument('--iterfile', metavar='ITERFILE', nargs='?', type=argparse.FileType('r'),
                         help='file which overwrites the number of iterations per harness')
 
+    parser.add_argument('--no-papi', action='store_true',
+                        help='do not compile performance counter library into benchmarks')
     parser.add_argument('--only-missing', action='store_true',
                         help='only execute benchmarks which are missing in the benchfile')
     parser.add_argument('--replace-runs', action='store_true',
@@ -549,6 +565,10 @@ if __name__ == "__main__":
 
     if not args.verbose:
         logging.disable(logging.DEBUG)  # we want to set all loggers
+
+    if not args.no_papi and not is_papi_installed():
+        logger.warning('PAPI does not seem to be installed on your system. '
+                       'You can exclude performance counter support with "--no-papi"')
 
     # Initialize Benchmarking Harness
     harness = BenchmarkingHarness(args.testdir)
@@ -576,7 +596,7 @@ if __name__ == "__main__":
         except Exception:
             logger.exception("cannot load file")
             corrupted_msg = 'Do you want to continue? The given file exists, but does not contain valid data'
-            if not args.yes and query_yes_no(corrupted_msg, default="no") == 'no':
+            if not args.yes and query_yes_no(corrupted_msg, default="no", on_keyboard_int="no") == 'no':
                 sys.exit()
 
     if args.iterfile:
@@ -624,12 +644,13 @@ if __name__ == "__main__":
         'replace_runs': args.replace_runs,
         'exec_args': args.exec_args,
         'iterdata': iterdata,
+        'no_papi': args.no_papi,
         'only_missing': args.only_missing,
         'result_writer_func': write_results
     }
 
     if not is_system_ready_for_benchmarking():
-        if not args.yes and query_yes_no('Do you want to continue with the benchmarks?') == 'no':
+        if not args.yes and query_yes_no('Do you want to continue with the benchmarks?', on_keyboard_int="no") == 'no':
             sys.exit()
 
     no_failures = True

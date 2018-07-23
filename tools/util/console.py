@@ -2,7 +2,7 @@ import sys
 
 
 # source: https://code.activestate.com/recipes/577058/
-def query_yes_no(question, default="yes"):
+def query_yes_no(question, default="yes", on_keyboard_int=None):
     valid = {"yes": "yes", "y": "yes", "ye": "yes",
              "no": "no", "n": "no"}
     if default is None:
@@ -16,7 +16,15 @@ def query_yes_no(question, default="yes"):
 
     while 1:
         sys.stdout.write(question + prompt)
-        choice = input().lower()
+
+        try:
+            choice = input().lower()
+        except KeyboardInterrupt:
+            if on_keyboard_int is not None:
+                return on_keyboard_int  # default behaviour for ^C
+            else:
+                raise
+
         if default is not None and choice == '':
             return default
         elif choice in valid.keys():
