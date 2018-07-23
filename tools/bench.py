@@ -12,7 +12,7 @@ import subprocess
 import sys
 import tempfile
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from util.bench_results import BenchmarkingResults
 from util.color_logger import get_logger
@@ -345,7 +345,7 @@ class BenchmarkingHarness(object):
                         except:  # NOQA: E722
                             logger.exception('cannot extract system informations with psutil')
 
-                    result_harness_data['datetime'] = datetime.utcnow().astimezone().isoformat()
+                    result_harness_data['datetime'] = datetime.now(timezone.utc).astimezone().isoformat()
 
                     try:
                         exec_args = [x for x in kwargs.get('exec_args', '').split(' ') if x]
