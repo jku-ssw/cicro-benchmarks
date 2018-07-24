@@ -31,12 +31,12 @@ def sulong_build_system_executor(make_env):
 
 
 def sulong_graalvm_executor(filepath, workdir, exec_args, warmup, **kwargs):
-    return wllvm_executor(filepath, workdir, '$GRAALVM_DIR/lli', exec_args + ["--warmup?={}".format(warmup)], **kwargs)
+    return wllvm_executor(filepath, workdir, '$GRAALVM_DIR/lli', exec_args + ["--warmup={}".format(warmup)], **kwargs)
 
 
 def sulong_latest_executor(filepath, workdir, exec_args, warmup, **kwargs):
     kwargs['timeout'] = 10000
-    return wllvm_executor(filepath, workdir, '$SULONG_LATEST_CMD', exec_args + ["--warmup?={}".format(warmup)], **kwargs)
+    return wllvm_executor(filepath, workdir, '$SULONG_LATEST_CMD', exec_args + ["--warmup={}".format(warmup)], **kwargs)
 
 
 sulong_env = {

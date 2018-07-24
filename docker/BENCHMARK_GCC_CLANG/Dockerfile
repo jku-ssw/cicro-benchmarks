@@ -8,8 +8,8 @@ RUN apt-get update && apt-get install -y build-essential cmake gcc-8 clang-6.0 l
 RUN git clone  https://github.com/jku-ssw/benchmarks  # TODO: disable caching for this command?
 
 # configure our enviroment to execute the benchmarks
-RUN echo "GCC=/usr/bin/gcc-8" > ./benchmarks/configs/env
-RUN echo "CLANG=/usr/bin/clang-6.0" >> ./benchmarks/configs/env
+RUN echo "GCC=/usr/bin/gcc-8" > ./benchmarks/configs/env \
+    && echo "CLANG=/usr/bin/clang-6.0" >> ./benchmarks/configs/env
 
 VOLUME /data
 
