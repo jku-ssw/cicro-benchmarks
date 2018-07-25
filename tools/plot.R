@@ -153,7 +153,17 @@ for(plot_name in df_long_baseline$metric_name %>% unique()) {
     scale_y_discrete('runtime', expand = c(0, 0)) +
     ggtitle(plot_name) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-  print(p2)
+
+  tryCatch({
+    print(p2)
+  }, error = function(e) {
+    if(e[1] == 'Breaks and labels are different lengths') {  # This error happens in rare cases. Seems to be a bug in ggplot2
+      warning(e)
+      warning('ignore invalid error. This plot will not be generated!')  # graph will not be plotted as well
+    } else {
+      stop(e)  # valid exception
+    }
+  })
 
   p_barchart = ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=benchmark, y=value_mean_factor, fill=config)) +
     geom_bar(stat="identity", position=position_dodge()) +
