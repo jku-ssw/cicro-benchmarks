@@ -69,7 +69,7 @@ class BenchmarkingResults(object):
 
                 run_id = 0
                 for entry in data:
-                    entry_h_data = harness_data.get(entry['harness'], {}).get(runtime) if 'harness' in entry else []
+                    entry_h_data = harness_data.get(entry['harness'], {}).get(runtime, []) if 'harness' in entry else []
                     h_data = entry_h_data[run_id] if len(entry_h_data) > run_id else None
 
                     if append:
