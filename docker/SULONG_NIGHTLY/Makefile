@@ -1,4 +1,4 @@
 .PHONY: build
 
 build: Dockerfile
-	sudo docker build -t sulong:nightly ./
+	docker build -t sulong:nightly ./

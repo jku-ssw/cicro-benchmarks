@@ -20,7 +20,8 @@ def graalvm_build_system_executor(make_env):
 def sulong_build_system_executor(make_env):
     result = build_system_executor(make_env, cc_version='--version', as_version='--version')
 
-    with subprocess.Popen([os.path.expandvars('$SULONG_LATEST_CMD'), '--version'], stdout=subprocess.PIPE) as p:
+    args = ['mx', '-p', os.path.expandvars('${SULONG_DIR}'), 'lli', '--version']
+    with subprocess.Popen(args, stdout=subprocess.PIPE) as p:
         stdout, _ = p.communicate(timeout=1)
 
         stdout_decoded = stdout.decode('utf-8').rstrip() if stdout else None
@@ -36,7 +37,8 @@ def sulong_graalvm_executor(filepath, workdir, exec_args, warmup, **kwargs):
 
 def sulong_latest_executor(filepath, workdir, exec_args, warmup, **kwargs):
     kwargs['timeout'] = 10000
-    return wllvm_executor(filepath, workdir, '$SULONG_LATEST_CMD', exec_args + ["--warmup={}".format(warmup)], **kwargs)
+    sulong_cmd = ' '.join(['mx', '-p', os.path.expandvars('${SULONG_DIR}'), 'lli'])
+    return wllvm_executor(filepath, workdir, sulong_cmd, exec_args + ["--warmup={}".format(warmup)], **kwargs)
 
 
 sulong_env = {

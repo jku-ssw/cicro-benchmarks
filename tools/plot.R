@@ -39,7 +39,11 @@ flatten_data <- function(raw) {
     for (config in names(raw_benchmark)) {
       df_benchmark_config <- raw_benchmark[[config]] %>%
         select(-mean, -std_dev, -iterations_per_run, -disabled) %>%
+        mutate(run=row_number()) %>%
         unnest() %>%
+        group_by(run) %>%
+        mutate(idx=row_number()) %>%
+        ungroup() %>%
         mutate(config=config)
       df_benchmark <- bind_rows(df_benchmark, df_benchmark_config)
     }
@@ -62,7 +66,7 @@ df$config %>% unique()
 # create a long table to allow the following operations
 df_long = df %>%
   mutate(benchmark=paste(fixture, name, sep=".")) %>%
-  gather(key=metric_name, value=value, -fixture, -name, -benchmark, -harness, -config) %>%
+  gather(key=metric_name, value=value, -fixture, -name, -benchmark, -harness, -run, -idx, -config) %>%
   filter(!is.na(value))
 
 # calculate mean and sum over all runs
@@ -120,6 +124,10 @@ if('PAPI_TOT_INS' %in% df_long_summary$metric_name) {
   }
 }
 
+if(!(BASE_RUNTIME %in% df$config)) {
+  stop("given --base-runtime name does not exist")
+}
+
 # add baseline to allow plotting relative to baseline
 df_long_baseline = df_long_summary  %>%
   group_by(benchmark, metric_name) %>%
@@ -145,7 +153,17 @@ for(plot_name in df_long_baseline$metric_name %>% unique()) {
     scale_y_discrete('runtime', expand = c(0, 0)) +
     ggtitle(plot_name) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-  print(p2)
+
+  tryCatch({
+    print(p2)
+  }, error = function(e) {
+    if(e[1] == 'Breaks and labels are different lengths') {  # This error happens in rare cases. Seems to be a bug in ggplot2
+      warning(e)
+      warning('ignore invalid error. This plot will not be generated!')  # graph will not be plotted as well
+    } else {
+      stop(e)  # valid exception
+    }
+  })
 
   p_barchart = ggplot(df_long_baseline %>% filter(metric_name == plot_name), aes(x=benchmark, y=value_mean_factor, fill=config)) +
     geom_bar(stat="identity", position=position_dodge()) +
@@ -154,8 +172,19 @@ for(plot_name in df_long_baseline$metric_name %>% unique()) {
     scale_y_continuous('runtime', expand = c(0, 0, 0.05, 0)) +
     ggtitle(plot_name) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-
   print(p_barchart)
+
+  for(config_name in df_long$config %>% unique()) {
+    df_long_config_metric = df_long %>% filter(config==config_name) %>% filter(metric_name==plot_name)
+    if(length(df_long_config_metric$metric_name) > 0) {
+      p_details = ggplot(df_long_config_metric, aes(y=value, x=idx, col=benchmark, group=interaction(benchmark, run))) +
+        geom_line() +
+        scale_x_discrete('idx') +
+        scale_y_continuous(trans = 'log10') +
+        ggtitle(paste(plot_name, config_name, sep=": "))
+      print(p_details + theme(legend.position='none'))  # TODO: no legend for now, because it occludes the graph
+    }
+  }
 }
 
 

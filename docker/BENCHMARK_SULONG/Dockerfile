@@ -12,7 +12,7 @@ RUN git clone  https://github.com/jku-ssw/benchmarks  # TODO: disable caching fo
 RUN echo "CLANG=/usr/bin/clang-6.0" > ./benchmarks/configs/env \
     && echo "LLVM_COMPILER=clang" >> ./benchmarks/configs/env \
     && echo "WLLVM_DIR=/usr/local/bin" >> ./benchmarks/configs/env \
-    && echo "SULONG_LATEST_CMD=mx -p /graalvm/sulong lli" >> ./benchmarks/configs/env
+    && echo "SULONG_DIR=/graalvm/sulong" >> ./benchmarks/configs/env
 
 VOLUME /data
 
