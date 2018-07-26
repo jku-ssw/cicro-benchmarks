@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include "chayai_json_outputter.h"
+#include "chayai_clock.h"
 
 #ifdef USE_PAPI
 #include <papi.h>
@@ -123,7 +124,15 @@ static void chayai_json_outputter_end_benchmark(
     const double standardDerivationUs = sqrt(varianceUs);
 
     fprintf(OUTPUT_STREAM, "\"mean\":%f,", runTimeAvgUs);
-    fprintf(OUTPUT_STREAM, "\"std_dev\":%f", standardDerivationUs);
+    fprintf(OUTPUT_STREAM, "\"std_dev\":%f,", standardDerivationUs);
+
+    fprintf(OUTPUT_STREAM, "\"clock_type\":\"%s\",", CHAYAI_CLOCK_TYPE);
+
+    const double clockResolutionUs = chayai_clock_resolution() / 1e3;
+    fprintf(OUTPUT_STREAM, "\"clock_resolution\":%f,", clockResolutionUs);
+
+    const double clockResolutionMeasuredUs = chayai_clock_resolution_measured() / 1e3;
+    fprintf(OUTPUT_STREAM, "\"clock_resolution_measured\":%f", clockResolutionMeasuredUs);
 
     // end benchmark dict
     fputs("}", OUTPUT_STREAM);
