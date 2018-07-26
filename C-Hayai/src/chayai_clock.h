@@ -50,6 +50,8 @@ typedef uint64_t CHayaiTimePoint;
 // Unix
 #elif defined(__unix__) || defined(__unix) || defined(unix)
 
+#include <unistd.h>  // required so we can check for _POSIX_TIMERS
+
 // gethrtime
 #   if (defined(__hpux) || defined(hpux)) || ((defined(__sun__) || defined(__sun) || defined(sun)) && (defined(__SVR4) || defined(__svr4__)))
 #   include <sys/time.h>
