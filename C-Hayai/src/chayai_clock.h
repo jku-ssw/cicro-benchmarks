@@ -33,6 +33,10 @@
 #ifndef CHAYAI_CLOCK_H
 #define CHAYAI_CLOCK_H
 
+// POSIX
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#include <unistd.h>
+#endif
 
 // Win32
 #if defined(_WIN32)
@@ -51,8 +55,6 @@ typedef uint64_t CHayaiTimePoint;
 
 // Unix
 #elif defined(__unix__) || defined(__unix) || defined(unix)
-
-#include <unistd.h>  // required so we can check for _POSIX_TIMERS
 
 // gethrtime
 #   if (defined(__hpux) || defined(hpux)) || ((defined(__sun__) || defined(__sun) || defined(sun)) && (defined(__SVR4) || defined(__svr4__)))
