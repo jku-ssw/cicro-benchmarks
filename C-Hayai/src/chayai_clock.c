@@ -12,7 +12,7 @@ int64_t chayai_clock_resolution_measured() {
         p1 = chayai_clock_now();
         do {
             p2 = chayai_clock_now();
-        } while((cur_time = chayai_clock_duration(p1, p2)) == 0L);
+        } while((cur_time = chayai_clock_duration(p1, p2)) <= 0L);
 
         if(cur_time < min_time) {
             min_time = cur_time;
