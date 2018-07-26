@@ -41,11 +41,13 @@
 #endif
 #include <windows.h>
 typedef LARGE_INTEGER CHayaiTimePoint;
+#define CHAYAI_CLOCK_TYPE "QueryPerformanceCounter"
 
 // Apple
 #elif defined(__APPLE__) && defined(__MACH__)
 #include <mach/mach_time.h>
 typedef uint64_t CHayaiTimePoint;
+#define CHAYAI_CLOCK_TYPE "mach_absolute_time"
 
 // Unix
 #elif defined(__unix__) || defined(__unix) || defined(unix)
@@ -56,16 +58,28 @@ typedef uint64_t CHayaiTimePoint;
 #   if (defined(__hpux) || defined(hpux)) || ((defined(__sun__) || defined(__sun) || defined(sun)) && (defined(__SVR4) || defined(__svr4__)))
 #   include <sys/time.h>
 typedef hrtime_t CHayaiTimePoint;
+#define CHAYAI_CLOCK_TYPE "gethrtime"
 
 // clock_gettime
 #   elif defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
 #   include <time.h>
 typedef struct timespec CHayaiTimePoint;
 
+#if defined(CLOCK_MONOTONIC_RAW)
+    #define CHAYAI_CLOCK_TYPE "clock_gettime(CLOCK_MONOTONIC_RAW)"
+#elif defined(CLOCK_MONOTONIC)
+    #define CHAYAI_CLOCK_TYPE "clock_gettime(CLOCK_MONOTONIC)"
+#elif defined(CLOCK_REALTIME)
+    #define CHAYAI_CLOCK_TYPE "clock_gettime(CLOCK_REALTIME)"
+#else
+    #define CHAYAI_CLOCK_TYPE "clock_gettime((clockid_t)-1)"
+#endif
+
 // gettimeofday
 #   else
 #   include <sys/time.h>
 typedef struct timeval CHayaiTimePoint;
+#define CHAYAI_CLOCK_TYPE "gettimeofday"
 
 #   endif
 #else
@@ -90,6 +104,14 @@ CHayaiTimePoint chayai_clock_now();
 /// @returns the number of nanoseconds elapsed between the two time
 /// points.
 int64_t chayai_clock_duration(CHayaiTimePoint startTime, CHayaiTimePoint endTime);
+
+/// Get the clock resolution of our clock
+/// @returns the clock resolution in nanoseconds
+int64_t chayai_clock_resolution();
+
+// Measure the clock resolution of our clock
+/// @returns the clock resolution in nanoseconds
+int64_t chayai_clock_resolution_measured();
 
 #ifdef __cplusplus
 }

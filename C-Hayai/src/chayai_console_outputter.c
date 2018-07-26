@@ -5,6 +5,7 @@
 
 #include "chayai_console.h"
 #include "chayai_console_outputter.h"
+#include "chayai_clock.h"
 
 #define OUTPUT_STREAM stdout
 #define PADDING 34
@@ -60,6 +61,13 @@ void chayai_console_outputter_init(CHayaiOutputter* outputter)
 
 static void chayai_console_outputter_begin(unsigned int bechmarksCount)
 {
+    const double clockResolutionUs = chayai_clock_resolution() / 1e3;
+    const double clockResolutionMeasuredUs = chayai_clock_resolution_measured() / 1e3;
+
+    chayai_console_change_color(OUTPUT_STREAM, CHAYAI_TEXT_PURPLE);
+    fprintf(OUTPUT_STREAM, "CLOCK SOURCE \"%s\" with resolution of (%f us / %f us)\n", CHAYAI_CLOCK_TYPE, clockResolutionUs, clockResolutionMeasuredUs);
+    chayai_console_change_color(OUTPUT_STREAM, CHAYAI_TEXT_DEFAULT);
+
     chayai_console_change_color(OUTPUT_STREAM, CHAYAI_TEXT_GREEN);
     fputs("[==========]", OUTPUT_STREAM);
     chayai_console_change_color(OUTPUT_STREAM, CHAYAI_TEXT_DEFAULT);

@@ -2,6 +2,26 @@
 #include "chayai_clock.h"
 #include "stddef.h"
 
+int64_t chayai_clock_resolution_measured() {
+    int64_t min_time = 0x8FFFFFFFFFFFF;  // maximum value
+    CHayaiTimePoint p1, p2;
+
+    // we measure at least 1000 times to find a lower value. If this succeeds, start a new measurement loop.
+    int64_t cur_time;
+    for(int i=0; i < 1000; i++) {
+        p1 = chayai_clock_now();
+        do {
+            p2 = chayai_clock_now();
+        } while((cur_time = chayai_clock_duration(p1, p2)) == 0L);
+
+        if(cur_time < min_time) {
+            min_time = cur_time;
+            i = 0; // start new measurement loop
+        }
+    }
+    return min_time;
+}
+
 // Win32
 #if defined(_WIN32)
 
@@ -10,7 +30,7 @@ static double chayai_performance_frequency_ns()
 {
     CHayaiTimePoint result;
     QueryPerformanceFrequency(&result);
-	return 1e9 / static_cast<double>(result.QuadPart);
+    return 1e9 / (double)(result.QuadPart);
 }
  
 CHayaiTimePoint chayai_clock_now()
@@ -29,6 +49,11 @@ int64_t chayai_clock_duration(CHayaiTimePoint startTime, CHayaiTimePoint endTime
         * performanceFrequencyNs);
 }
 
+int64_t chayai_clock_resolution() {
+    int64_t resolution = (int64_t)chayai_performance_frequency_ns();
+    return resolution > 0L ? resolution : 1L;
+}s
+
 // Apple    
 #elif defined(__APPLE__) && defined(__MACH__)
 
@@ -45,6 +70,10 @@ int64_t chayai_clock_duration(CHayaiTimePoint startTime, CHayaiTimePoint endTime
     return (endTime - startTime) * time_info.numer / time_info.denom;
 }
 
+int64_t chayai_clock_resolution() {
+    return 1L; // TODO: theroretical maximal resolution
+}
+
 // Unix
 #elif defined(__unix__) || defined(__unix) || defined(unix)
 
@@ -59,7 +88,11 @@ CHayaiTimePoint chayai_clock_now()
 int64_t chayai_clock_duration(CHayaiTimePoint startTime, CHayaiTimePoint endTime)
 {
     return (int64_t)(endTime - startTime);
-}  
+}
+
+int64_t chayai_clock_resolution() {
+    return 1L; // TODO: theroretical maximal resolution
+}
 
 // clock_gettime
 #   elif defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
@@ -96,7 +129,21 @@ int64_t chayai_clock_duration(CHayaiTimePoint startTime, CHayaiTimePoint endTime
 
     return timeDiff.tv_sec * 1000000000L + timeDiff.tv_nsec;
 } 
-  
+
+int64_t chayai_clock_resolution() {
+    struct timespec res;
+# if   defined(CLOCK_MONOTONIC_RAW)
+    clock_getres(CLOCK_MONOTONIC_RAW, &res);
+# elif defined(CLOCK_MONOTONIC)
+    clock_getres(CLOCK_MONOTONIC, &res);
+# elif defined(CLOCK_REALTIME)
+    clock_getres(CLOCK_REALTIME, &res);
+# else
+    clock_gettime((clockid_t)-1, &res);
+# endif
+    return res.tv_sec * 1000000000L + res.tv_nsec;
+}
+
 // gettimeofday
 #   else
 
@@ -113,5 +160,10 @@ int64_t chayai_clock_duration(CHayaiTimePoint startTime, CHayaiTimePoint endTime
         (endTime.tv_usec - startTime.tv_usec) * 1000);
 }
 
+int64_t chayai_clock_resolution() {
+    return 1000L; // TODO: theroretical maximal resolution
+}
+
 #   endif
+
 #endif
