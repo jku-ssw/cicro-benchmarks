@@ -4,11 +4,17 @@ SULONG_GIT_TAG = "master"
 DOCKER_IMAGE_NAME = "benchmark-sulong"
 DOCKER_IMAGE_VERSION = $(GIT_TAG)
 
+DOCKER_RUN_ARGS =
+
+OUTPUT_DIR = $(CURDIR)/data
+
+BENCHMARK_EXEC_ARGS = ""
+BENCHMARK_RUNS = 2
+
 .PHONY: build run
 
 build: Dockerfile
-	docker build --build-arg GIT_TAG=$(GIT_TAG) --build-arg SULONG_GIT_TAG=$(SULONG_GIT_TAG) -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) ./
+	docker build --build-arg GIT_TAG=$(GIT_TAG) -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) ./
 
 run:
-	docker run -i -v $(CURDIR)/data:/data $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
-	chown -R $USER $(CURDIR)/data  # change owner so we can view data
+	docker run -i $(DOCKER_RUN_ARGS) -v $(OUTPUT_DIR):/data $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) --exec-args=$(BENCHMARK_EXEC_ARGS) --runs=$(BENCHMARK_RUNS)

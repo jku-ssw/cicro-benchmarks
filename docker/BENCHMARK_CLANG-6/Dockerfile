@@ -16,4 +16,4 @@ VOLUME /data
 RUN apt-get update && apt-get install -y clang-6.0
 RUN echo "CLANG=/usr/bin/clang-6.0" >> ./benchmarks/configs/env
 
-ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/benchmark.json", "--runs=2", "--filter-runtime=(clang)", "--suffix=-v6"] FOREGROUND
+ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/clang-6.0.json", "--filter-runtime=(clang)", "--suffix=-v6"] FOREGROUND

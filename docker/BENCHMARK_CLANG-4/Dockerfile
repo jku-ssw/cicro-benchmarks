@@ -16,4 +16,4 @@ VOLUME /data
 RUN apt-get update && apt-get install -y clang-4.0
 RUN echo "CLANG=/usr/bin/clang-4.0" >> ./benchmarks/configs/env
 
-ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/benchmark.json", "--runs=2", "--filter-runtime=(clang)", "--suffix=-v4"] FOREGROUND
+ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/clang-4.0.json", "--filter-runtime=(clang)", "--suffix=-v4"] FOREGROUND

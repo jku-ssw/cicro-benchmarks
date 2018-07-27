@@ -20,4 +20,4 @@ RUN echo "CLANG=/usr/bin/clang-6.0" > ./benchmarks/configs/env \
     && echo "WLLVM_DIR=/usr/local/bin" >> ./benchmarks/configs/env \
     && echo "SULONG_DIR=/graalvm/sulong" >> ./benchmarks/configs/env
 
-ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/benchmark.json", "--no-papi", "--filter-runtime=sulong-warmup-0"] FOREGROUND
+ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/sulong.json", "--no-papi", "--filter-runtime=sulong-warmup-0"] FOREGROUND
