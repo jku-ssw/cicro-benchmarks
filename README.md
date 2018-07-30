@@ -63,6 +63,20 @@ This tool prints some basic informations which could be usefull to find missing 
 ### Plot Benchmark Results
 
 ```
+./tools/plot.R --benchfile=example_result.json --base-runtime=clang-O0
+```
+
+This R script generates lots of graphs depending on the data given. Basic plots of every measured metric includes a
+boxplot for general overview as well as a matrix plot which gives more insights about outliers. Furthermore,
+barcharts as well as linecharts are plotted to help gaining some more insights into the details and validity of the data
+itself. The last two graphs are note useful for analysis, but to check if there is some odd behaviour in absolute runtime,
+or if there are benchmarks executed way more often than other ones. In case of hardware counter, the script is furthermore
+able to print the instructions per cycle as well as the instruction mix if applicable.
+
+
+### Plot Benchmark Results
+
+```
 ./tools/plot.R --benchfile=example_results.json --base-runtime=clang-O0
 ```
 

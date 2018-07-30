@@ -4,6 +4,10 @@ import argparse
 import os
 import re
 import sqlite3
+import sys
+
+
+DEFAULT_DB_FILE = os.path.join(sys.path[0], 'database.db')
 
 
 def print_classification_count(conn):
@@ -69,7 +73,7 @@ if __name__ == "__main__":
 
     parser.add_argument('benchdir', metavar='BENCHDIR', nargs='?', type=str,
                         help='directory which contains all the benchmarks')
-    parser.add_argument('--database', metavar='FILE', type=str, nargs='?', default='database.db',
+    parser.add_argument('--database', metavar='FILE', type=str, nargs='?', default=DEFAULT_DB_FILE,
                         help='filepath to database')
 
     args = parser.parse_args()
