@@ -56,7 +56,7 @@ def callgrind_executor(filepath, workdir, exec_args, **kwargs):
 
 
 def drmemory_executor(filepath, workdir, exec_args, **kwargs):
-    return execute_binary_analysis_tool(filepath, workdir, ['${DR_MEMORY}', '--'], exec_args, **kwargs)  # TODO: exit code?
+    return execute_binary_analysis_tool(filepath, workdir, ['${DR_MEMORY}', '-exit_code_if_errors', '1', '--'], exec_args, **kwargs)
 
 
 valgrind_kwargs = {'build_system_func': valgrind_build_system_executor, 'exec_func': valgrind_executor}
