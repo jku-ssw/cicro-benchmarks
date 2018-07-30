@@ -3,20 +3,26 @@ BENCHMARK_EXEC_ARGS_PAPI = $(BENCHMARK_EXEC_ARGS) --papi=PAPI_LD_INS,PAPI_SR_INS
 
 BENCHMARK_RUNS = 2
 
+BENCHMARK_BASE_RUNTIME = clang-6.0-O0  # TODO: change
+
 OUTPUT_DIR_NAME = data
 OUTPUT_DIR = $(CURDIR)/$(OUTPUT_DIR_NAME)
 
 DOCKER_DIR = $(CURDIR)/../docker
 
+ALL_TARGET_NAMES = clang-4.0 clang-5.0 clang-6.0 compcert gcc-5 gcc-6 gcc-7 gcc-8 sanitizers sulong tcc valgrind
+ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
+ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
+
 .PHONY: all build clean
 
-all: build  # TODO: add all benchmark targets and then merge as well as plot
+all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/Rplots.pdf
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
 
 clean:
-	rm -f $(OUTPUT_DIR_NAME)/*.json Rplots.pdf
+	rm -f $(OUTPUT_DIR_NAME)/*.json $(OUTPUT_DIR_NAME)/Rplots.pdf
 
 # benchmark clang
 $(OUTPUT_DIR_NAME)/clang-4.0.json:
@@ -59,15 +65,15 @@ $(OUTPUT_DIR_NAME)/tcc.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_TCC run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS_PAPI)"
 
 # benchmark valgrind (based on clang-6.0)
-$(OUTPUT_DIR_NAME)/tcc.json:
+$(OUTPUT_DIR_NAME)/valgrind.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_VALGRIND run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS)"
 
 #no-papi.json:
 #	../tools/bench.py -y --filter-runtime="(gcc|clang)-(O0|O3)" no-papi.json --no-papi --suffix='-no-papi' --runs=${RUNS}
 
-merged.json: gcc.json clang.json compcert.json tcc.json sanitizers.json valgrind.json callgrind.json sulong-warmup.json no-papi.json
-	rm -f merged.json
-	../tools/merge_results.py gcc.json clang.json compcert.json tcc.json sanitizers.json valgrind.json callgrind.json sulong-warmup.json no-papi.json merged.json
+$(OUTPUT_DIR_NAME)/merged.json: $(ALL_TARGET_PATHS)
+	rm -f $(OUTPUT_DIR_NAME)/merged.json
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="$(ALL_TARGET_JSON) merged.json"
 
-Rplots.pdf: merged.json
-	../tools/plot.R --benchfile=merged.json --base-runtime=clang-O0
+$(OUTPUT_DIR_NAME)/Rplots.pdf: $(OUTPUT_DIR_NAME)/merged.json
+	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) PLOT_ARGS="--benchfile=/data/merged.json --base-runtime=$(BENCHMARK_BASE_RUNTIME)"

@@ -21,6 +21,6 @@ RUN wget -O - "http://compcert.inria.fr/release/compcert-${COMPCERT_VERSION}.tgz
 RUN eval `opam config env` && (cd "/CompCert-$COMPCERT_VERSION" && ./configure x86_64-linux && make -j 4 all)
 RUN (cd "/CompCert-$COMPCERT_VERSION" && make install)
 
-RUN echo "COMPCERT=/usr/local/bin/ccomp" >> ./benchmarks/configs/env
+RUN echo "COMPCERT=/usr/local/bin/ccomp" >> /benchmarks/configs/env
 
-ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/compcert.json", "--filter-runtime=(compcert)"] FOREGROUND
+ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/compcert.json", "--filter-runtime=(compcert)"] FOREGROUND

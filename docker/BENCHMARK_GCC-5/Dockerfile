@@ -14,6 +14,6 @@ VOLUME /data
 
 # configure our enviroment for the specific benchmark
 RUN apt-get update && apt-get install -y gcc-5
-RUN echo "GCC=/usr/bin/gcc-5" > ./benchmarks/configs/env
+RUN echo "GCC=/usr/bin/gcc-5" > /benchmarks/configs/env
 
-ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/gcc-5.json", "--filter-runtime=(gcc)", "--suffix=-v5"] FOREGROUND
+ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/gcc-5.json", "--filter-runtime=(gcc)", "--suffix=-v5"] FOREGROUND

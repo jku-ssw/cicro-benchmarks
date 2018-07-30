@@ -15,9 +15,9 @@ RUN git clone https://github.com/jku-ssw/benchmarks && cd /benchmarks && git che
 VOLUME /data
 
 # configure our enviroment to execute the benchmarks
-RUN echo "CLANG=/usr/bin/clang-6.0" > ./benchmarks/configs/env \
-    && echo "LLVM_COMPILER=clang" >> ./benchmarks/configs/env \
-    && echo "WLLVM_DIR=/usr/local/bin" >> ./benchmarks/configs/env \
-    && echo "SULONG_DIR=/graalvm/sulong" >> ./benchmarks/configs/env
+RUN echo "CLANG=/usr/bin/clang-6.0" > /benchmarks/configs/env \
+    && echo "LLVM_COMPILER=clang" >> /benchmarks/configs/env \
+    && echo "WLLVM_DIR=/usr/local/bin" >> /benchmarks/configs/env \
+    && echo "SULONG_DIR=/graalvm/sulong" >> /benchmarks/configs/env
 
-ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/sulong.json", "--no-papi", "--filter-runtime=sulong-warmup-0"] FOREGROUND
+ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/sulong.json", "--no-papi", "--filter-runtime=sulong-warmup-0"] FOREGROUND
