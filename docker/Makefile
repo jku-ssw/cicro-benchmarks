@@ -50,6 +50,9 @@ build_BENCHMARK_VALGRIND:
 	$(MAKE) -C BENCHMARK_VALGRIND build GIT_TAG=$(GIT_TAG)
 
 # Docker container for various stuff of our harness
+build_MERGE:
+	$(MAKE) -C MERGE build GIT_TAG=$(GIT_TAG)
+
 build_PLOT:
 	$(MAKE) -C PLOT build GIT_TAG=$(GIT_TAG)
 
@@ -59,4 +62,4 @@ build_BENCHMARK_GCC: build_BENCHMARK_GCC-5 build_BENCHMARK_GCC-6 build_BENCHMARK
 
 build_BENCHMARK: build_BENCHMARK_CLANG build_BENCHMARK_COMPCERT build_BENCHMARK_GCC build_BENCHMARK_SANITIZERS build_BENCHMARK_SULONG build_BENCHMARK_TCC build_BENCHMARK_VALGRIND
 
-build: build_BENCHMARK build_PLOT
+build: build_BENCHMARK build_MERGE build_PLOT
