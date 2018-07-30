@@ -1,6 +1,6 @@
-#include <assert.h>
+#include "chayai.h"  // first include!
 
-#include "chayai.h"
+#include <assert.h>
 
 #include "websnarf-bstrlib/bstraux.h"
 #include "websnarf-bstrlib/bstrlib.h"

@@ -1,6 +1,6 @@
-#include <assert.h>
+#include "chayai.h"  // first include!
 
-#include "chayai.h"
+#include <assert.h>
 
 /* We need to directly insert the .c file in order to test the */
 /* static functions as well */

@@ -15,5 +15,4 @@ if( USE_PAPI )
     target_link_libraries(chayai papi)
 endif()
 
-
 set_property(TARGET chayai PROPERTY C_STANDARD 99)

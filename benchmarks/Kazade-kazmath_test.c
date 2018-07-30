@@ -1,6 +1,6 @@
-#include <assert.h>
+#include "chayai.h"  // first include!
 
-#include "chayai.h"
+#include <assert.h>
 
 #include "Kazade-kazmath/kazmath/vec3.h"
 #include "Kazade-kazmath/kazmath/mat4.h"

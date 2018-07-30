@@ -1,7 +1,7 @@
+#include "chayai.h"  // first include!
+
 #include <stddef.h>
 #include <stdbool.h>
-
-#include "chayai.h"
 
 #include "camgunz-cmp/cmp.h"
 

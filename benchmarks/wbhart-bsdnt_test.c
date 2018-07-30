@@ -1,4 +1,4 @@
-#include "chayai.h"
+#include "chayai.h"  // first include!
 
 #include "wbhart-bsdnt/nn.h"
 #include "wbhart-bsdnt/test.h"

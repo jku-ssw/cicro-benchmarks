@@ -1,9 +1,9 @@
+#include "chayai.h"  // first include!
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <assert.h>
-
-#include "chayai.h"
 
 #include "kuba---zip/src/zip.h"
 

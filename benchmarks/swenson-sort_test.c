@@ -1,6 +1,6 @@
-#include <stdlib.h>
+#include "chayai.h"  // first include!
 
-#include "chayai.h"
+#include <stdlib.h>
 
 
 #define SORT_NAME sorter

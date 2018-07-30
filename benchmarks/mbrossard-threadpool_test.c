@@ -1,8 +1,8 @@
+#include "chayai.h"  // first include!
+
 #include <unistd.h>
 #include <pthread.h>
 #include <assert.h>
-
-#include "chayai.h"
 
 #include "mbrossard-threadpool/src/threadpool.h"
 

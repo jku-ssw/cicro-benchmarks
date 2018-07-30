@@ -1,8 +1,8 @@
+#include "chayai.h"  // first include!
+
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-
-#include "chayai.h"
 
 #include "ctz-cifra/src/sha3.h"
 #include "ctz-cifra/src/salsa20.h"

@@ -1,6 +1,6 @@
-#include <assert.h>
+#include "chayai.h"  // first include!
 
-#include "chayai.h"
+#include <assert.h>
 
 #include "quartzjer-js0n/src/js0n.h"
 

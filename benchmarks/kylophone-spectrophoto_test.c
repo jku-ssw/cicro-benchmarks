@@ -1,6 +1,6 @@
-#include <assert.h>
+#include "chayai.h"  // first include!
 
-#include "chayai.h"
+#include <assert.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "kylophone-spectrophoto/stb_image.h"

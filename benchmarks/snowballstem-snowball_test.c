@@ -1,8 +1,8 @@
+#include "chayai.h"  // first include!
+
 #include <string.h>
 #include <stddef.h>
 #include <assert.h>
-
-#include "chayai.h"
 
 #include "snowballstem-snowball/include/libstemmer.h"
 

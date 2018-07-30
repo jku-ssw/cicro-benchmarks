@@ -1,6 +1,7 @@
 #ifndef CHAYAI_H
 #define CHAYAI_H
 
+#include "chayai_clock.h" // has to be on top for struct timespec!
 #include "chayai_benchmarker.h"
 #include "chayai_console_outputter.h"
 #include "chayai_json_outputter.h"
