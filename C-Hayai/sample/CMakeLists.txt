@@ -29,3 +29,5 @@ target_link_libraries(sample
   chayai
   ${EXT_LIB}
 )
+
+set_property(TARGET sample PROPERTY C_STANDARD 99)
