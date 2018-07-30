@@ -1,41 +1,69 @@
-.PHONY: all clean
+BENCHMARK_EXEC_ARGS =
+BENCHMARK_EXEC_ARGS_PAPI = $(BENCHMARK_EXEC_ARGS) --papi=PAPI_LD_INS,PAPI_SR_INS,PAPI_BR_INS,PAPI_TOT_INS,PAPI_TOT_CYC
 
-all: gcc.json clang.json compcert.json tcc.json sanitizers.json valgrind.json callgrind.json sulong-warmup.json no-papi.json
+BENCHMARK_RUNS = 2
+
+OUTPUT_DIR_NAME = data
+OUTPUT_DIR = $(CURDIR)/$(OUTPUT_DIR_NAME)
+
+DOCKER_DIR = $(CURDIR)/../docker
+
+.PHONY: all build clean
+
+all: build  # TODO: add all benchmark targets and then merge as well as plot
+
+build:
+	$(MAKE) -C $(DOCKER_DIR) build
 
 clean:
-	rm -f *.json Rplots.pdf
+	rm -f $(OUTPUT_DIR_NAME)/*.json Rplots.pdf
 
-.DELETE_ON_ERROR:  # TODO: script return non-zero-code when benchmark fails
+# benchmark clang
+$(OUTPUT_DIR_NAME)/clang-4.0.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-4 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS_PAPI)"
 
-RUNS=2
-PAPI_EXEC_ARGS="--papi=PAPI_LD_INS,PAPI_SR_INS,PAPI_BR_INS,PAPI_TOT_INS,PAPI_TOT_CYC"
+$(OUTPUT_DIR_NAME)/clang-5.0.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-5 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS_PAPI)"
 
-sulong-warmup.json:
-	../tools/bench.py -y --filter-runtime="(sulong-warmup-0|sulong-warmup-2)" sulong-warmup.json --filter-harness="(?!(faragon-libsrt|armon-libart))" --runs=1  # TODO: add iterations file
+$(OUTPUT_DIR_NAME)/clang-6.0.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-6 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS_PAPI)"
 
-gcc.json:
-	../tools/bench.py -y --filter-runtime="gcc" gcc.json --exec-args=${PAPI_EXEC_ARGS} --runs=${RUNS}
+# benchmark compcert
+$(OUTPUT_DIR_NAME)/compcert.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_COMPCERT run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS)"
 
-clang.json:
-	../tools/bench.py -y --filter-runtime="clang" clang.json --exec-args=${PAPI_EXEC_ARGS} --runs=${RUNS}
+# benchmark gcc
+$(OUTPUT_DIR_NAME)/gcc-5.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-5 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS_PAPI)"
 
-compcert.json:
-	../tools/bench.py -y --filter-runtime="compcert" compcert.json --exec-args=${PAPI_EXEC_ARGS} --runs=${RUNS} --ignore-errors
+$(OUTPUT_DIR_NAME)/gcc-6.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-6 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS_PAPI)"
 
-sanitizers.json:
-	../tools/bench.py -y --filter-runtime="(asan-O3|msan-O3|tsan-O3|ubsan-O3)" sanitizers.json --runs=${RUNS} --ignore-errors
+$(OUTPUT_DIR_NAME)/gcc-7.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS_PAPI)"
 
-tcc.json:
-	../tools/bench.py -y --filter-runtime="tcc" tcc.json --exec-args=${PAPI_EXEC_ARGS} --runs=${RUNS} --ignore-errors
+$(OUTPUT_DIR_NAME)/gcc-8.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS_PAPI)"
 
-valgrind.json:
-	../tools/bench.py -y --filter-runtime="valgrind-O3" valgrind.json --runs=${RUNS}
+# benchmark sanitizers (based on clang-6.0)
+$(OUTPUT_DIR_NAME)/sanitizers.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_SANITIZERS run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS)"
 
-callgrind.json:
-	../tools/bench.py -y --filter-runtime="callgrind-O3" callgrind.json --runs=${RUNS}
+# benchmark sulong (based on clang-6.0)
+$(OUTPUT_DIR_NAME)/sulong.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_SULONG run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS)"
+	# TODO: --filter-runtime="(sulong-warmup-0|sulong-warmup-2)" --filter-harness="(?!(faragon-libsrt|armon-libart))" --runs=1  and iterations file
 
-no-papi.json:
-	../tools/bench.py -y --filter-runtime="(gcc|clang)-(O0|O3)" no-papi.json --no-papi --suffix='-no-papi' --runs=${RUNS}
+# benchmark tcc
+$(OUTPUT_DIR_NAME)/tcc.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_TCC run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS_PAPI)"
+
+# benchmark valgrind (based on clang-6.0)
+$(OUTPUT_DIR_NAME)/tcc.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_VALGRIND run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_EXEC_ARGS="$(BENCHMARK_EXEC_ARGS)"
+
+#no-papi.json:
+#	../tools/bench.py -y --filter-runtime="(gcc|clang)-(O0|O3)" no-papi.json --no-papi --suffix='-no-papi' --runs=${RUNS}
 
 merged.json: gcc.json clang.json compcert.json tcc.json sanitizers.json valgrind.json callgrind.json sulong-warmup.json no-papi.json
 	rm -f merged.json

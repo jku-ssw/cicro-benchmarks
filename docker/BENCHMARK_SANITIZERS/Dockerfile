@@ -13,7 +13,7 @@ RUN git clone https://github.com/jku-ssw/benchmarks && cd /benchmarks && git che
 VOLUME /data
 
 # configure our enviroment for the specific benchmark
-RUN apt-get update && apt-get install -y clang-5.0
-RUN echo "CLANG=/usr/bin/clang-5.0" >> ./benchmarks/configs/env
+RUN apt-get update && apt-get install -y clang-6.0
+RUN echo "CLANG=/usr/bin/clang-6.0" >> ./benchmarks/configs/env
 
-ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/clang-5.0.json", "--filter-runtime=(clang)", "--suffix=-v5"] FOREGROUND
+ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/sanitizers.json", "--filter-runtime=(asan-O3|msan-O3|tsan-O3|ubsan-O3)"] FOREGROUND

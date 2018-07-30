@@ -3,11 +3,17 @@ GIT_TAG = "master"
 DOCKER_IMAGE_NAME = "benchmark-gcc-6"
 DOCKER_IMAGE_VERSION = $(GIT_TAG)
 
+DOCKER_RUN_ARGS = --privileged
+
+OUTPUT_DIR = $(CURDIR)/data
+
+BENCHMARK_EXEC_ARGS = "--papi=PAPI_LD_INS,PAPI_SR_INS,PAPI_BR_INS,PAPI_TOT_INS,PAPI_TOT_CYC"
+BENCHMARK_RUNS = 2
+
 .PHONY: build run
 
 build: Dockerfile
 	docker build --build-arg GIT_TAG=$(GIT_TAG) -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) ./
 
 run:
-	docker run -i -v $(CURDIR)/data:/data $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
-	chown -R $USER $(CURDIR)/data  # change owner so we can view data
+	docker run -i $(DOCKER_RUN_ARGS) -v $(OUTPUT_DIR):/data $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) --exec-args=$(BENCHMARK_EXEC_ARGS) --runs=$(BENCHMARK_RUNS)

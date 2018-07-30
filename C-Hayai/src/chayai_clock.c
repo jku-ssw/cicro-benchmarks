@@ -52,7 +52,7 @@ int64_t chayai_clock_duration(CHayaiTimePoint startTime, CHayaiTimePoint endTime
 int64_t chayai_clock_resolution() {
     int64_t resolution = (int64_t)chayai_performance_frequency_ns();
     return resolution > 0L ? resolution : 1L;
-}s
+}
 
 // Apple    
 #elif defined(__APPLE__) && defined(__MACH__)

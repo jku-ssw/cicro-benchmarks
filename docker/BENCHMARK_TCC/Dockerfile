@@ -16,4 +16,4 @@ VOLUME /data
 RUN apt-get update && apt-get install -y tcc
 RUN echo "TCC=/usr/bin/tcc" >> ./benchmarks/configs/env
 
-ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/benchmark.json", "--runs=2", "--filter-runtime=(tcc)"] FOREGROUND
+ENTRYPOINT ["./benchmarks/tools/bench.py", "/data/tcc.json", "--filter-runtime=(tcc)"] FOREGROUND
