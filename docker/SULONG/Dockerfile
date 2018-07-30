@@ -16,7 +16,7 @@ RUN wget -O - "${JVMCI_URL}" | tar -xz -C /graalvm
 # install and build sulong
 ARG SULONG_GIT_TAG=master
 RUN git clone https://github.com/graalvm/sulong graalvm/sulong && cd /graalvm/sulong && git checkout "${SULONG_GIT_TAG}"
-RUN echo "JAVA_HOME=/graalvm/`ls /graalvm | grep jvmci`" > graalvm/sulong/mx.sulong/env
+RUN echo "JAVA_HOME=/graalvm/`ls /graalvm | grep jvmci`" > /graalvm/sulong/mx.sulong/env
 RUN cd graalvm/sulong && mx build
 
 CMD ["/bin/bash"]
