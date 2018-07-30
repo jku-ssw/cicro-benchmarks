@@ -1,6 +1,6 @@
-#include <assert.h>
+#include "chayai.h"  // first include!
 
-#include "chayai.h"
+#include <assert.h>
 
 #include <bson.h>
 #include <bcon.h>

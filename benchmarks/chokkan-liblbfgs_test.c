@@ -1,7 +1,7 @@
+#include "chayai.h"  // first include!
+
 #include <stddef.h>
 #include <assert.h>
-
-#include "chayai.h"
 
 #include "lbfgs.h"
 

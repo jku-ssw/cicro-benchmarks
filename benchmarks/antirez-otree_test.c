@@ -1,10 +1,10 @@
+#include "chayai.h"  // first include!
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
-
-#include "chayai.h"
 
 #include "antirez-otree/btree.h"
 

@@ -1,7 +1,7 @@
+#include "chayai.h"  // first include!
+
 #include <stddef.h> // size_t required in liteserver-binn/src/binn.h
 #include <assert.h>
-
-#include "chayai.h"
 
 #include "liteserver-binn/src/binn.h"
 

@@ -1,7 +1,7 @@
+#include "chayai.h"  // first include!
+
 #include <string.h>
 #include <assert.h>
-
-#include "chayai.h"
 
 #include "zhemao-libds/vector.h"
 

@@ -1,8 +1,8 @@
+#include "chayai.h"  // first include!
+
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-
-#include "chayai.h"
 
 #include "wolkykim-qlibc/include/qlibc/qlibc.h"
 

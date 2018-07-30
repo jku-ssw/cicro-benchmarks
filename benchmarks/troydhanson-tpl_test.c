@@ -1,7 +1,7 @@
+#include "chayai.h"  // first include!
+
 #include <stdlib.h>
 #include <assert.h>
-
-#include "chayai.h"
 
 #include "troydhanson-tpl/src/tpl.h"
 

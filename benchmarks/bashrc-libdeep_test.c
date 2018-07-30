@@ -1,9 +1,9 @@
+#include "chayai.h"  // first include!
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <limits.h>
 #include <assert.h>
-
-#include "chayai.h"
 
 #include "bashrc-libdeep/src/globals.h"
 #include "bashrc-libdeep/src/deeplearn.h"

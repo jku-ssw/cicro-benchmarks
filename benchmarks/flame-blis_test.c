@@ -1,4 +1,4 @@
-#include "chayai.h"
+#include "chayai.h"  // first include!
 
 #include <unistd.h>
 #include "blis.h"

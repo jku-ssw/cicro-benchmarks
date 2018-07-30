@@ -1,7 +1,7 @@
+#include "chayai.h"  // first include!
+
 #include <stdlib.h>
 #include <assert.h>
-
-#include "chayai.h"
 
 #include "skeeto-branchless-utf8/utf8.h"
 
