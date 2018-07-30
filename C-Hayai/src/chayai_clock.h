@@ -35,6 +35,13 @@
 
 // POSIX
 #if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+
+#if __STDC_VERSION__ >= 199901L  // struct timespec is a POSIX definition
+#define _XOPEN_SOURCE 600
+#else
+#define _XOPEN_SOURCE 500
+#endif
+
 #include <unistd.h>
 #endif
 
