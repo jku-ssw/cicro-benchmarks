@@ -133,11 +133,19 @@ class BenchmarkingResults(object):
         return self.get_benchmark(benchmark_name, runtime, run_id) is not None
 
     def set_single_run(self, harness_name, runtime, data, harness_data=None, overwrite=False, run_id=0):
+        if not data:
+            logger.error("cannot add benchmark run without data")  # our data model does not support this at the moment
+            return
+
         for benchmark in data.get('benchmarks', []):
             self.add_benchmark(benchmark, runtime, harness_name,
                                harness_data=harness_data, overwrite=overwrite, run_id=run_id)
 
     def append_single_run(self, harness_name, runtime, data, harness_data=None):
+        if not data:
+            logger.error("cannot add benchmark run without data")  # our data model does not support this at the moment
+            return
+
         for benchmark in data.get('benchmarks', []):
             self.append_benchmark(benchmark, runtime, harness_name, harness_data=harness_data)
 
