@@ -151,6 +151,7 @@ for(plot_name in df_long_baseline$metric_name %>% unique()) {
     scale_fill_gradient(low = "white", high = "steelblue", na.value = "grey50", trans="log1p", breaks=my_breaks, labels=my_breaks, guide="legend") +
     scale_x_discrete('benchmark', expand = c(0, 0)) +
     scale_y_discrete('runtime', expand = c(0, 0)) +
+    guides(fill=guide_legend(title="factor")) +
     ggtitle(plot_name) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 
@@ -169,7 +170,8 @@ for(plot_name in df_long_baseline$metric_name %>% unique()) {
     geom_bar(stat="identity", position=position_dodge()) +
     geom_errorbar(aes(ymin=value_mean_factor-value_sd_factor, ymax=value_mean_factor+value_sd_factor), position = position_dodge(width = .9)) +
     scale_x_discrete('benchmark', expand = c(0, 0)) +
-    scale_y_continuous('runtime', expand = c(0, 0, 0.05, 0)) +
+    scale_y_continuous('factor', expand = c(0, 0, 0.05, 0)) +
+    guides(fill=guide_legend(title="runtime")) +
     ggtitle(plot_name) +
     theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
   print(p_barchart)
@@ -203,6 +205,7 @@ ggplot(df_long_summary %>% filter(metric_name == 'duration'), aes(x=benchmark, f
   scale_fill_gradient(low = "white", high = "steelblue", na.value = "grey50", trans="log1p", guide="legend") +
   scale_x_discrete('benchmark', expand = c(0, 0)) +
   scale_y_discrete('runtime', expand = c(0, 0)) +
+  guides(fill=guide_legend(title="time [s]")) +
   ggtitle('absolute runtime in seconds') +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 
@@ -211,5 +214,6 @@ ggplot(df_long_baseline %>% filter(metric_name == 'duration'), aes(x=benchmark, 
   scale_fill_gradient(low = "white", high = "steelblue", na.value = "grey50", guide="legend") + #, trans="log1p"
   scale_x_discrete('benchmark', expand = c(0, 0)) +
   scale_y_discrete('runtime', expand = c(0, 0)) +
+  guides(fill=guide_legend(title="run-factor")) +
   ggtitle('number of runs relative to baseline') +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
