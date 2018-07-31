@@ -376,7 +376,7 @@ class BenchmarkingHarness(object):
                         else:
                             result_data = exec_ret
 
-                        if type(result_data) is dict and len(result_data) != 0:
+                        if (type(result_data) is dict and len(result_data) != 0) or 'stderr' in result_harness_data:
                             # cleanup database entries
                             if kwargs.get('replace_runs'):
                                 if run_id == 0:
