@@ -21,12 +21,11 @@ def print_classification_count(conn):
     """)
 
     # output table in latex format
-    print(r"\begin{tabular}{ l c }")
-    print(r"  type & projects \\")
-    print(r"  \hline")
+    print(r"\begin{tabular}{ l c } \toprule")
+    print(r"  type & projects \\ \midrule")
     for line in c.fetchall():
         print(r"  {btype} & {projects} \\".format(btype=line[0], projects=line[1]))
-    print(r"\end{tabular}")
+    print(r"\bottomrule \end{tabular}")
 
 
 def print_classification_in_detail(conn, benchdir):
@@ -58,14 +57,13 @@ def print_classification_in_detail(conn, benchdir):
     rows.sort(key=lambda r: r[2], reverse=True)
     rows.sort(key=lambda r: r[1], reverse=True)
 
-    print(r"\begin{tabular}{ l c c }")
-    print(r"  type & projects & benchmarks \\")
-    print(r"  \hline")
+    print(r"\begin{tabular}{ l c c } \toprule")
+    print(r"  type & projects & benchmarks \\ \midrule")
     for row in rows:
        print(r"  {} & {} & {}\\".format(*row))
     print(r"  \hline")
     print(r"  sum & {} & {}\\".format(sum([r[1] for r in rows]), sum([r[2] for r in rows])))
-    print(r"\end{tabular}")
+    print(r"\bottomrule\end{tabular}")
 
 
 if __name__ == "__main__":
