@@ -122,7 +122,7 @@ class BenchmarkingResults(object):
 
         file_data = {'benchmark_data': benchmark_data, 'harness_data': harness_data}
 
-        json.dump(file_data, file)
+        json.dump(file_data, file, sort_keys=True, indent=4, separators=(',', ': '))
 
     def get_benchmark(self, benchmark_name, runtime, run_id=0):
         self.c.execute('SELECT `DATA` FROM `BENCHMARKS` WHERE `NAME`=? AND `RUNTIME`=? AND `RUN_ID`=?',
@@ -153,8 +153,8 @@ class BenchmarkingResults(object):
         bench_name = get_benchmark_name(data)
         harness = harness if harness is not None else data.get('harness')
 
-        sql_data = json.dumps(data) if data else None
-        sql_harness_data = json.dumps(harness_data) if harness_data else None
+        sql_data = json.dumps(data, indent=4, separators=(',', ': ')) if data else None
+        sql_harness_data = json.dumps(harness_data, indent=4, separators=(',', ': ')) if harness_data else None
 
         if self.is_benchmark_present(bench_name, runtime, run_id):
             if not overwrite:
@@ -194,8 +194,8 @@ class BenchmarkingResults(object):
         bench_name = get_benchmark_name(data)
         harness = harness if harness is not None else data.get('harness')
 
-        sql_data = json.dumps(data) if data else None
-        sql_harness_data = json.dumps(harness_data) if harness_data else None
+        sql_data = json.dumps(data, indent=4, separators=(',', ': ')) if data else None
+        sql_harness_data = json.dumps(harness_data, indent=4, separators=(',', ': ')) if harness_data else None
 
         query = """INSERT INTO `BENCHMARKS` (
             `NAME`,
