@@ -24,3 +24,5 @@ RUN (cd "/CompCert-$COMPCERT_VERSION" && make install)
 RUN echo "COMPCERT=/usr/local/bin/ccomp" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/compcert.json", "--filter-runtime=(compcert)"] FOREGROUND
+
+CMD chmod +rw /data/compcert.json

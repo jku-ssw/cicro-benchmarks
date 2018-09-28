@@ -17,3 +17,5 @@ RUN apt-get update && apt-get install -y tcc
 RUN echo "TCC=/usr/bin/tcc" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/tcc.json", "--filter-runtime=(tcc)"] FOREGROUND
+
+CMD chmod +rw /data/tcc.json

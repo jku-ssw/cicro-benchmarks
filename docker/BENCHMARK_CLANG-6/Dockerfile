@@ -17,3 +17,5 @@ RUN apt-get update && apt-get install -y clang-6.0
 RUN echo "CLANG=/usr/bin/clang-6.0" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/clang-6.0.json", "--filter-runtime=(clang)", "--suffix=-v6"] FOREGROUND
+
+CMD chmod +rw /data/clang-6.0.json

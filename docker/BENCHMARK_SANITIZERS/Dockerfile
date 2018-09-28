@@ -17,3 +17,5 @@ RUN apt-get update && apt-get install -y clang-6.0
 RUN echo "CLANG=/usr/bin/clang-6.0" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/sanitizers.json", "--filter-runtime=(asan-O3|msan-O3|tsan-O3|ubsan-O3)"] FOREGROUND
+
+CMD chmod +rw /data/sanitizers.json

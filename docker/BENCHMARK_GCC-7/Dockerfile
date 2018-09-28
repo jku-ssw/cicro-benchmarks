@@ -17,3 +17,5 @@ RUN apt-get update && apt-get install -y gcc-7
 RUN echo "GCC=/usr/bin/gcc-7" > /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/gcc-7.json", "--filter-runtime=(gcc)", "--suffix=-v7"] FOREGROUND
+
+CMD chmod +rw /data/gcc-7.json
