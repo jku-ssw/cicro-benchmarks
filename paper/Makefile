@@ -16,13 +16,16 @@ ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 
 .PHONY: all build clean
 
-all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/Rplots.pdf
+all: $(OUTPUT_DIR_NAME)/benchmark-classification.tex build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/Rplots.pdf
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
 
 clean:
 	rm -f $(OUTPUT_DIR_NAME)/*.json $(OUTPUT_DIR_NAME)/Rplots.pdf
+
+$(OUTPUT_DIR_NAME)/benchmark-classification.tex:
+	../docs/raw/benchmark_classification.py > $(OUTPUT_DIR)/benchmark-classification.tex
 
 # benchmark clang
 $(OUTPUT_DIR_NAME)/clang-4.0.json:
