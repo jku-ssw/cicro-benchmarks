@@ -66,8 +66,8 @@ df$config %>% unique()
 # create a long table to allow the following operations
 df_long = df %>%
   mutate(benchmark=paste(fixture, name, sep=".")) %>%
-  gather(key=metric_name, value=value, -fixture, -name, -benchmark, -harness, -run, -idx, -config) %>%
-  filter(!is.na(value))
+  gather(key=metric_name, value=value, -fixture, -name, -clock_type, -clock_resolution, -clock_resolution_measured, -benchmark, -harness, -run, -idx, -config) %>%
+  filter(!is.numeric(value) || !is.na(value))
 
 # calculate mean and sum over all runs
 df_long_summary = df_long %>%
