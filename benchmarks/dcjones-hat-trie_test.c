@@ -4,6 +4,10 @@
 
 #include "dcjones-hat-trie/src/hat-trie.h"
 
+#define NUM_STRINGS 10000  // how many strings
+#define M_LOW 50           // minimum length of each string
+#define M_HIGH 1000        // maximum length of each string
+
 /* Simple random string generation. */
 void randstr(char* x, size_t len)
 {
@@ -17,14 +21,11 @@ BENCHMARK(dcjones, hat_trie, 100, 1) {
     hattrie_t* T = hattrie_create();
     assert(T != NULL);
 
-    const size_t n = 10000;  // how many strings
-    const size_t m_low  = 50;  // minimum length of each string
-    const size_t m_high = 1000; // maximum length of each string
-    char x[m_high+1];
+    char x[M_HIGH+1];
 
     size_t i, m;
-    for (i = 0; i < n; ++i) {
-        m = m_low + rand() % (m_high - m_low);
+    for (i = 0; i < NUM_STRINGS; ++i) {
+        m = M_LOW + rand() % (M_HIGH - M_LOW);
         randstr(x, m);
         *hattrie_get(T, x, m) = 1;
     }
