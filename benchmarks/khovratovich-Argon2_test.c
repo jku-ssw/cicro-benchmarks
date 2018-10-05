@@ -5,18 +5,19 @@
 
 #include "khovratovich-Argon2/Source/C99/Argon2/argon2.h"
 
+#define INLEN 16
+#define OUTLEN 16
+
 #define CREATE_CONTEXT \
-    const uint32_t inlen = 16;\
-    const unsigned outlen=16;\
-    unsigned char out[outlen];\
-    unsigned char pwd_array[inlen];\
-    unsigned char salt_array[inlen];\
+    unsigned char out[OUTLEN];\
+    unsigned char pwd_array[INLEN];\
+    unsigned char salt_array[INLEN];\
     uint32_t t_cost = 1;\
-    memset(pwd_array, 0, inlen);\
-    memset(salt_array, 1, inlen);\
+    memset(pwd_array, 0, INLEN);\
+    memset(salt_array, 1, INLEN);\
     uint32_t m_cost = 1 << 18;\
     uint32_t thread_n = 1;\
-    Argon2_Context context = {out, outlen, pwd_array, inlen, salt_array, inlen,\
+    Argon2_Context context = {out, OUTLEN, pwd_array, INLEN, salt_array, INLEN,\
                               NULL, 0, NULL, 0, t_cost, m_cost, thread_n, thread_n, NULL, NULL, false, false, false,false }
 
 BENCHMARK(khovratovich, Argon2d, 10, 1) {
