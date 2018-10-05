@@ -22,6 +22,8 @@ if __name__ == "__main__":
                         help='file where the benchmarks are merged into')
     parser.add_argument('outfile', metavar='OUTFILE', type=argparse.FileType('x'),
                         help='file where the benchmarks are merged into')
+    parser.add_argument('--filter-runtime', metavar='REGEX', type=str, default='.*',
+                        help='regular expression to select which runtimes should be used')
 
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='enable debug output')
@@ -40,4 +42,4 @@ if __name__ == "__main__":
             logger.exception("cannot load file")
             sys.exit()
 
-    results.store_file(args.outfile)
+    results.store_file(args.outfile, args.filter_runtime)
