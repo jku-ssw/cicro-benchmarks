@@ -373,6 +373,15 @@ class BenchmarkingHarness(object):
                                 logger.warning("benchmark harness had some output on stderr:\n%s", result_stderr)
                                 result_harness_data['stderr'] = result_stderr
                                 no_error = False
+                                if kwargs.get('ignore_invalid_measurements', False) and result_data:
+                                    for benchmark in result_data.get('benchmarks', []):
+                                        logger.debug("remove data from measurement:\n%s", benchmark)
+                                        if 'runs' in benchmark:
+                                            benchmark['runs'] = []
+                                        if 'mean' in benchmark:
+                                            benchmark['mean'] = None
+                                        if 'std_dev' in benchmark:
+                                            benchmark['std_dev'] = None
                         else:
                             result_data = exec_ret
 
@@ -555,6 +564,8 @@ if __name__ == "__main__":
                         help='skip the compilation step when benchmarking')
     parser.add_argument('--ignore-errors', '-i', action='store_true',
                         help='ignore all errors in the make step to do at least a partial benchmark')
+    parser.add_argument('--ignore-invalid-measurements', '-im', action='store_true',
+                        help='ignore measurements of runs which exited with an error code')
     parser.add_argument('--jobs', '-j', type=int, default=int(os.cpu_count()/2) + 1,
                         help='number of jobs used for make')
     parser.add_argument('--verbose', '-v', action='store_true',
@@ -638,6 +649,7 @@ if __name__ == "__main__":
         'skip_compilation': args.skip_compilation,
         'filter_harness': args.filter_harness,
         'ignore_errors': args.ignore_errors,
+        'ignore_invalid_measurements': args.ignore_invalid_measurements,
         'make_jobs': args.jobs,
         'timeout': args.timeout,
         'suffix': args.suffix,
