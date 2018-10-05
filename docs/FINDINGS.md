@@ -293,6 +293,7 @@ time mx --jdk jvmci --dynamicimports=/compiler lli btree_example.bc allocfree 10
 Reported:
 * [antirez/otree/pull/3](https://github.com/antirez/otree/pull/3) (Use-after-free error fix)
 * [antirez/otree/pull/4](https://github.com/antirez/otree/pull/4) (Uninitialized byte)
+* [antirez/otree/pull/5](https://github.com/antirez/otree/pull/5) (Illegal arithmetic on a pointer)
 
 # chrismoos/hash-ring (2017.30.11)
 
