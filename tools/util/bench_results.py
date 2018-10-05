@@ -1,4 +1,5 @@
 import json
+import re
 import sqlite3
 
 from .color_logger import get_logger
@@ -79,7 +80,7 @@ class BenchmarkingResults(object):
                                            harness_data=h_data, overwrite=False, verbose=verbose, run_id=run_id)
                     run_id += 1
 
-    def store_file(self, file):
+    def store_file(self, file, runtime_filter='.*'):
         benchmark_data = {}
         harness_data = {}
 
@@ -90,6 +91,10 @@ class BenchmarkingResults(object):
             harness = row['harness']
             data = row['data']
             h_data = row['harness_data']
+
+            if not re.match(runtime_filter, runtime):
+                logger.debug('"{}" does not match filter -> skip'.format(runtime))
+                continue
 
             if data is not None:
                 if name not in benchmark_data:

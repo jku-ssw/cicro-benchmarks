@@ -44,7 +44,8 @@ BENCHMARK(chrismoos, hash_ring, 100, 1) {
     addNodes(ring, NUM_NODES);
     assert(ring->numNodes == 64 && ring->numItems == 32768);
 
-    uint8_t *keys = (uint8_t*)malloc(KEY_SIZE * NUM_KEYS);
+    uint8_t *keys = (uint8_t*)calloc(NUM_KEYS, KEY_SIZE);
+    //uint8_t *keys = (uint8_t*)malloc(KEY_SIZE, NUM_KEYS); // TODO: why does malloc cause use-of-uninitialized-value?
     generateKeys(keys, NUM_KEYS, KEY_SIZE);
 
     for(int x = 0; x < NUM_KEYS; x++) {
