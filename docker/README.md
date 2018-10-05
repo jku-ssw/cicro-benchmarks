@@ -23,5 +23,5 @@ your needs. The images are intentional very similar to allow docker reuse many p
 is recommended to set the GIT_TAG because when using ```master``` docker will not rebuild images if required.
 
 Please note building all images requires about 45 minutes. Furthermore, many images are called with ```--privileged``` to
-support measuring hardware counters. This can be deactivated by setting ```DOCKER_RUN_ARGS="" BENCHMARK_EXEC_ARGS=""```
+support measuring hardware counters. This can be deactivated by setting ```DOCKER_RUN_ARGS="" BENCHMARK_ARGS=""```
 when invoking ```sudo make run```
