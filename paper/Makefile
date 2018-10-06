@@ -10,7 +10,7 @@ OUTPUT_DIR = $(CURDIR)/$(OUTPUT_DIR_NAME)
 
 DOCKER_DIR = $(CURDIR)/../docker
 
-ALL_TARGET_NAMES = clang-4.0 clang-5.0 clang-6.0 compcert gcc-5 gcc-6 gcc-7 gcc-8 sanitizers sulong tcc valgrind
+-ALL_TARGET_NAMES = clang-3.9 clang-4.0 clang-5.0 clang-6.0 compcert gcc-5 gcc-6 gcc-7 gcc-8 sanitizers sulong tcc valgrind
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 
@@ -28,6 +28,9 @@ $(OUTPUT_DIR_NAME)/benchmark-classification.tex:
 	../docs/raw/benchmark_classification.py > $(OUTPUT_DIR)/benchmark-classification.tex
 
 # benchmark clang
+$(OUTPUT_DIR_NAME)/clang-3.9.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-3.9 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)'"
+
 $(OUTPUT_DIR_NAME)/clang-4.0.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-4 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args=$(BENCHMARK_EXEC_ARGS_PAPI)"
 
@@ -91,8 +94,8 @@ $(OUTPUT_DIR_NAME)/merged.json: $(ALL_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="$(ALL_TARGET_JSON) merged.json"
 
-$(OUTPUT_DIR_NAME)/llvm-versions.json: $(OUTPUT_DIR_NAME)/clang-4.0.json $(OUTPUT_DIR_NAME)/clang-5.0.json $(OUTPUT_DIR_NAME)/clang-6.0.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-O3' clang-4.0.json clang-5.0.json clang-6.0.json llvm-versions.json"
+$(OUTPUT_DIR_NAME)/llvm-versions.json: $(OUTPUT_DIR_NAME)/clang-3.9.json $(OUTPUT_DIR_NAME)/clang-4.0.json $(OUTPUT_DIR_NAME)/clang-5.0.json $(OUTPUT_DIR_NAME)/clang-6.0.json
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-O3' clang-3.9.json clang-4.0.json clang-5.0.json clang-6.0.json llvm-versions.json"
 
 
 $(OUTPUT_DIR_NAME)/Rplots.pdf: $(OUTPUT_DIR_NAME)/merged.json
