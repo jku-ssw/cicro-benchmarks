@@ -16,7 +16,7 @@ ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 
 .PHONY: all build clean
 
-all: $(OUTPUT_DIR_NAME)/benchmark-classification.tex build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/Rplots.pdf
+all: $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(OUTPUT_DIR_NAME)/llvm-versions.json build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/Rplots.pdf
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
@@ -90,6 +90,10 @@ $(OUTPUT_DIR_NAME)/valgrind.json:
 $(OUTPUT_DIR_NAME)/merged.json: $(ALL_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="$(ALL_TARGET_JSON) merged.json"
+
+$(OUTPUT_DIR_NAME)/llvm-versions.json: $(OUTPUT_DIR_NAME)/clang-4.0.json $(OUTPUT_DIR_NAME)/clang-5.0.json $(OUTPUT_DIR_NAME)/clang-6.0.json
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-O3' clang-4.0.json clang-5.0.json clang-6.0.json llvm-versions.json"
+
 
 $(OUTPUT_DIR_NAME)/Rplots.pdf: $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) PLOT_ARGS="--benchfile=/data/merged.json --base-runtime=$(BENCHMARK_BASE_RUNTIME)"
