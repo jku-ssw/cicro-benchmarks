@@ -152,7 +152,7 @@ class BenchmarkingHarness(object):
 
         if kwargs.get('ignore_errors', False):
             make_params.append('-i')  # -i = ignore-errors
-            logger.warning('errors during "make" will be ignored')
+            logger.warning('errors during "make" will be ignored and a 0 exit code will be returned')
 
         logger.info('build benchmarks with "%s"', ' '.join(make_params))
         with subprocess.Popen(['make'] + make_params, cwd=args.testdir) as process:
@@ -563,7 +563,7 @@ if __name__ == "__main__":
     parser.add_argument('--skip-compilation', action='store_true',
                         help='skip the compilation step when benchmarking')
     parser.add_argument('--ignore-errors', '-i', action='store_true',
-                        help='ignore all errors in the make step to do at least a partial benchmark')
+                        help='ignore all errors in the make step to run only  the successfully compiled benchmarks and return a 0 exit code')
     parser.add_argument('--ignore-invalid-measurements', '-im', action='store_true',
                         help='ignore measurements of runs which exited with an error code')
     parser.add_argument('--jobs', '-j', type=int, default=int(os.cpu_count()/2) + 1,
@@ -676,5 +676,7 @@ if __name__ == "__main__":
         logger.exception('Something went wrong while executing the testcases')
     finally:
         # write_results()  # writing to file now happens in execute_single_runtime(...)
-
+        if args.ignore_errors and not no_failures:
+            logger.warning('Ignored failed run and return 0 as exit code')
+            sys.exit(0)
         sys.exit(0 if no_failures else 1)
