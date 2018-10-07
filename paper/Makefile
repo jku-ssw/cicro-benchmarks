@@ -14,7 +14,11 @@ CLANG_TARGET_NAMES = clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7.0
 CLANG_TARGET_JSON = $(CLANG_TARGET_NAMES:=.json)
 CLANG_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(CLANG_TARGET_JSON))
 
-ALL_TARGET_NAMES = $(LLVM_TARGET_NAMES) compcert gcc-5 gcc-6 gcc-7 gcc-8 sanitizers tcc valgrind sulong
+GCC_TARGET_NAMES = gcc-5 gcc-6 gcc-7 gcc-8
+GCC_TARGET_JSON = $(GCC_TARGET_NAMES:=.json)
+GCC_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(GCC_TARGET_JSON))
+
+ALL_TARGET_NAMES = $(LLVM_TARGET_NAMES) $(GCC_TARGET_NAMES) compcert sanitizers tcc valgrind sulong
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 3600
@@ -23,7 +27,7 @@ GCC_VERSION_COMPARISON_RUNTIMES = gcc-O3
 
 .PHONY: all build clean
 
-all: $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(OUTPUT_DIR_NAME)/llvm-versions.json build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/Rplots.pdf
+all: $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(OUTPUT_DIR_NAME)/llvm-versions.json $(OUTPUT_DIR_NAME)/gcc-versions.json build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/Rplots.pdf
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
@@ -108,6 +112,9 @@ $(OUTPUT_DIR_NAME)/llvm-versions.json: $(CLANG_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/llvm-versions.json
 	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='$(LLVM_VERSION_COMPARISON_RUNTIMES)' $(CLANG_TARGET_JSON) llvm-versions.json"
 
+$(OUTPUT_DIR_NAME)/gcc-versions.json: $(GCC_TARGET_PATHS)
+	rm -f $(OUTPUT_DIR_NAME)/gcc-versions.json
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='$(GCC_VERSION_COMPARISON_RUNTIMES)' $(GCC_TARGET_JSON) gcc-versions.json"
 
 $(OUTPUT_DIR_NAME)/Rplots.pdf: $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) PLOT_ARGS="--benchfile=/data/merged.json --base-runtime=$(BENCHMARK_BASE_RUNTIME)"
