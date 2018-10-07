@@ -24,7 +24,19 @@ def drmemory_build_system_executor(make_env):
 
         stdout_decoded = stdout.decode('utf-8').rstrip() if stdout else None
         if p.returncode == 0 and stdout_decoded:
-            result['VALGRIND_version'] = stdout_decoded
+            result['DRMEMORY_version'] = stdout_decoded
+
+    return result
+
+def qemu_build_system_executor(make_env):
+    result = build_system_executor(make_env, cc_version='--version', as_version='--version')
+
+    with subprocess.Popen(['qemu-x86_64', '-version'], stdout=subprocess.PIPE) as p:
+        stdout, _ = p.communicate(timeout=1)
+
+        stdout_decoded = stdout.decode('utf-8').rstrip() if stdout else None
+        if p.returncode == 0 and stdout_decoded:
+            result['QEMU_version'] = stdout_decoded
 
     return result
 
@@ -59,10 +71,16 @@ def drmemory_executor(filepath, workdir, exec_args, **kwargs):
     return execute_binary_analysis_tool(filepath, workdir, ['${DR_MEMORY}', '-exit_code_if_errors', '1', '--'], exec_args, **kwargs)
 
 
+def qemu_executor(filepath, workdir, exec_args, **kwargs):
+    return execute_binary_analysis_tool(filepath, workdir, ['qemu-x86_64'], exec_args, **kwargs)
+
+
 valgrind_kwargs = {'build_system_func': valgrind_build_system_executor, 'exec_func': valgrind_executor}
 callgrind_kwargs = {'build_system_func': valgrind_build_system_executor, 'exec_func': callgrind_executor}
 drmemory_kwargs = {'build_system_func': drmemory_build_system_executor, 'exec_func': drmemory_executor}
+qemu_kwargs = {'build_system_func': qemu_build_system_executor, 'exec_func': qemu_executor}
 
 harness.add_runtime('valgrind-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "PAPI": 0}, **valgrind_kwargs)
 harness.add_runtime('callgrind-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "PAPI": 0}, **callgrind_kwargs)
 harness.add_runtime('drmemory-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **drmemory_kwargs)
+harness.add_runtime('qemu-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **qemu_kwargs)

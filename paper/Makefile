@@ -18,7 +18,7 @@ GCC_TARGET_NAMES = gcc-4 gcc-5 gcc-6 gcc-7 gcc-8
 GCC_TARGET_JSON = $(GCC_TARGET_NAMES:=.json)
 GCC_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(GCC_TARGET_JSON))
 
-ALL_TARGET_NAMES = $(LLVM_TARGET_NAMES) $(GCC_TARGET_NAMES) compcert sanitizers tcc valgrind sulong
+ALL_TARGET_NAMES = $(LLVM_TARGET_NAMES) $(GCC_TARGET_NAMES) compcert sanitizers tcc valgrind qemu sulong
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 3600
@@ -72,11 +72,11 @@ $(OUTPUT_DIR_NAME)/gcc-7.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --ignore-errors --filter-runtime '$(GCC_VERSION_COMPARISON_RUNTIMES)'"
 
 $(OUTPUT_DIR_NAME)/gcc-8.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --ignore-errors"
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --ignore-errors $(HIGH_TIMEOUT)" # high timeout for MPX
 
 # benchmark sanitizers (based on clang-6.0)
 $(OUTPUT_DIR_NAME)/sanitizers.json: $(OUTPUT_DIR_NAME)/asan.json $(OUTPUT_DIR_NAME)/msan.json $(OUTPUT_DIR_NAME)/tsan.json $(OUTPUT_DIR_NAME)/ubsan.json
-	rm -f $(OUTPUT_DIR_NAME)/sanitizers.json
+	rm -f $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="asan.json msan.json tsan.json ubsan.json merged.json"
 
 $(OUTPUT_DIR_NAME)/asan.json:
@@ -103,6 +103,10 @@ $(OUTPUT_DIR_NAME)/tcc.json:
 # benchmark valgrind (based on clang-6.0)
 $(OUTPUT_DIR_NAME)/valgrind.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_VALGRIND run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors $(HIGH_TIMEOUT)"
+
+$(OUTPUT_DIR_NAME)/qemu.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_QEMU run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' $(HIGH_TIMEOUT)"
+
 
 #no-papi.json:
 #	../tools/bench.py -y --filter-runtime="(gcc|clang)-(O0|O3)" no-papi.json --no-papi --suffix='-no-papi' --runs=${RUNS}
