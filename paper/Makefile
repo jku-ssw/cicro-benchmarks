@@ -10,7 +10,11 @@ OUTPUT_DIR = $(CURDIR)/$(OUTPUT_DIR_NAME)
 
 DOCKER_DIR = $(CURDIR)/../docker
 
-ALL_TARGET_NAMES = clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7.0 compcert gcc-5 gcc-6 gcc-7 gcc-8 sanitizers tcc valgrind sulong
+CLANG_TARGET_NAMES = clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7.0
+CLANG_TARGET_JSON = $(CLANG_TARGET_NAMES:=.json)
+CLANG_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(CLANG_TARGET_JSON))
+
+ALL_TARGET_NAMES = $(LLVM_TARGET_NAMES) compcert gcc-5 gcc-6 gcc-7 gcc-8 sanitizers tcc valgrind sulong
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 3600
@@ -100,9 +104,9 @@ $(OUTPUT_DIR_NAME)/merged.json: $(ALL_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="$(ALL_TARGET_JSON) merged.json"
 
-$(OUTPUT_DIR_NAME)/llvm-versions.json: $(OUTPUT_DIR_NAME)/clang-3.9.json $(OUTPUT_DIR_NAME)/clang-4.0.json $(OUTPUT_DIR_NAME)/clang-5.0.json $(OUTPUT_DIR_NAME)/clang-6.0.json $(OUTPUT_DIR_NAME)/clang-6.0.json $(OUTPUT_DIR_NAME)/clang-7.0.json
+$(OUTPUT_DIR_NAME)/llvm-versions.json: $(CLANG_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/llvm-versions.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='$(LLVM_VERSION_COMPARISON_RUNTIMES)' clang-3.9.json clang-4.0.json clang-5.0.json clang-6.0.json clang-7.0.json llvm-versions.json"
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='$(LLVM_VERSION_COMPARISON_RUNTIMES)' $(CLANG_TARGET_JSON) llvm-versions.json"
 
 
 $(OUTPUT_DIR_NAME)/Rplots.pdf: $(OUTPUT_DIR_NAME)/merged.json
