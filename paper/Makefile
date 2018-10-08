@@ -9,6 +9,7 @@ OUTPUT_DIR_NAME = data
 OUTPUT_DIR = $(CURDIR)/$(OUTPUT_DIR_NAME)
 
 DOCKER_DIR = $(CURDIR)/../docker
+TOOLS_DIR = $(CURDIR)/../tools
 
 CLANG_TARGET_NAMES = clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7.0
 CLANG_TARGET_JSON = $(CLANG_TARGET_NAMES:=.json)
@@ -27,7 +28,7 @@ GCC_VERSION_COMPARISON_RUNTIMES = gcc-O3
 
 .PHONY: all build clean
 
-all: $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(OUTPUT_DIR_NAME)/llvm-versions.json $(OUTPUT_DIR_NAME)/gcc-versions.json build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/Rplots.pdf
+all: $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(OUTPUT_DIR_NAME)/llvm-versions.json $(OUTPUT_DIR_NAME)/gcc-versions.json build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/Rplots.pdf $(OUTPUT_DIR_NAME)/LLVM-versions.pdf $(OUTPUT_DIR_NAME)/GCC-versions.pdf
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
@@ -125,3 +126,9 @@ $(OUTPUT_DIR_NAME)/gcc-versions.json: $(GCC_TARGET_PATHS)
 
 $(OUTPUT_DIR_NAME)/Rplots.pdf: $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) PLOT_ARGS="--benchfile=/data/merged.json --base-runtime=$(BENCHMARK_BASE_RUNTIME)"
+
+$(OUTPUT_DIR_NAME)/LLVM-versions.pdf: $(OUTPUT_DIR_NAME)/llvm-versions.json
+	Rscript $(TOOLS_DIR)/plot_compiler_versions.R --benchfile=data/llvm-versions.json --base-runtime=clang-O3-v3.9 --outputfile=$(OUTPUT_DIR_NAME)/LLVM-versions.pdf
+
+$(OUTPUT_DIR_NAME)/GCC-versions.pdf: $(OUTPUT_DIR_NAME)/gcc-versions.json
+	Rscript $(TOOLS_DIR)/plot_compiler_versions.R --benchfile=data/gcc-versions.json --base-runtime=gcc-O3-v4 --outputfile=$(OUTPUT_DIR_NAME)/GCC-versions.pdf
