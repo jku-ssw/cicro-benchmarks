@@ -77,8 +77,8 @@ $(OUTPUT_DIR_NAME)/gcc-8.json:
 
 # benchmark sanitizers (based on clang-6.0)
 $(OUTPUT_DIR_NAME)/sanitizers.json: $(OUTPUT_DIR_NAME)/asan.json $(OUTPUT_DIR_NAME)/msan.json $(OUTPUT_DIR_NAME)/tsan.json $(OUTPUT_DIR_NAME)/ubsan.json
-	rm -f $(OUTPUT_DIR_NAME)/merged.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="asan.json msan.json tsan.json ubsan.json merged.json"
+	rm -f $(OUTPUT_DIR_NAME)/sanitizers.json
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="asan.json msan.json tsan.json ubsan.json sanitizers.json"
 
 $(OUTPUT_DIR_NAME)/asan.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_SANITIZERS run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime asan-O3" OUTPUT_FILE="$(OUTPUT_DIR_NAME)/asan.json $(HIGH_TIMEOUT)"
