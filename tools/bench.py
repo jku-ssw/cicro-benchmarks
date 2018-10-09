@@ -523,7 +523,7 @@ if __name__ == "__main__":
     # Parse Command-line Arguments
     parser = argparse.ArgumentParser(description='Execute benchmarks and export them',
                                      formatter_class=lambda prog: argparse.HelpFormatter(prog,
-                                                                                         max_help_position=30,
+                                                                                         max_help_position=40,
                                                                                          width=120))
 
     parser.add_argument('benchfile', metavar='BENCHFILE', type=str,
@@ -563,7 +563,8 @@ if __name__ == "__main__":
     parser.add_argument('--skip-compilation', action='store_true',
                         help='skip the compilation step when benchmarking')
     parser.add_argument('--ignore-errors', '-i', action='store_true',
-                        help='ignore all errors in the make step to run only  the successfully compiled benchmarks and return a 0 exit code')
+                        help='ignore all errors in the make step and run only the successfully compiled benchmarks. '
+                             'Furthermore return a 0 exit code even when some errors occured')
     parser.add_argument('--ignore-invalid-measurements', '-im', action='store_true',
                         help='ignore measurements of runs which exited with an error code')
     parser.add_argument('--jobs', '-j', type=int, default=int(os.cpu_count()/2) + 1,

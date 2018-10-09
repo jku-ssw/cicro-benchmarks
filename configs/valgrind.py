@@ -28,6 +28,7 @@ def drmemory_build_system_executor(make_env):
 
     return result
 
+
 def qemu_build_system_executor(make_env):
     result = build_system_executor(make_env, cc_version='--version', as_version='--version')
 

@@ -1,79 +1,21 @@
 #!/usr/bin/env Rscript
 
 library(tidyverse)
-library(jsonlite)
-library(optparse)
+library(modules, warn.conflicts=FALSE)
 
-option_list = list(
-  make_option(c("-b", "--benchfile"), type="character", default=NA,
-              help="preprocessed .json file to plot", metavar="character"),
-  make_option(c("-r", "--base-runtime"), type="character", default=NA,
-              help="runtime which specifies the base", metavar="character")
-);
+util = import('util')
 
-opt_parser = OptionParser(option_list=option_list);
-opt = parse_args(opt_parser);
+# parse commandline arguments
+args <- util$parse_script_args(FALSE)
 
-# check benchfile is provided
-if (!is.na(opt$benchfile)) {
-  if(!file.exists(opt$benchfile)) {
-    stop("--benchfile file does not exist!", opt$benchfile)
-  }
-  # read url and convert to data.frame
-  raw <- fromJSON(txt=opt$benchfile)
-} else {
-  stop("--benchfile parameter must be provided. See script usage (--help)")
-}
+# read data into basic data-structures
+df                <- util$parse_data(args$raw)
+df_long           <- util$create_long(df)
+df_long_summary   <- util$create_long_summary(df_long)
 
-if (!is.na(opt$'base-runtime')) {
-  BASE_RUNTIME <- opt$'base-runtime'
-} else {
-  stop("--base-runtime parameter must be provided. See script usage (--help)")
-}
-
-flatten_data <- function(raw) {
-  res <- data.frame()
-  for(benchmark in names(raw)) {
-    raw_benchmark <- raw[[benchmark]]
-    df_benchmark <- data.frame()
-    for (config in names(raw_benchmark)) {
-      df_benchmark_config <- raw_benchmark[[config]] %>%
-        select(-mean, -std_dev, -iterations_per_run, -disabled) %>%
-        mutate(run=row_number()) %>%
-        unnest() %>%
-        group_by(run) %>%
-        mutate(idx=row_number()) %>%
-        ungroup() %>%
-        mutate(config=config)
-      df_benchmark <- bind_rows(df_benchmark, df_benchmark_config)
-    }
-    res <- bind_rows(res, df_benchmark) # %>% mutate(benchmark=benchmark))
-  }
-  res
-}
-
-if ("benchmark_data" %in% names(raw)) {
-  benchmark_data = raw[['benchmark_data']]
-} else {
-  benchmark_data = raw  # support old format as well
-}
-
-df = flatten_data(benchmark_data)
-
-print("runtimes in the dataset:")
-df$config %>% unique()
-
-# create a long table to allow the following operations
-df_long = df %>%
-  mutate(benchmark=paste(fixture, name, sep=".")) %>%
-  gather(key=metric_name, value=value, -fixture, -name, -clock_type, -clock_resolution, -clock_resolution_measured, -benchmark, -harness, -run, -idx, -config) %>%
-  filter(!is.numeric(value) || !is.na(value))
-
-# calculate mean and sum over all runs
-df_long_summary = df_long %>%
-  group_by(benchmark, config, metric_name) %>%
-  summarise(runs=n(), value_mean=mean(value), value_sum=sum(value), value_sd=sd(value)) %>%
-  ungroup()
+###################################################################################
+# script specific code starts now
+###################################################################################
 
 # print IPC
 if('PAPI_TOT_INS' %in% df_long_summary$metric_name && 'PAPI_TOT_CYC' %in% df_long_summary$metric_name ) {
@@ -124,17 +66,8 @@ if('PAPI_TOT_INS' %in% df_long_summary$metric_name) {
   }
 }
 
-if(!(BASE_RUNTIME %in% df$config)) {
-  stop("given --base-runtime name does not exist")
-}
-
-# add baseline to allow plotting relative to baseline
-df_long_baseline = df_long_summary  %>%
-  group_by(benchmark, metric_name) %>%
-  mutate(baseline_runs=runs[config==BASE_RUNTIME]) %>%
-  mutate(value_mean_factor=value_mean/value_mean[config==BASE_RUNTIME]) %>%
-  mutate(value_sd_factor=value_sd/value_mean[config==BASE_RUNTIME]) %>%  # TODO: correct?
-  ungroup()
+# now we calculate the baseline, delay calculations util now, to allow basic plots even when this function fails
+df_long_baseline <- util$create_long_baseline(df_long_summary, args$base_runtime)
 
 for(plot_name in df_long_baseline$metric_name %>% unique()) {
   print(paste("plot comparison of:", plot_name, " "))
