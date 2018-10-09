@@ -7,3 +7,6 @@ harness.add_runtime('clang-O1', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "
 harness.add_runtime('clang-O2', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O2"}, **clang_kwargs)
 harness.add_runtime('clang-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **clang_kwargs)
 harness.add_runtime('clang-Os', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -Os"}, **clang_kwargs)
+harness.add_runtime('clang-O3-fno-strict-aliasing', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fno-strict-aliasing"}, **clang_kwargs)
+harness.add_runtime('clang-O3-fno-strict-overflow', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fno-strict-overflow"}, **clang_kwargs)
+harness.add_runtime('clang-O3-fno-delete-null-pointer-checks', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fno-delete-null-pointer-checks"}, **clang_kwargs)
