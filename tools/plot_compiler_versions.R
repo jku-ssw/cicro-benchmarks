@@ -107,7 +107,8 @@ p <- ggplot(normalized_duration_data, aes(x=config, y=value_mean_factor)) +
     scale_x_discrete("") +
     scale_y_continuous("normalized execution time") +
     stat_summary(fun.y=geo_mean, colour="darkred", geom="point", shape=18, size=3, show_guide = FALSE) +
-    geom_text(data = means, aes(label = value_mean_factor, vjust=-3, hjust=-1))
+    geom_text(data = means, aes(label = value_mean_factor, vjust=-3)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 if (is.na(opt$outputfile)) {
     print(p)

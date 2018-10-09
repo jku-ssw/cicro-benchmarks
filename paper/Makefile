@@ -3,7 +3,7 @@ BENCHMARK_EXEC_ARGS_PAPI = $(BENCHMARK_EXEC_ARGS) --papi=PAPI_LD_INS,PAPI_SR_INS
 
 BENCHMARK_RUNS = 2
 
-BENCHMARK_BASE_RUNTIME = clang-6.0-O0  # TODO: change
+BENCHMARK_BASE_RUNTIME = clang-O3-v7  # TODO: change
 
 OUTPUT_DIR_NAME = data
 OUTPUT_DIR = $(CURDIR)/$(OUTPUT_DIR_NAME)
@@ -28,7 +28,7 @@ GCC_VERSION_COMPARISON_RUNTIMES = gcc-O3
 
 .PHONY: all build clean
 
-all: $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(OUTPUT_DIR_NAME)/llvm-versions.json $(OUTPUT_DIR_NAME)/gcc-versions.json build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/Rplots.pdf $(OUTPUT_DIR_NAME)/LLVM-versions.pdf $(OUTPUT_DIR_NAME)/GCC-versions.pdf
+all: $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(OUTPUT_DIR_NAME)/compiler-flags.json $(OUTPUT_DIR_NAME)/llvm-versions.json $(OUTPUT_DIR_NAME)/gcc-versions.json build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/Rplots.pdf $(OUTPUT_DIR_NAME)/LLVM-versions.pdf $(OUTPUT_DIR_NAME)/GCC-versions.pdf $(OUTPUT_DIR_NAME)/compiler-flags.pdf
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
@@ -124,6 +124,10 @@ $(OUTPUT_DIR_NAME)/gcc-versions.json: $(GCC_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/gcc-versions.json
 	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='$(GCC_VERSION_COMPARISON_RUNTIMES)' $(GCC_TARGET_JSON) gcc-versions.json"
 
+$(OUTPUT_DIR_NAME)/compiler-flags.json: $(GCC_TARGET_PATHS) $(CLANG_TARGET_PATHS)
+	rm -f $(OUTPUT_DIR_NAME)/compiler-flags.json
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='(gcc-O0-v8|gcc-O1-v8|gcc-O2-v8|gcc-O3-v8|gcc-Os-v8|clang-O0-v7|clang-O1-v7|clang-O2-v7|clang-O3-v7|clang-Os-v7)' $(GCC_TARGET_JSON) $(CLANG_TARGET_JSON) compiler-flags.json"
+
 $(OUTPUT_DIR_NAME)/Rplots.pdf: $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) PLOT_ARGS="--benchfile=/data/merged.json --base-runtime=$(BENCHMARK_BASE_RUNTIME)"
 
@@ -132,3 +136,6 @@ $(OUTPUT_DIR_NAME)/LLVM-versions.pdf: $(OUTPUT_DIR_NAME)/llvm-versions.json
 
 $(OUTPUT_DIR_NAME)/GCC-versions.pdf: $(OUTPUT_DIR_NAME)/gcc-versions.json
 	Rscript $(TOOLS_DIR)/plot_compiler_versions.R --benchfile=data/gcc-versions.json --base-runtime=gcc-O3-v4 --outputfile=$(OUTPUT_DIR_NAME)/GCC-versions.pdf
+
+$(OUTPUT_DIR_NAME)/compiler-flags.pdf: $(OUTPUT_DIR_NAME)/compiler-flags.json
+	Rscript $(TOOLS_DIR)/plot_compiler_versions.R --benchfile=data/compiler-flags.json --base-runtime=clang-O0-v7 --outputfile=$(OUTPUT_DIR_NAME)/compiler-flags.pdf
