@@ -16,4 +16,4 @@ VOLUME /data
 RUN apt-get update && apt-get install -y clang-6.0 qemu
 RUN echo "CLANG=/usr/bin/clang-6.0" >> /benchmarks/configs/env
 
-ENTRYPOINT ["/benchmarks/tools/bench.py", "--filter-runtime=qemu"] FOREGROUND
+ENTRYPOINT ["/benchmarks/tools/bench.py", "--filter-runtime=qemu-O3"] FOREGROUND
