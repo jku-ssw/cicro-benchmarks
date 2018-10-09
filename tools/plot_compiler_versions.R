@@ -39,5 +39,5 @@ p <- ggplot(normalized_duration_data, aes(x=config, y=value_mean_factor)) +
 if (is.na(args$outputfile)) {
     print(p)
 } else {
-    ggsave(opt$outputfile, device="pdf")
+    ggsave(args$outputfile, device="pdf")
 }
