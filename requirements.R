@@ -8,6 +8,9 @@ install.packages('tidyverse', repos=cran_repos)
 # optparse
 install.packages('optparse', repos=cran_repos)
 
+# devtools
+install.packages('devtools', repos=cran_repos)
+
 # jsonlite
 install.packages('jsonlite', repos=cran_repos)
 
