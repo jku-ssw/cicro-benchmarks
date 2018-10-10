@@ -19,3 +19,5 @@ RUN apt-get update && apt-get install -y clang-7
 RUN echo "CLANG=/usr/bin/clang-7" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/clang-7.0.json", "--filter-runtime=(clang)", "--suffix=-v7"] FOREGROUND
+
+CMD chmod +rw /data/clang-7.0.json

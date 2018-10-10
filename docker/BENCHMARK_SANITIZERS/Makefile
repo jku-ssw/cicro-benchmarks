@@ -3,11 +3,12 @@ GIT_TAG = "master"
 DOCKER_IMAGE_NAME = "benchmark-sanitizers"
 DOCKER_IMAGE_VERSION = $(GIT_TAG)
 
-DOCKER_RUN_ARGS =
+DOCKER_RUN_ARGS = --privileged
 
 OUTPUT_DIR = $(CURDIR)/data
+OUTPUT_FILE = $(OUTPUT_DIR)/sanitizers.json
 
-BENCHMARK_ARGS = --privileged=true
+BENCHMARK_ARGS =
 BENCHMARK_RUNS = 2
 
 .PHONY: build run
@@ -16,4 +17,4 @@ build: Dockerfile
 	docker build --build-arg GIT_TAG=$(GIT_TAG) -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) ./
 
 run:
-	docker run -i $(DOCKER_RUN_ARGS) -v $(OUTPUT_DIR):/data $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) --ignore-errors --runs=$(BENCHMARK_RUNS) $(BENCHMARK_ARGS)
+	docker run -i $(DOCKER_RUN_ARGS) -v $(OUTPUT_DIR):/data $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) --ignore-errors --runs=$(BENCHMARK_RUNS) $(BENCHMARK_ARGS) $(OUTPUT_FILE)

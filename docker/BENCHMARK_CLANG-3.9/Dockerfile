@@ -17,5 +17,3 @@ RUN apt-get update && apt-get install -y clang-3.9 libomp-dev
 RUN echo "CLANG=/usr/bin/clang-3.9" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/clang-3.9.json", "--filter-runtime=(clang)", "--suffix=-v3.9"] FOREGROUND
-
-CMD chmod +rw /data/clang-3.9.json

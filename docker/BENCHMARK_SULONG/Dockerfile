@@ -21,5 +21,3 @@ RUN echo "CLANG=/usr/bin/clang-6.0" > /benchmarks/configs/env \
     && echo "SULONG_DIR=/graalvm/sulong" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/sulong.json", "--no-papi"] FOREGROUND
-
-CMD chmod +rw /data/sulong.json

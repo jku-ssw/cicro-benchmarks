@@ -17,5 +17,3 @@ RUN apt-get update && apt-get install -y g++-4.8
 RUN echo "GCC=/usr/bin/gcc-4.8" > /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/gcc-4.json", "--filter-runtime=(gcc)", "--suffix=-v4"] FOREGROUND
-
-CMD chmod +rw /data/gcc-4.json

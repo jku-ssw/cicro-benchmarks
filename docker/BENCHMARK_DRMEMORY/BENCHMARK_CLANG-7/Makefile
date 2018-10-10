@@ -1,6 +1,6 @@
 GIT_TAG = "master"
 
-DOCKER_IMAGE_NAME = "benchmark-valgrind"
+DOCKER_IMAGE_NAME = "benchmark-clang-7"
 DOCKER_IMAGE_VERSION = $(GIT_TAG)
 
 DOCKER_RUN_ARGS = --privileged

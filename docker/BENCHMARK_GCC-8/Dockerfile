@@ -17,5 +17,3 @@ RUN apt-get update && apt-get install -y gcc-8
 RUN echo "GCC=/usr/bin/gcc-8" > /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/gcc-8.json", "--filter-runtime=(gcc)", "--suffix=-v8"] FOREGROUND
-
-CMD chmod +rw /data/gcc-8.json

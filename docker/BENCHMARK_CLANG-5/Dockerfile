@@ -17,5 +17,3 @@ RUN apt-get update && apt-get install -y clang-5.0
 RUN echo "CLANG=/usr/bin/clang-5.0" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/clang-5.0.json", "--filter-runtime=(clang)", "--suffix=-v5"] FOREGROUND
-
-CMD chmod +rw /data/clang-5.0.json

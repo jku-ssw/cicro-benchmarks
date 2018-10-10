@@ -55,6 +55,11 @@ build_BENCHMARK_TCC:
 build_BENCHMARK_VALGRIND:
 	$(MAKE) -C BENCHMARK_VALGRIND build GIT_TAG=$(GIT_TAG)
 
+# Docker container for QEMU
+
+build_BENCHMARK_QEMU:
+	$(MAKE) -C BENCHMARK_VALGRIND build GIT_TAG=$(GIT_TAG)
+
 # Docker container for various stuff of our harness
 build_MERGE:
 	$(MAKE) -C MERGE build GIT_TAG=$(GIT_TAG)

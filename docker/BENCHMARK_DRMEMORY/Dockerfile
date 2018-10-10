@@ -12,13 +12,11 @@ RUN git clone https://github.com/jku-ssw/benchmarks && cd /benchmarks && git che
 # place to store results
 VOLUME /data
 
-# configure our enviroment for the specific benchmark
-RUN apt-get update && apt-get install -y clang-6.0
+RUN apt-get install -y clang-6.0
 RUN echo "CLANG=/usr/bin/clang-6.0" >> /benchmarks/configs/env
-
-RUN apt-get update && apt-get install -y wget
-ARG DRMEMORY_URL="https://github.com/DynamoRIO/drmemory/releases/download/cronbuild-1.11.17622/DrMemory-Linux-1.11.17622-1.tar.gz"
+RUN apt-get install -y wget
+ARG DRMEMORY_URL="https://github.com/DynamoRIO/drmemory/releases/download/release_2.0.1/DrMemory-Linux-2.0.1-2.tar.gz"
 RUN wget -O - "${DRMEMORY_URL}" | tar -xz -C /
-RUN echo "DR_MEMORY=/`ls / | grep -i DrMemory`/bin/drmemory" >> /benchmarks/configs/env
+RUN echo "DR_MEMORY=/`ls / | grep -i DrMemory`/bin64/drmemory" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/drmemory.json", "--filter-runtime=(drmemory)"] FOREGROUND
