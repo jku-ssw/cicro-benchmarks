@@ -10,3 +10,4 @@ harness.add_runtime('clang-Os', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "
 harness.add_runtime('clang-O3-fno-strict-aliasing', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fno-strict-aliasing"}, **clang_kwargs)
 harness.add_runtime('clang-O3-fno-strict-overflow', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fno-strict-overflow"}, **clang_kwargs)
 harness.add_runtime('clang-O3-fno-delete-null-pointer-checks', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fno-delete-null-pointer-checks"}, **clang_kwargs)
+harness.add_runtime('clang-O3-mno-retpoline', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -mno-retpoline"}, **clang_kwargs)
