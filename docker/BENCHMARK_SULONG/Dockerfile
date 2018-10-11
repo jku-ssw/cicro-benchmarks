@@ -4,7 +4,7 @@ FROM sulong:"${SULONG_GIT_TAG}"
 MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
 
 # our main dependencies
-RUN apt-get update && apt-get install -y git build-essential cmake libpapi-dev python3 python3-psutil python3-pip clang-6.0
+RUN apt-get update && apt-get install -y --no-install-recommends git build-essential cmake libpapi-dev python3 python3-psutil python3-pip clang-6.0 ca-certificates
 RUN pip3 install wllvm
 
 # our benchmarking project

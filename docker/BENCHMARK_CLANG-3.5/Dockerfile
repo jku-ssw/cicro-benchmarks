@@ -3,7 +3,9 @@ FROM ubuntu:18.04
 MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
 
 # our main dependencies
-RUN apt-get update && apt-get install -y git build-essential cmake libpapi-dev python3 python3-psutil wget software-properties-common
+RUN apt-get update && apt-get install -y --no-install-recommends git build-essential cmake libpapi-dev python3 python3-psutil ca-certificates
+
+RUN apt-get update && apt-get install -y --no-install-recommends wget software-properties-common
 
 # our benchmarking project
 ARG GIT_TAG=master

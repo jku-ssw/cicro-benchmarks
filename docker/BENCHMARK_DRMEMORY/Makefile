@@ -3,7 +3,7 @@ GIT_TAG = "master"
 DOCKER_IMAGE_NAME = "benchmark-drmemory"
 DOCKER_IMAGE_VERSION = $(GIT_TAG)
 
-DOCKER_RUN_ARGS =
+DOCKER_RUN_ARGS = --privileged
 
 OUTPUT_DIR = $(CURDIR)/data
 
