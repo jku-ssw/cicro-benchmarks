@@ -11,7 +11,7 @@ OUTPUT_DIR = $(CURDIR)/$(OUTPUT_DIR_NAME)
 DOCKER_DIR = $(CURDIR)/../docker
 TOOLS_DIR = $(CURDIR)/../tools
 
-CLANG_TARGET_NAMES = clang-3.5 clang-3.6 clang-3.7 clang-3.8 clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7.0
+CLANG_TARGET_NAMES = clang-3.3 clang-3.4 clang-3.5 clang-3.6 clang-3.7 clang-3.8 clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7.0
 CLANG_TARGET_JSON = $(CLANG_TARGET_NAMES:=.json)
 CLANG_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(CLANG_TARGET_JSON))
 
@@ -40,6 +40,12 @@ $(OUTPUT_DIR_NAME)/benchmark-classification.tex:
 	../docs/raw/benchmark_classification.py > $(OUTPUT_DIR)/benchmark-classification.tex
 
 # benchmark clang
+$(OUTPUT_DIR_NAME)/clang-3.3.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-3.3 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --filter-runtime '$(LLVM_VERSION_COMPARISON_RUNTIMES)'"
+
+$(OUTPUT_DIR_NAME)/clang-3.4.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-3.4 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --filter-runtime '$(LLVM_VERSION_COMPARISON_RUNTIMES)'"
+
 $(OUTPUT_DIR_NAME)/clang-3.5.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-3.5 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --filter-runtime '$(LLVM_VERSION_COMPARISON_RUNTIMES)'"
 
