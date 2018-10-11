@@ -11,7 +11,7 @@ OUTPUT_DIR = $(CURDIR)/$(OUTPUT_DIR_NAME)
 DOCKER_DIR = $(CURDIR)/../docker
 TOOLS_DIR = $(CURDIR)/../tools
 
-CLANG_TARGET_NAMES = clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7.0
+CLANG_TARGET_NAMES = clang-3.5 clang-3.6 clang-3.7 clang-3.8 clang-3.9 clang-4.0 clang-5.0 clang-6.0 clang-7.0
 CLANG_TARGET_JSON = $(CLANG_TARGET_NAMES:=.json)
 CLANG_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(CLANG_TARGET_JSON))
 
@@ -19,7 +19,7 @@ GCC_TARGET_NAMES = gcc-4 gcc-5 gcc-6 gcc-7 gcc-8
 GCC_TARGET_JSON = $(GCC_TARGET_NAMES:=.json)
 GCC_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(GCC_TARGET_JSON))
 
-ALL_TARGET_NAMES = $(LLVM_TARGET_NAMES) $(GCC_TARGET_NAMES) compcert sanitizers tcc memcheck callgrind qemu sulong
+ALL_TARGET_NAMES = $(LLVM_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert sanitizers tcc qemu memcheck callgrind sulong
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 7200
@@ -28,7 +28,7 @@ GCC_VERSION_COMPARISON_RUNTIMES = gcc-O3
 
 .PHONY: all build clean
 
-all: $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(OUTPUT_DIR_NAME)/compiler-flags.json $(OUTPUT_DIR_NAME)/llvm-versions.json $(OUTPUT_DIR_NAME)/gcc-versions.json build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/Rplots.pdf $(OUTPUT_DIR_NAME)/LLVM-versions.pdf $(OUTPUT_DIR_NAME)/GCC-versions.pdf $(OUTPUT_DIR_NAME)/compiler-flags.pdf
+all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(OUTPUT_DIR_NAME)/compiler-flags.json $(OUTPUT_DIR_NAME)/llvm-versions.json $(OUTPUT_DIR_NAME)/gcc-versions.json $(OUTPUT_DIR_NAME)/Rplots.pdf $(OUTPUT_DIR_NAME)/LLVM-versions.pdf $(OUTPUT_DIR_NAME)/GCC-versions.pdf $(OUTPUT_DIR_NAME)/compiler-flags.pdf
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
@@ -40,6 +40,18 @@ $(OUTPUT_DIR_NAME)/benchmark-classification.tex:
 	../docs/raw/benchmark_classification.py > $(OUTPUT_DIR)/benchmark-classification.tex
 
 # benchmark clang
+$(OUTPUT_DIR_NAME)/clang-3.5.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-3.5 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --filter-runtime '$(LLVM_VERSION_COMPARISON_RUNTIMES)'"
+
+$(OUTPUT_DIR_NAME)/clang-3.6.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-3.6 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --filter-runtime '$(LLVM_VERSION_COMPARISON_RUNTIMES)'"
+
+$(OUTPUT_DIR_NAME)/clang-3.7.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-3.7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --filter-runtime '$(LLVM_VERSION_COMPARISON_RUNTIMES)'"
+
+$(OUTPUT_DIR_NAME)/clang-3.8.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-3.8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --filter-runtime '$(LLVM_VERSION_COMPARISON_RUNTIMES)'"
+
 $(OUTPUT_DIR_NAME)/clang-3.9.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-3.9 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --filter-runtime '$(LLVM_VERSION_COMPARISON_RUNTIMES)'"
 
@@ -58,6 +70,10 @@ $(OUTPUT_DIR_NAME)/clang-7.0.json:
 # benchmark compcert
 $(OUTPUT_DIR_NAME)/compcert.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_COMPCERT run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors"
+
+# benchmark qemu
+$(OUTPUT_DIR_NAME)/qemu.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_QEMU run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors"
 
 # benchmark gcc
 $(OUTPUT_DIR_NAME)/gcc-4.json:
@@ -110,6 +126,9 @@ $(OUTPUT_DIR_NAME)/callgrind.json:
 
 $(OUTPUT_DIR_NAME)/qemu.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_QEMU run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' $(HIGH_TIMEOUT)"
+
+$(OUTPUT_DIR_NAME)/drmemory.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_DRMEMORY run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime drmemory-O3 --ignore-errors $(HIGH_TIMEOUT)"
 
 
 #no-papi.json:
