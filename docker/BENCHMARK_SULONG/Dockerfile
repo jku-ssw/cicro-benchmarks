@@ -1,5 +1,4 @@
-ARG SULONG_GIT_TAG=master
-FROM sulong:"${SULONG_GIT_TAG}"
+FROM sulong:master
 
 MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
 
