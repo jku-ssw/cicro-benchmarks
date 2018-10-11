@@ -5,6 +5,8 @@ MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
 # our main dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends git build-essential cmake libpapi-dev python3 python3-psutil wget software-properties-common ca-certificates
 
+RUN apt-get update && apt-get install -y --no-install-recommends gpg-agent
+
 # our benchmarking project
 ARG GIT_TAG=master
 RUN git clone https://github.com/jku-ssw/benchmarks && cd /benchmarks && git checkout "${GIT_TAG}"
