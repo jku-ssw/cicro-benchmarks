@@ -1,13 +1,8 @@
+FROM benchmark-base as base
+
 FROM ubuntu:18.04
 
 MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
-
-# our main dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends git build-essential cmake libpapi-dev python3 python3-psutil ca-certificates
-
-# our benchmarking project
-ARG GIT_TAG=master
-RUN git clone https://github.com/jku-ssw/benchmarks && cd /benchmarks && git checkout "${GIT_TAG}"
 
 # place to store results
 VOLUME /data
@@ -15,6 +10,11 @@ VOLUME /data
 # configure our enviroment for plotting
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y r-base littler libssl-dev libcurl4-openssl-dev libxml2-dev
 
+# install R dependencies
+COPY --from=base /benchmarks/requirements.R /benchmarks/
 RUN /benchmarks/requirements.R
+
+# our benchmarking project files
+COPY --from=base /benchmarks/tools/*.R /benchmarks/tools/
 
 ENTRYPOINT ["/benchmarks/tools/plot.R"] FOREGROUND

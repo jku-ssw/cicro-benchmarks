@@ -1,0 +1,10 @@
+# Ignore everything
+**
+
+# Allow files and directories which are required for base image
+!./benchmarks/**
+!./configs/**
+!./C-Hayai/**
+!./tools/**
+
+!./requirements.R
