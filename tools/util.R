@@ -84,7 +84,7 @@ parse_data <- function(raw) {
   df = priv_flatten_data(benchmark_data)
 
   print("runtimes in the dataset:")
-  df$config %>% unique()
+  print(df$config %>% unique())
 
   return(df)
 }

@@ -14,7 +14,7 @@ VOLUME /data
 
 # configure our enviroment for the specific benchmark
 RUN apt-add-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty universe" && apt-add-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty main restricted"
-RUN apt-get update && apt-get install -y clang-3.3 libomp-dev
+RUN apt-get update && apt-get install -y --no-install-recommends clang-3.3 libomp-dev
 
 # our benchmarking project
 COPY --from=base /benchmarks /benchmarks

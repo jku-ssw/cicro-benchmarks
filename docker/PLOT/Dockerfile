@@ -8,7 +8,7 @@ MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
 VOLUME /data
 
 # configure our enviroment for plotting
-RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y r-base littler libssl-dev libcurl4-openssl-dev libxml2-dev
+RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y --no-install-recommends r-base gcc g++ libcurl4-gnutls-dev littler libssl-dev libxml2-dev
 
 # install R dependencies
 COPY --from=base /benchmarks/requirements.R /benchmarks/
