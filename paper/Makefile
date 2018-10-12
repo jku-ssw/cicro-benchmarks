@@ -19,7 +19,7 @@ GCC_TARGET_NAMES = gcc-4 gcc-5 gcc-6 gcc-7 gcc-8
 GCC_TARGET_JSON = $(GCC_TARGET_NAMES:=.json)
 GCC_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(GCC_TARGET_JSON))
 
-ALL_TARGET_NAMES = $(LLVM_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert sanitizers tcc qemu memcheck callgrind sulong
+ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) # drmemory compcert sanitizers tcc memcheck callgrind # qemu sulong
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 7200
