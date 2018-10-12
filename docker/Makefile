@@ -3,10 +3,13 @@ SULONG_GIT_TAG = "master"
 
 .PHONY: build
 
-# Docker containers for various clang versions
+# Docker container which contains the benchmarking suite
+build_BENCHMARK_BASE:
+	docker build -t "benchmark-base" ../
 
-build_BENCHMARK_CLANG-3.3:
-	$(MAKE) -C BENCHMARK_CLANG-3.3 build GIT_TAG=$(GIT_TAG)
+# Docker containers for various clang versions
+build_BENCHMARK_CLANG-3.3: build_BENCHMARK_BASE
+	$(MAKE) -C BENCHMARK_CLANG-3.3 build
 
 build_BENCHMARK_CLANG-3.4:
 	$(MAKE) -C BENCHMARK_CLANG-3.4 build GIT_TAG=$(GIT_TAG)
@@ -89,8 +92,8 @@ build_BENCHMARK_DRMEMORY:
 build_MERGE:
 	$(MAKE) -C MERGE build GIT_TAG=$(GIT_TAG)
 
-build_PLOT:
-	$(MAKE) -C PLOT build GIT_TAG=$(GIT_TAG)
+build_PLOT: build_BENCHMARK_BASE
+	$(MAKE) -C PLOT build
 
 # Helper targets
 build_BENCHMARK_CLANG: build_BENCHMARK_CLANG-3.3 build_BENCHMARK_CLANG-3.4 build_BENCHMARK_CLANG-3.5 build_BENCHMARK_CLANG-3.6 build_BENCHMARK_CLANG-3.7 build_BENCHMARK_CLANG-3.8 build_BENCHMARK_CLANG-3.9 build_BENCHMARK_CLANG-4 build_BENCHMARK_CLANG-5 build_BENCHMARK_CLANG-6 build_BENCHMARK_CLANG-7
