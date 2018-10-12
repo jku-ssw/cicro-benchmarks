@@ -154,7 +154,7 @@ $(OUTPUT_DIR_NAME)/gcc-versions.json: $(GCC_TARGET_PATHS)
 
 $(OUTPUT_DIR_NAME)/compiler-flags.json: $(GCC_TARGET_PATHS) $(CLANG_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/compiler-flags.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='(gcc-O0-v8|gcc-O1-v8|gcc-O2-v8|gcc-O3-v8|gcc-Os-v8|clang-O0-v7|clang-O1-v7|clang-O2-v7|clang-O3-v7|clang-Os-v7)' $(GCC_TARGET_JSON) $(CLANG_TARGET_JSON) compiler-flags.json"
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='(gcc-O0-v8|gcc-O1-v8|gcc-O2-v8|gcc-O3-v8|gcc-Os-v8|gcc-O3-fno-strict-overflow-v8|gcc-O3-fno-delete-null-pointer-checks-v8|clang-O0-v7|clang-O1-v7|clang-O2-v7|clang-O3-v7|clang-Os-v7|clang-fno-delete-null-pointer-checks-O3-v7|clang-fno-strict-aliasing-O3-v7|clang-fno-strict-overflow-O3-v7|clang-mno-retpoline-O3-v7)' $(GCC_TARGET_JSON) $(CLANG_TARGET_JSON) compiler-flags.json"
 
 $(OUTPUT_DIR_NAME)/Rplots.pdf: $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) PLOT_ARGS="--benchfile=/data/merged.json --base-runtime=$(BENCHMARK_BASE_RUNTIME)"
