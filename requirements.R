@@ -1,18 +1,10 @@
 #!/usr/bin/env Rscript
 
+packages <- c('tidyverse', 'optparse', 'devtools', 'jsonlite')
 cran_repos <- 'http://cran.rstudio.com/'
+jobs <- 8
 
-# tidyverse
-install.packages('tidyverse', repos=cran_repos)
-
-# optparse
-install.packages('optparse', repos=cran_repos)
-
-# devtools
-install.packages('devtools', repos=cran_repos)
-
-# jsonlite
-install.packages('jsonlite', repos=cran_repos)
+install.packages(packages, repos=cran_repos, Ncpus=jobs)
 
 # modules
-devtools::install_github('klmr/modules', ref='version-0.9.10')
+devtools::install_github('klmr/modules', ref='version-0.9.10', threads=jobs)
