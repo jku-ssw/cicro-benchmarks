@@ -37,7 +37,7 @@ def sulong_graalvm_executor(filepath, workdir, exec_args, warmup, **kwargs):
 
 def sulong_latest_executor(filepath, workdir, exec_args, warmup, **kwargs):
     kwargs['timeout'] = 10000
-    sulong_cmd = ' '.join(['mx', '-p', os.path.expandvars('${SULONG_DIR}'), 'lli'])
+    sulong_cmd = ' '.join(['mx', '--dynamicimport', '/compiler' '--jdk', 'jvmci' '-p', os.path.expandvars('${SULONG_DIR}'), 'lli'])
     return wllvm_executor(filepath, workdir, sulong_cmd, exec_args + ["--warmup={}".format(warmup)], **kwargs)
 
 
