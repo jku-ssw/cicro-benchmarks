@@ -1,4 +1,4 @@
-DOCKER_IMAGE_NAME = "cicro/benchmark-gcc-6"
+DOCKER_IMAGE_NAME = "cicro/benchmark-gcc-4.8"
 
 DOCKER_RUN_ARGS = --privileged
 
