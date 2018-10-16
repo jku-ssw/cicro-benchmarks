@@ -1,4 +1,4 @@
-DOCKER_IMAGE_NAME = "cicro/benchmark-clang-4
+DOCKER_IMAGE_NAME = "cicro/benchmark-clang-4"
 
 DOCKER_RUN_ARGS = --privileged
 
