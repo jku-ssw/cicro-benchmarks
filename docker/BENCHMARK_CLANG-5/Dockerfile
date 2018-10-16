@@ -1,19 +1,22 @@
+FROM cicro/benchmark-base as base
+
 FROM ubuntu:18.04
 
 MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
 
 # our main dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends git build-essential cmake libpapi-dev python3 python3-psutil ca-certificates
-
-# our benchmarking project
-ARG GIT_TAG=master
-RUN git clone https://github.com/jku-ssw/benchmarks && cd /benchmarks && git checkout "${GIT_TAG}"
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake libpapi-dev python3 python3-psutil ca-certificates
 
 # place to store results
 VOLUME /data
 
-# configure our enviroment for the specific benchmark
-RUN apt-get update && apt-get install -y clang-5.0
+# install our enviroment for the specific benchmark
+RUN apt-get update && apt-get install -y --no-install-recommends clang-5.0
+
+# our benchmarking project
+COPY --from=base /benchmarks /benchmarks
+
+# configure benchmark enviroment
 RUN echo "CLANG=/usr/bin/clang-5.0" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/clang-5.0.json", "--filter-runtime=(clang)", "--suffix=-v5"] FOREGROUND

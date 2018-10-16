@@ -1,7 +1,4 @@
-GIT_TAG = "master"
-
-DOCKER_IMAGE_NAME = "benchmark-clang-4"
-DOCKER_IMAGE_VERSION = $(GIT_TAG)
+DOCKER_IMAGE_NAME = "cicro/benchmark-clang-4
 
 DOCKER_RUN_ARGS = --privileged
 
@@ -13,7 +10,10 @@ BENCHMARK_RUNS = 2
 .PHONY: build run
 
 build: Dockerfile
-	docker build --build-arg GIT_TAG=$(GIT_TAG) -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) ./
+	docker build -t $(DOCKER_IMAGE_NAME) ./
+
+pull:
+	docker pull $(DOCKER_IMAGE_NAME)
 
 run:
-	docker run -i $(DOCKER_RUN_ARGS) -v $(OUTPUT_DIR):/data $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) --runs=$(BENCHMARK_RUNS) $(BENCHMARK_ARGS)
+	docker run --rm -i $(DOCKER_RUN_ARGS) -v $(OUTPUT_DIR):/data $(DOCKER_IMAGE_NAME) --runs=$(BENCHMARK_RUNS) $(BENCHMARK_ARGS)

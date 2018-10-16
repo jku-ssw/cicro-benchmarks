@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends wget software-p
 # place to store results
 VOLUME /data
 
-# configure our enviroment for the specific benchmark
+# install our enviroment for the specific benchmark
 RUN apt-add-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty universe" && apt-add-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty main restricted"
 RUN apt-get update && apt-get install -y --no-install-recommends clang-3.3 libomp-dev
 
