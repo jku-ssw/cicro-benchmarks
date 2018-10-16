@@ -1,4 +1,4 @@
-FROM benchmark-base as base
+FROM cicro/benchmark-base as base
 
 FROM ubuntu:18.04
 
