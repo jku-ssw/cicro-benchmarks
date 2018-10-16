@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 VOLUME /data
 
 # install our enviroment for the specific benchmark
-RUN apt-get update && apt-get install -y g++-4.8
+RUN apt-get update && apt-get install -y --no-install-recommends g++-4.8
 
 # our benchmarking project
 COPY --from=base /benchmarks /benchmarks
