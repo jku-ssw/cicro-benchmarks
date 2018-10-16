@@ -622,28 +622,36 @@ if __name__ == "__main__":
     def write_results():
         """ atomic write of results into a file"""
         logger.info('write results into benchmark file')
-        with tempfile.NamedTemporaryFile('w', dir=os.path.dirname(args.benchfile),
-                                         prefix=".bench_", suffix='.json', delete=False) as f:
-            # write results
-            results.store_file(f)
-            os.fsync(f.fileno())
+        try:
+            with tempfile.NamedTemporaryFile('w', dir=os.path.dirname(args.benchfile),
+                                             prefix=".bench_", suffix='.json', delete=False) as f:
+                # write results
+                results.store_file(f)
+                os.fsync(f.fileno())
 
-            # if the file exists, move it somewhere else
-            tmp_filename = args.benchfile + '.deleteme'
-            delete_tmp_file = False
-            if os.path.exists(args.benchfile):
-                assert not os.path.exists(tmp_filename)
-                os.link(args.benchfile, tmp_filename)
-                os.unlink(args.benchfile)
-                delete_tmp_file = True
+                # if the file exists, move it somewhere else
+                tmp_filename = args.benchfile + '.deleteme'
+                delete_tmp_file = False
+                if os.path.exists(args.benchfile):
+                    assert not os.path.exists(tmp_filename)
+                    os.link(args.benchfile, tmp_filename)
+                    os.unlink(args.benchfile)
+                    delete_tmp_file = True
 
-            # link new file
-            os.link(f.name, args.benchfile)
-            os.unlink(f.name)
+                # link new file
+                os.link(f.name, args.benchfile)
+                os.unlink(f.name)
 
-            # remove old file
-            if delete_tmp_file:
-                os.unlink(tmp_filename)
+                # remove old file
+                if delete_tmp_file:
+                    os.unlink(tmp_filename)
+        except FileNotFoundError as e:
+            logger.warning('use fallback method to write file, because atomic function failed')
+            logger.debug(str(e))
+            with open(args.benchfile, 'w') as f:
+                # write results directly into result file
+                results.store_file(f)
+                os.fsync(f.fileno())
 
     execution_kwargs = {
         'skip_clean': args.skip_clean or args.skip_compilation,
