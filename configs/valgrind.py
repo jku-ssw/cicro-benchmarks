@@ -41,6 +41,8 @@ def qemu_build_system_executor(make_env):
 
     return result
 
+def boehmgc_build_system_executor(make_env):
+    return build_system_executor(make_env, cc_version='--version', as_version='--version')
 
 def execute_binary_analysis_tool(filepath, workdir, tool, exec_args, **kwargs):
     env_tool = [os.path.expandvars(value) if type(value) is str else value for value in tool]
@@ -75,13 +77,17 @@ def drmemory_executor(filepath, workdir, exec_args, **kwargs):
 def qemu_executor(filepath, workdir, exec_args, **kwargs):
     return execute_binary_analysis_tool(filepath, workdir, ['qemu-x86_64'], exec_args, **kwargs)
 
+def boehmgc_executor(filepath, workdir, exec_args, **kwargs):
+    return execute_binary_analysis_tool(filepath, workdir, ['LD_PRELOAD=$(GC_LIBRARY_PATH)'], exec_args, **kwargs)
 
 valgrind_kwargs = {'build_system_func': valgrind_build_system_executor, 'exec_func': valgrind_executor}
 callgrind_kwargs = {'build_system_func': valgrind_build_system_executor, 'exec_func': callgrind_executor}
 drmemory_kwargs = {'build_system_func': drmemory_build_system_executor, 'exec_func': drmemory_executor}
 qemu_kwargs = {'build_system_func': qemu_build_system_executor, 'exec_func': qemu_executor}
+boehmgc_kwargs = {'build_system_func': boehmgc_build_system_executor, 'exec_func': boehmgc_executor}
 
 harness.add_runtime('valgrind-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "PAPI": 0}, **valgrind_kwargs)
 harness.add_runtime('callgrind-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "PAPI": 0}, **callgrind_kwargs)
 harness.add_runtime('drmemory-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **drmemory_kwargs)
 harness.add_runtime('qemu-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **qemu_kwargs)
+harness.add_runtime('boehmgc-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **boehmgc_kwargs)
