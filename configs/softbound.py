@@ -1,1 +1,1 @@
-harness.add_runtime('softboundcets-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-O3 -fsoftboundcets -L${SOFTBOUND_RUNTIME_DIR} -lsoftboundcets_rt", "LDFLAGS": ""})
+harness.add_runtime('softboundcets-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-O3 -fsoftboundcets -L${SOFTBOUND_RUNTIME_DIR}", "LDFLAGS": ""})
