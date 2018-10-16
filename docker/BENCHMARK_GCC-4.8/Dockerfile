@@ -11,12 +11,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends build-essential
 VOLUME /data
 
 # install our enviroment for the specific benchmark
-RUN apt-get update && apt-get install -y gcc-8
+RUN apt-get update && apt-get install -y g++-4.8
 
 # our benchmarking project
 COPY --from=base /benchmarks /benchmarks
 
 # configure benchmark enviroment
-RUN echo "GCC=/usr/bin/gcc-8" > /benchmarks/configs/env
+RUN echo "GCC=/usr/bin/gcc-4.8" > /benchmarks/configs/env
 
-ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/gcc-8.json", "--filter-runtime=(gcc)", "--suffix=-v8"] FOREGROUND
+ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/gcc-4.8.json", "--filter-runtime=(gcc)", "--suffix=-v4.8"] FOREGROUND
