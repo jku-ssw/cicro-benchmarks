@@ -1,4 +1,4 @@
-DOCKER_IMAGE_NAME = "benchmark-clang-3.3"
+DOCKER_IMAGE_NAME = "cicro/benchmark-clang-3.3"
 
 DOCKER_RUN_ARGS = --privileged
 
@@ -11,6 +11,9 @@ BENCHMARK_RUNS = 2
 
 build: Dockerfile
 	docker build -t $(DOCKER_IMAGE_NAME) ./
+
+pull:
+	docker pull $(DOCKER_IMAGE_NAME)
 
 run:
 	docker run --rm -i $(DOCKER_RUN_ARGS) -v $(OUTPUT_DIR):/data $(DOCKER_IMAGE_NAME) --runs=$(BENCHMARK_RUNS) $(BENCHMARK_ARGS)
