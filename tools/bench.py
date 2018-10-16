@@ -645,7 +645,7 @@ if __name__ == "__main__":
                 # remove old file
                 if delete_tmp_file:
                     os.unlink(tmp_filename)
-        except FileNotFoundError as e:
+        except FileNotFoundError as e:  # NOQA: F821
             logger.warning('use fallback method to write file, because atomic function failed')
             logger.debug(str(e))
             with open(args.benchfile, 'w') as f:
