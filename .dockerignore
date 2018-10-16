@@ -1,5 +1,6 @@
 # Ignore some folders which do not contain releveant data
 ./.idea/**
+./.git/**
 ./paper/**
 ./docker/**
 ./docs/**

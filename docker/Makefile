@@ -5,7 +5,7 @@ SULONG_GIT_TAG = "master"
 
 # Docker container which contains the benchmarking suite
 build_BENCHMARK_BASE:
-	docker build -t "benchmark-base" ../
+	docker build -t "cicro/benchmark-base" ../
 
 # Docker containers for various clang versions
 build_BENCHMARK_CLANG-3.3: build_BENCHMARK_BASE
