@@ -26,9 +26,12 @@ HIGH_TIMEOUT = --timeout 7200
 LLVM_VERSION_COMPARISON_RUNTIMES = clang-O3
 GCC_VERSION_COMPARISON_RUNTIMES = gcc-O3
 
+PLOTS = tools-overview.pdf  LLVM-versions.pdf GCC-versions.pdf compiler-flags.pdf Rplots.pdf
+PLOT_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(PLOTS))
+
 .PHONY: all build clean
 
-all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(OUTPUT_DIR_NAME)/compiler-flags.json $(OUTPUT_DIR_NAME)/llvm-versions.json $(OUTPUT_DIR_NAME)/gcc-versions.json $(OUTPUT_DIR_NAME)/Rplots.pdf $(OUTPUT_DIR_NAME)/LLVM-versions.pdf $(OUTPUT_DIR_NAME)/GCC-versions.pdf $(OUTPUT_DIR_NAME)/compiler-flags.pdf
+all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(PLOT_PATHS)
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
@@ -76,10 +79,6 @@ $(OUTPUT_DIR_NAME)/clang-7.0.json:
 # benchmark compcert
 $(OUTPUT_DIR_NAME)/compcert.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_COMPCERT run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors"
-
-# benchmark qemu
-$(OUTPUT_DIR_NAME)/qemu.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_QEMU run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors"
 
 # benchmark gcc
 $(OUTPUT_DIR_NAME)/gcc-4.8.json:
@@ -152,6 +151,10 @@ $(OUTPUT_DIR_NAME)/merged.json: $(ALL_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="$(ALL_TARGET_JSON) merged.json"
 
+$(OUTPUT_DIR_NAME)/overview.json: $(ALL_TARGET_PATHS)
+	rm -f $(OUTPUT_DIR_NAME)/overview.json
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-O3-v7|gcc-O3-v8|gcc-mpx-O3-v8|gcc-gcov-O0-v8|asan-O3|msan-O3|tsan-O3|ubsan-O3|compcert|lowfat-O3|softboundcets-O3|sulong-graalvm|tcc|valgrind-O3|callgrind-O3|drmemory-O3|qemu-O3' merged.json overview.json"
+
 $(OUTPUT_DIR_NAME)/llvm-versions.json: $(CLANG_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/llvm-versions.json
 	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='$(LLVM_VERSION_COMPARISON_RUNTIMES)' $(CLANG_TARGET_JSON) llvm-versions.json"
@@ -175,3 +178,6 @@ $(OUTPUT_DIR_NAME)/GCC-versions.pdf: $(OUTPUT_DIR_NAME)/gcc-versions.json
 
 $(OUTPUT_DIR_NAME)/compiler-flags.pdf: $(OUTPUT_DIR_NAME)/compiler-flags.json
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/compiler-flags.json --base-runtime=clang-O0-v7 --outputfile=/data/compiler-flags.pdf"
+
+$(OUTPUT_DIR_NAME)/tools-overview.pdf: $(OUTPUT_DIR_NAME)/overview.json
+	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/overview.json --base-runtime=clang-O3-v7 --outputfile=/data/tools-overview.pdf"
