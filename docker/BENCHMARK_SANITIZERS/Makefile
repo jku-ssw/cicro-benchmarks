@@ -3,7 +3,7 @@ DOCKER_IMAGE_NAME = "cicro/benchmark-sanitizers"
 DOCKER_RUN_ARGS = --privileged
 
 OUTPUT_DIR = $(CURDIR)/data
-OUTPUT_FILE = $(OUTPUT_DIR)/sanitizers.json
+OUTPUT_FILE = /data/sanitizers.json
 
 BENCHMARK_ARGS =
 BENCHMARK_RUNS = 2
