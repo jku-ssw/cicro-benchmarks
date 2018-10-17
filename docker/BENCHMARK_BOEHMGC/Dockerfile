@@ -1,3 +1,5 @@
+FROM cicro/benchmark-base as base
+
 FROM ubuntu:18.04
 
 MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>

@@ -83,7 +83,7 @@ build_BENCHMARK_SOFTBOUNDCETS: build_BENCHMARK_BASE
 
 # Docker container for the Boehm GC
 build_BENCHMARK_BOEHMGC: build_BENCHMARK_BASE
-	$(MAKE) -C build_BENCHMARK_BOEHMGC build
+	$(MAKE) -C BENCHMARK_BOEHMGC build
 
 # Docker containers for sulong
 build_SULONG:
