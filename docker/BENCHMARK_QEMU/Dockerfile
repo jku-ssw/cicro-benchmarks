@@ -19,4 +19,4 @@ COPY --from=base /benchmarks /benchmarks
 # configure benchmark enviroment
 RUN echo "CLANG=/usr/bin/clang-6.0" >> /benchmarks/configs/env
 
-ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/qemu-O3.json", "--filter-runtime=qemu-O3"] FOREGROUND
+ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/qemu.json", "--filter-runtime=qemu-O3"] FOREGROUND
