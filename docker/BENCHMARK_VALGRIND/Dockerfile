@@ -11,4 +11,4 @@ COPY --from=harness /benchmarks /benchmarks
 # configure benchmark enviroment
 RUN echo "CLANG=/usr/bin/clang-6.0" >> /benchmarks/configs/env
 
-ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/valgrind.json", "--filter-runtime=(valgrind-O3|callgrind-O3)"] FOREGROUND
+ENTRYPOINT ["/benchmarks/tools/bench.py", "--filter-runtime=(valgrind-O3|callgrind-O3)"] FOREGROUND
