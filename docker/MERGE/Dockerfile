@@ -1,15 +1,14 @@
+FROM cicro/benchmark-harness as harness
+
 FROM ubuntu:18.04
 
-MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
-
 # our main dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends git build-essential cmake libpapi-dev python3 python3-psutil ca-certificates
-
-# our benchmarking project
-ARG GIT_TAG=master
-RUN git clone https://github.com/jku-ssw/benchmarks && cd /benchmarks && git checkout "${GIT_TAG}"
+RUN apt-get update && apt-get install -y --no-install-recommends python3
 
 # place to store results
 VOLUME /data
+
+# our benchmarking project
+COPY --from=harness /benchmarks/tools/ /benchmarks/tools
 
 ENTRYPOINT ["/benchmarks/tools/merge_results.py"] FOREGROUND

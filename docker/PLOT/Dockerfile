@@ -1,8 +1,6 @@
-FROM cicro/benchmark-base as base
+FROM cicro/benchmark-harness as harness
 
 FROM ubuntu:18.04
-
-MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
 
 # place to store results
 VOLUME /data
@@ -11,7 +9,7 @@ VOLUME /data
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y --no-install-recommends r-base gcc g++ libcurl4-gnutls-dev littler libssl-dev libxml2-dev
 
 # install R dependencies
-COPY --from=base /benchmarks/requirements.R /benchmarks/
+COPY --from=harness /benchmarks/requirements.R /benchmarks/
 RUN /benchmarks/requirements.R
 
 # our benchmarking project files
