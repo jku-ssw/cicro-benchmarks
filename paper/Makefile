@@ -19,7 +19,7 @@ GCC_TARGET_NAMES = gcc-4.8 gcc-5 gcc-6 gcc-7 gcc-8
 GCC_TARGET_JSON = $(GCC_TARGET_NAMES:=.json)
 GCC_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(GCC_TARGET_JSON))
 
-ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert sanitizers lowfat tcc memcheck callgrind qemu softbound sulong boehmgc
+ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert sanitizers lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 7200
@@ -138,7 +138,7 @@ $(OUTPUT_DIR_NAME)/drmemory.json:
 $(OUTPUT_DIR_NAME)/lowfat.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_LOWFAT run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime lowfat-O3 --ignore-errors"
 
-$(OUTPUT_DIR_NAME)/softbound.json:
+$(OUTPUT_DIR_NAME)/softboundcets.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_SOFTBOUNDCETS run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime softboundcets-O3 --ignore-errors"
 
 $(OUTPUT_DIR_NAME)/boehmgc.json:
