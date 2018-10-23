@@ -47,7 +47,7 @@ pull_BENCHMARK: $(PULL_BENCHMARK_TARGETS_ALL)
 
 # generic executors
 $(BUILD_BENCHMARK_TARGETS_ALL): build_BENCHMARK_BASE build_BENCHMARK_HARNESS
-	$(MAKE) -C $(subst pull_,,$@) build
+	$(MAKE) -C $(subst build_,,$@) build
 
 $(PULL_BENCHMARK_TARGETS_ALL):
 	$(MAKE) -C $(subst pull_,,$@) pull
