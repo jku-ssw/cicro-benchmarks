@@ -1,6 +1,7 @@
 # C Benchmarking Suite
 
-[![Build Status](https://travis-ci.org/jku-ssw/benchmarks.svg?branch=master)](https://travis-ci.org/jku-ssw/benchmarks)
+[![Build Status](https://travis-ci.org/jku-ssw/cicro-benchmarks.svg?branch=master)](https://travis-ci.org/jku-ssw/cicro-benchmarks)
+[![Docker Hub](https://img.shields.io/badge/docker--hub-automated-blue.svg)](https://hub.docker.com/u/cicro/)
 
 This is a benchmarking suite for C compilers, optimizers and runtime environments. It allows us to measure how changes
 affect runtime performance in a general manner and to not be dependent on a few single benchmarks. Compared to other
