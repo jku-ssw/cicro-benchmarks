@@ -4,11 +4,18 @@ SULONG_GIT_TAG = "master"
 .PHONY: build pull
 
 # Docker container which contains the benchmarking suite
+build_BENCHMARK_HARNESS:
+	docker build -t "cicro/benchmark-harness" ../
+
+pull_BENCHMARK_HARNESS:
+	docker pull "cicro/benchmark-harness"
+
+# Docker container which contains the main dependencies
 build_BENCHMARK_BASE:
-	docker build -t "cicro/benchmark-base" ../
+	$(MAKE) -C BENCHMARK_BASE build
 
 pull_BENCHMARK_BASE:
-	docker pull "cicro/benchmark-base"
+	$(MAKE) -C BENCHMARK_BASE pull
 
 # Docker containers for various clang versions
 BENCHMARK_TARGETS_CLANG = 3.3 3.4 3.5 3.6 3.7 3.8 4 5 6 7
@@ -39,7 +46,7 @@ build_BENCHMARK: $(BUILD_BENCHMARK_TARGETS_ALL)
 pull_BENCHMARK: $(PULL_BENCHMARK_TARGETS_ALL)
 
 # generic executors
-$(BUILD_BENCHMARK_TARGETS_ALL): build_BENCHMARK_BASE
+$(BUILD_BENCHMARK_TARGETS_ALL): build_BENCHMARK_BASE build_BENCHMARK_HARNESS
 	$(MAKE) -C $(subst pull_,,$@) build
 
 $(PULL_BENCHMARK_TARGETS_ALL):

@@ -1,4 +1,4 @@
-FROM cicro/benchmark-base as base
+FROM cicro/benchmark-harness as harness
 
 FROM cicro/sulong:master
 
@@ -12,7 +12,7 @@ RUN pip3 install wllvm
 VOLUME /data
 
 # our benchmarking project
-COPY --from=base /benchmarks /benchmarks
+COPY --from=harness /benchmarks /benchmarks
 
 # configure benchmark enviroment
 RUN echo "CLANG=/usr/bin/clang-6.0" > /benchmarks/configs/env \

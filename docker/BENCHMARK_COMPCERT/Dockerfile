@@ -1,14 +1,6 @@
-FROM cicro/benchmark-base as base
+FROM cicro/benchmark-harness as harness
 
-FROM ubuntu:18.04
-
-MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
-
-# our main dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake libpapi-dev python3 python3-psutil ca-certificates
-
-# place to store results
-VOLUME /data
+FROM cicro/benchmark-base
 
 # install our enviroment for the specific benchmark
 RUN apt-get update && apt-get install -y --no-install-recommends gcc-8 libc6-dev ocaml opam m4  # build requirements for compcert
@@ -20,7 +12,7 @@ RUN eval `opam config env` && (cd "/CompCert-$COMPCERT_VERSION" && ./configure x
 RUN (cd "/CompCert-$COMPCERT_VERSION" && make install)
 
 # our benchmarking project
-COPY --from=base /benchmarks /benchmarks
+COPY --from=harness /benchmarks /benchmarks
 
 # configure benchmark enviroment
 RUN echo "COMPCERT=/usr/local/bin/ccomp" >> /benchmarks/configs/env
