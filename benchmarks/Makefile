@@ -65,7 +65,7 @@ exec_%_$(TEST_SUFFIX): %_$(TEST_SUFFIX)
 
 $(C_HAYAI_LIB): $(C_HAYAI_DIR)/src/*
 	mkdir -p $(C_HAYAI_DIR)/build
-	(cd $(C_HAYAI_DIR)/build && cmake ../ -DCMAKE_C_COMPILER='$(CC)' -DCMAKE_C_FLAGS='$(CFLAGS)' -DCMAKE_STATIC_LINKER_FLAGS='$(LDFLAGS)' -DUSE_PAPI=$(USE_PAPI_VALUE))
+	(cd $(C_HAYAI_DIR)/build && cmake ../ -DCMAKE_C_COMPILER='$(CC)' -DCMAKE_C_FLAGS='$(CFLAGS)' -DUSE_PAPI=$(USE_PAPI_VALUE))  #-DCMAKE_STATIC_LINKER_FLAGS='$(LDFLAGS)'
 	$(MAKE) -C $(C_HAYAI_DIR)/build -j4 AS='$(AS)' CC='$(CC)' CFLAGS='$(CFLAGS)' LDFLAGS='$(LDFLAGS)' chayai
 
 .PHONY: all clean
