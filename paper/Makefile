@@ -115,7 +115,7 @@ $(OUTPUT_DIR_NAME)/ubsan.json:
 
 # benchmark sulong (based on clang-6.0)
 $(OUTPUT_DIR_NAME)/sulong.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_SULONG run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors $(HIGH_TIMEOUT)"
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_SULONG run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime sulong --ignore-errors $(HIGH_TIMEOUT)"
 	# TODO: --filter-runtime="(sulong-warmup-0|sulong-warmup-2)" --filter-harness="(?!(faragon-libsrt|armon-libart))" --runs=1  and iterations file
 
 # benchmark tcc
