@@ -14,4 +14,4 @@ COPY --from=harness /benchmarks /benchmarks
 # configure benchmark enviroment
 RUN echo "CLANG=/usr/bin/clang-6.0" >> /benchmarks/configs/env
 
-ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/drmemory.json", "--filter-runtime=(dmalloc)"] FOREGROUND
+ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/dmalloc.json", "--filter-runtime=(dmalloc)"] FOREGROUND
