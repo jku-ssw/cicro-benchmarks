@@ -7,6 +7,7 @@ harness.add_runtime('gcc-O1', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99
 harness.add_runtime('gcc-O2', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O2"}, **gcc_kwargs)
 harness.add_runtime('gcc-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3"}, **gcc_kwargs)
 harness.add_runtime('gcc-march-native-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -march=native"}, **gcc_kwargs)
+harness.add_runtime('gcc-Ofast', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -Ofast"}, **gcc_kwargs)
 harness.add_runtime('gcc-Os', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -Os"}, **gcc_kwargs)
 harness.add_runtime('gcc-fno-strict-aliasing-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -fno-strict-aliasing"}, **gcc_kwargs)
 harness.add_runtime('gcc-fno-strict-overflow-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -fno-strict-overflow"}, **gcc_kwargs)
