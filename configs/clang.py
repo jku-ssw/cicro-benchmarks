@@ -6,6 +6,7 @@ harness.add_runtime('clang-O0', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "
 harness.add_runtime('clang-O1', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O1"}, **clang_kwargs)
 harness.add_runtime('clang-O2', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O2"}, **clang_kwargs)
 harness.add_runtime('clang-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **clang_kwargs)
+harness.add_runtime('clang-march-native-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -march=native"}, **clang_kwargs)
 harness.add_runtime('clang-Os', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -Os"}, **clang_kwargs)
 harness.add_runtime('clang-fno-strict-aliasing-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fno-strict-aliasing"}, **clang_kwargs)
 harness.add_runtime('clang-fno-strict-overflow-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fno-strict-overflow"}, **clang_kwargs)
