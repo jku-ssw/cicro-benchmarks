@@ -1,0 +1,8 @@
+#!/bin/bash
+
+DOCKER_TRIGGER_URL="https://cloud.docker.com/api/build/v1/source"
+
+echo "* Trigger image builds:"
+
+# TODO: encapsule into function, simplify declaration
+curl -s -X POST "${DOCKER_TRIGGER_URL}/2bc375bb-17c4-4581-b2fe-5602f895631b/trigger/ca7348d8-9f80-4c7b-a305-218aced58b42/call/" | grep -o "\"image\":\s*\"[a-zA-Z0-9\./\-]*\""

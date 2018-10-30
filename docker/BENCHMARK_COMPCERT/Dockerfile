@@ -1,6 +1,8 @@
-FROM cicro/benchmark-harness as harness
+ARG CACHE_TAG=latest
 
-FROM cicro/benchmark-base
+FROM cicro/benchmark-harness:${CACHE_TAG} as harness
+
+FROM cicro/benchmark-base:${CACHE_TAG}
 
 # install our enviroment for the specific benchmark
 RUN apt-get update && apt-get install -y --no-install-recommends gcc-8 libc6-dev ocaml opam m4  # build requirements for compcert
