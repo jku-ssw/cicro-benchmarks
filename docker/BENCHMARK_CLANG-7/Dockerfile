@@ -4,7 +4,7 @@ FROM cicro/benchmark-base
 
 # install our enviroment for the specific benchmark
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-7 main"
-RUN apt-get update && apt-get install -y --no-install-recommends clang-7
+RUN apt-get update && apt-get install -y --no-install-recommends clang-7 libomp-dev
 
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks

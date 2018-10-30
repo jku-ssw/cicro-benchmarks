@@ -4,7 +4,7 @@ FROM cicro/benchmark-base
 
 # install our enviroment for the specific benchmark
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-7 main"
-RUN apt-get update && apt-get install -y --no-install-recommends clang-7
+RUN apt-get update && apt-get install -y --no-install-recommends clang-7 libomp-dev
 
 RUN wget -O - https://github.com/ivmai/libatomic_ops/releases/download/v7.6.6/libatomic_ops-7.6.6.tar.gz | tar -xz -C / && \
     cd /libatomic_ops-7.6.6 && ./configure && make && make install && rm -r /libatomic_ops-7.6.6
