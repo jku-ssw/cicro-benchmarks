@@ -1,4 +1,6 @@
-FROM cicro/benchmark-harness as harness
+ARG CACHE_TAG=latest
+
+FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 
 FROM ubuntu:18.04
 

@@ -2,8 +2,8 @@
 
 if [[ -z "${CACHE_TAG}" ]]; then
   # $CACHE_TAG is undefined, use part of $IMAGE_NAME as workaround
+  # Kown issue: https://forums.docker.com/t/build-env-var-cache-tag-not-passed-to-post-push-hook/41747
   CACHE_TAG=${IMAGE_NAME#*:}
 fi
 
-echo "docker build --cache-from $IMAGE_NAME --build-arg CACHE_TAG=$CACHE_TAG -f $DOCKERFILE_PATH -t $IMAGE_NAME ."
 docker build --cache-from $IMAGE_NAME --build-arg CACHE_TAG=$CACHE_TAG -f $DOCKERFILE_PATH -t $IMAGE_NAME .

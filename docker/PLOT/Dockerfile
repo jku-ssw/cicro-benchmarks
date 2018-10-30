@@ -1,6 +1,8 @@
-FROM cicro/benchmark-harness as harness
+ARG CACHE_TAG=latest
 
-FROM cicro/benchmark-base
+FROM cicro/benchmark-harness:${CACHE_TAG} as harness
+
+FROM cicro/benchmark-base:${CACHE_TAG}
 
 # configure our enviroment for plotting
 RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -y --no-install-recommends r-base gcc g++ libcurl4-gnutls-dev littler libssl-dev libxml2-dev

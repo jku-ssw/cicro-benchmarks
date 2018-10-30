@@ -1,6 +1,8 @@
-FROM cicro/benchmark-harness as harness
+ARG CACHE_TAG=latest
 
-FROM cicro/benchmark-base
+FROM cicro/benchmark-harness:${CACHE_TAG} as harness
+
+FROM cicro/benchmark-base:${CACHE_TAG}
 
 # install our enviroment for the specific benchmark
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-7 main"
