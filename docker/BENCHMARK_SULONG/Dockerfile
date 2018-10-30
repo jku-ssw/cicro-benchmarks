@@ -5,7 +5,7 @@ FROM cicro/sulong:master
 MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
 
 # our main dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake libpapi-dev python3 python3-psutil python3-pip clang-6.0 ca-certificates python3-setuptools
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake libpapi-dev python3 python3-psutil python3-pip clang-6.0 libomp-dev ca-certificates python3-setuptools
 RUN pip3 install wllvm
 
 # place to store results

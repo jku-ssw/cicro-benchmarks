@@ -3,7 +3,7 @@ FROM cicro/benchmark-harness as harness
 FROM cicro/benchmark-base
 
 # install our enviroment for the specific benchmark
-RUN apt-get update && apt-get install -y --no-install-recommends valgrind clang-6.0
+RUN apt-get update && apt-get install -y --no-install-recommends clang-6.0 libomp-dev valgrind
 
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
