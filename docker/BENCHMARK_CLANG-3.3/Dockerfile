@@ -1,6 +1,8 @@
-FROM cicro/benchmark-harness as harness
+ARG CACHE_TAG=latest
 
-FROM cicro/benchmark-base
+FROM cicro/benchmark-harness:${CACHE_TAG} as harness
+
+FROM cicro/benchmark-base:${CACHE_TAG}
 
 # install our enviroment for the specific benchmark
 RUN apt-add-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty universe" && apt-add-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty main restricted"

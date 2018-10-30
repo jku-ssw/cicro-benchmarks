@@ -1,0 +1,2 @@
+#!/bin/bash
+docker build --cache-from $IMAGE_NAME --build-arg CACHE_TAG=$CACHE_TAG -f $DOCKERFILE_PATH -t $IMAGE_NAME .
