@@ -92,12 +92,18 @@ def diehard_executor(filepath, workdir, exec_args, **kwargs):
     env['LD_PRELOAD'] = env.get('DIEHARD_PATH')
     return execute_binary_analysis_tool(filepath, workdir, [], exec_args, env=env, **kwargs)
 
+def jemalloc_executor(filepath, workdir, exec_args, **kwargs):
+    env = os.environ.copy()
+    env['LD_PRELOAD'] = env.get('JEMALLOC_PATH')
+    return execute_binary_analysis_tool(filepath, workdir, [], exec_args, env=env, **kwargs)
+
 valgrind_kwargs = {'build_system_func': valgrind_build_system_executor, 'exec_func': valgrind_executor}
 callgrind_kwargs = {'build_system_func': valgrind_build_system_executor, 'exec_func': callgrind_executor}
 drmemory_kwargs = {'build_system_func': drmemory_build_system_executor, 'exec_func': drmemory_executor}
 qemu_kwargs = {'build_system_func': qemu_build_system_executor, 'exec_func': qemu_executor}
 boehmgc_kwargs = {'build_system_func': boehmgc_build_system_executor, 'exec_func': boehmgc_executor}
 diehard_kwargs = {'build_system_func': diehard_build_system_executor, 'exec_func': diehard_executor}
+jemalloc_kwargs = {'build_system_func': diehard_build_system_executor, 'exec_func': jemalloc_executor}
 
 harness.add_runtime('valgrind-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "PAPI": 0}, **valgrind_kwargs)
 harness.add_runtime('callgrind-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "PAPI": 0}, **callgrind_kwargs)
@@ -105,3 +111,4 @@ harness.add_runtime('drmemory-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS"
 harness.add_runtime('qemu-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **qemu_kwargs)
 harness.add_runtime('boehmgc-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **boehmgc_kwargs)
 harness.add_runtime('diehard-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **diehard_kwargs)
+harness.add_runtime('jemalloc-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **jemalloc_kwargs)
