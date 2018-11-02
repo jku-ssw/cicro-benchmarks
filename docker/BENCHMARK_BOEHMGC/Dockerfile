@@ -18,6 +18,6 @@ COPY --from=harness /benchmarks /benchmarks
 
 # configure benchmark enviroment
 RUN echo "CLANG=/usr/bin/clang-7" >> /benchmarks/configs/env && \
-    echo "GC_LIBRARY_PATH=/usr/local/lib/libgc.so" >> /benchmarks/configs/env
+    echo "LD_PRELOAD=/usr/local/lib/libgc.so" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/boehmgc.json", "--filter-runtime=(boehmgc)"] FOREGROUND

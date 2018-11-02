@@ -17,6 +17,6 @@ COPY --from=harness /benchmarks /benchmarks
 
 # configure benchmark enviroment
 RUN echo "CLANG=/usr/bin/clang-7" >> /benchmarks/configs/env && \
-    echo "HOARD_PATH=/Hoard/src/libhoard.so" >> /benchmarks/configs/env
+    echo "LD_PRELOAD=/Hoard/src/libhoard.so" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/hoard.json", "--filter-runtime=(hoard-O3)"] FOREGROUND

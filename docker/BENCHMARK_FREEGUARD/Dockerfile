@@ -17,6 +17,6 @@ COPY --from=harness /benchmarks /benchmarks
 
 # configure benchmark enviroment
 RUN echo "CLANG=/usr/bin/clang-7" >> /benchmarks/configs/env && \
-    echo "LD_PRELOAD_PATH=/FreeGuard/libfreeguard.so" >> /benchmarks/configs/env
+    echo "LD_PRELOAD=/FreeGuard/libfreeguard.so" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/freeguard.json", "--filter-runtime=(freeguard-O3)"] FOREGROUND

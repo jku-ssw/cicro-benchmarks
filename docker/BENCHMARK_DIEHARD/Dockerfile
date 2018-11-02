@@ -16,6 +16,6 @@ COPY --from=harness /benchmarks /benchmarks
 
 # configure benchmark enviroment
 RUN echo "CLANG=/usr/bin/clang-6.0" >> /benchmarks/configs/env && \
-    echo "DIEHARD_PATH=/DieHard/src/libdiehard.so" >> /benchmarks/configs/env
+    echo "LD_PRELOAD=/DieHard/src/libdiehard.so" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/diehard.json", "--filter-runtime=(diehard-O3)"] FOREGROUND

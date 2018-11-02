@@ -17,6 +17,6 @@ COPY --from=harness /benchmarks /benchmarks
 
 # configure benchmark enviroment
 RUN echo "CLANG=/usr/bin/clang-7" >> /benchmarks/configs/env && \
-    echo "JEMALLOC_PATH=/jemalloc-5.1.0/lib/libjemalloc.so.2" >> /benchmarks/configs/env
+    echo "LD_PRELOAD=/jemalloc-5.1.0/lib/libjemalloc.so.2" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/jemalloc.json", "--filter-runtime=(jemalloc-O3)"] FOREGROUND
