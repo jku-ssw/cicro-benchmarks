@@ -1,22 +1,17 @@
 ARG CACHE_TAG=latest
 
 FROM cicro/benchmark-harness:${CACHE_TAG} as harness
+FROM cicro/benchmark-clang-base:${CACHE_TAG}
 
-FROM cicro/benchmark-base:${CACHE_TAG}
-
-# install our enviroment for the specific benchmark
-RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-7 main"
-RUN apt-get update && apt-get install -y --no-install-recommends clang-7 libomp-dev
 RUN apt-get update && apt-get install -y --no-install-recommends git
 RUN git clone https://github.com/emeryberger/Hoard
-RUN ln -s /usr/bin/clang++-7 /usr/bin/clang++ && cd Hoard/src && make
-
+RUN sed -i 's/fprintf(stderr, versionMessage);//g' Hoard/src/source/libhoard.cpp # replace version message output to stderr
+RUN cd Hoard/src && make
 
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
 # configure benchmark enviroment
-RUN echo "CLANG=/usr/bin/clang-7" >> /benchmarks/configs/env && \
-    echo "LD_PRELOAD=/Hoard/src/libhoard.so" >> /benchmarks/configs/env.run
+RUN echo "LD_PRELOAD=/Hoard/src/libhoard.so" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/hoard.json", "--filter-runtime=(hoard-O3)"] FOREGROUND

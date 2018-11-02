@@ -1,12 +1,7 @@
 ARG CACHE_TAG=latest
 
 FROM cicro/benchmark-harness:${CACHE_TAG} as harness
-
-FROM cicro/benchmark-base:${CACHE_TAG}
-
-# install our enviroment for the specific benchmark
-RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-7 main"
-RUN apt-get update && apt-get install -y --no-install-recommends clang-7 libomp-dev
+FROM cicro/benchmark-clang-base:${CACHE_TAG}
 
 RUN wget -O - https://github.com/ivmai/libatomic_ops/releases/download/v7.6.6/libatomic_ops-7.6.6.tar.gz | tar -xz -C / && \
     cd /libatomic_ops-7.6.6 && ./configure && make && make install && rm -r /libatomic_ops-7.6.6
@@ -17,7 +12,6 @@ RUN wget -O - https://github.com/ivmai/bdwgc/releases/download/v7.6.8/gc-7.6.8.t
 COPY --from=harness /benchmarks /benchmarks
 
 # configure benchmark enviroment
-RUN echo "CLANG=/usr/bin/clang-7" >> /benchmarks/configs/env && \
-    echo "LD_PRELOAD=/usr/local/lib/libgc.so" >> /benchmarks/configs/env.run
+RUN echo "LD_PRELOAD=/usr/local/lib/libgc.so" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/boehmgc.json", "--filter-runtime=(boehmgc)"] FOREGROUND
