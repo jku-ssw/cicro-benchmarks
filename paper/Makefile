@@ -27,7 +27,7 @@ HIGH_TIMEOUT = --timeout 7200
 LLVM_VERSION_COMPARISON_RUNTIMES = clang-O3
 GCC_VERSION_COMPARISON_RUNTIMES = gcc-O3
 
-PLOTS = tools-overview.pdf  LLVM-versions.pdf GCC-versions.pdf compiler-flags.pdf Rplots.pdf instruction-mix-clang.pdf instruction-mix-gcc.pdf
+PLOTS = tools-overview.pdf  LLVM-versions.pdf GCC-versions.pdf compiler-flags.pdf Rplots.pdf instruction-mix-clang.pdf instruction-mix-gcc.pdf memory-allocators.pdf
 PLOT_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(PLOTS))
 
 .PHONY: all build clean
@@ -86,7 +86,7 @@ $(OUTPUT_DIR_NAME)/dmalloc.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_DMALLOC run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors"
 
 $(OUTPUT_DIR_NAME)/freeguard.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_FREEGUARD run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors"
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_FREEGUARD run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors --filter-harness '(?!(wolkykim-qlibc))'" # wolkykim-qlibc gets stuck during execution
 
 # benchmark gcc
 $(OUTPUT_DIR_NAME)/gcc-4.8.json:
@@ -162,7 +162,7 @@ $(OUTPUT_DIR_NAME)/hoard.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_HOARD run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime hoard-O3 --ignore-errors"
 
 $(OUTPUT_DIR_NAME)/libdislocator.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_HOARD run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime libdislocator-O3 --ignore-errors"
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_LIBDISLOCATOR run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime libdislocator-O3 --ignore-errors"
 
 
 #no-papi.json:
@@ -174,7 +174,11 @@ $(OUTPUT_DIR_NAME)/merged.json: $(ALL_TARGET_PATHS)
 
 $(OUTPUT_DIR_NAME)/overview.json: $(OUTPUT_DIR_NAME)/merged.json
 	rm -f $(OUTPUT_DIR_NAME)/overview.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='boehmgc-O3|clang-O3-v7|gcc-O3-v8|gcc-mpx-O3-v8|gcc-gcov-O0-v8|asan-O3|msan-O3|tsan-O3|ubsan-O3|compcert-O|lowfat-O3|softboundcets-O3|sulong-graalvm|tcc|valgrind-O3|callgrind-O3|drmemory-O3|qemu-O3|dmalloc-O3|diehard-O3|jemalloc-O3|hoard-O3|freeguard-O3' merged.json overview.json"
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='boehmgc-O3|clang-O3-v7|gcc-O3-v8|gcc-mpx-O3-v8|gcc-gcov-O0-v8|asan-O3|msan-O3|tsan-O3|ubsan-O3|compcert-O|lowfat-O3|softboundcets-O3|sulong-graalvm|tcc|valgrind-O3|callgrind-O3|drmemory-O3|qemu-O3|dmalloc-O3|diehard-O3|jemalloc-O3|hoard-O3|freeguard-O3|libdislocator-O3' merged.json overview.json"
+
+$(OUTPUT_DIR_NAME)/memory-allocators.json: $(OUTPUT_DIR_NAME)/merged.json
+	rm -f $(OUTPUT_DIR_NAME)/overview.json
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-O3-v7|boehmgc-O3|dmalloc-O3|diehard-O3|jemalloc-O3|hoard-O3|freeguard-O3|libdislocator-O3' merged.json memory-allocators.json"
 
 $(OUTPUT_DIR_NAME)/llvm-versions.json: $(CLANG_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/llvm-versions.json
@@ -210,6 +214,10 @@ $(OUTPUT_DIR_NAME)/clang-compiler-flags.pdf: $(OUTPUT_DIR_NAME)/special-clang-fl
 
 $(OUTPUT_DIR_NAME)/tools-overview.pdf: $(OUTPUT_DIR_NAME)/overview.json
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/overview.json --base-runtime=clang-O3-v7 --outputfile=/data/tools-overview.pdf"
+
+$(OUTPUT_DIR_NAME)/memory-allocators.pdf: $(OUTPUT_DIR_NAME)/memory-allocators.json
+	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/memory-allocators.json --base-runtime=clang-O3-v7 --outputfile=/data/memory-allocators.pdf"
+
 
 $(OUTPUT_DIR_NAME)/instruction-mix-clang.pdf: $(OUTPUT_DIR_NAME)/clang-7.0.json
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_instruction_mix.R" PLOT_ARGS="--benchfile=/data/clang-7.0.json --base-runtime=clang-O3-v7 --outputfile=/data/instruction-mix-clang.pdf"
