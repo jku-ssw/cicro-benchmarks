@@ -99,3 +99,4 @@ harness.add_runtime('freeguard-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS
 harness.add_runtime('libdislocator-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
 harness.add_runtime('tcmalloc-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
 harness.add_runtime('dlmalloc-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
+harness.add_runtime('tlsf-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
