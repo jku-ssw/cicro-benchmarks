@@ -20,7 +20,7 @@ GCC_TARGET_JSON = $(GCC_TARGET_NAMES:=.json)
 GCC_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(GCC_TARGET_JSON))
 
 
-ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert sanitizers lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc ptmalloc
+ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert sanitizers lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 7200
@@ -32,7 +32,7 @@ PLOT_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(PLOTS))
 
 .PHONY: all build clean
 
-all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(PLOT_PATHS)
+all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(PLOT_PATHS) $(OUTPUT_DIR_NAME)/loc.csv
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
@@ -170,8 +170,9 @@ $(OUTPUT_DIR_NAME)/tcmalloc.json:
 $(OUTPUT_DIR_NAME)/dlmalloc.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_DLMALLOC run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime dlmalloc-O3 --ignore-errors"
 
-$(OUTPUT_DIR_NAME)/ptmalloc.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_PTMALLOC-3 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime ptmalloc-O3 --ignore-errors"
+$(OUTPUT_DIR_NAME)/tlsf.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_TLSF run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime tlsf-O3 --ignore-errors"
+
 
 #no-papi.json:
 #	../tools/bench.py -y --filter-runtime="(gcc|clang)-(O0|O3)" no-papi.json --no-papi --suffix='-no-papi' --runs=${RUNS}
@@ -185,8 +186,8 @@ $(OUTPUT_DIR_NAME)/overview.json: $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='boehmgc-O3|clang-O3-v7|gcc-O3-v8|gcc-mpx-O3-v8|gcc-gcov-O0-v8|asan-O3|msan-O3|tsan-O3|ubsan-O3|compcert-O|lowfat-O3|softboundcets-O3|sulong-graalvm|tcc|valgrind-O3|callgrind-O3|drmemory-O3|qemu-O3|dmalloc-O3|diehard-O3|jemalloc-O3|hoard-O3|freeguard-O3|libdislocator-O3' merged.json overview.json"
 
 $(OUTPUT_DIR_NAME)/memory-allocators.json: $(OUTPUT_DIR_NAME)/merged.json
-	rm -f $(OUTPUT_DIR_NAME)/overview.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-O3-v7|boehmgc-O3|dmalloc-O3|diehard-O3|jemalloc-O3|hoard-O3|freeguard-O3|libdislocator-O3|dlmalloc-O3|tcmalloc-O3|ptmalloc-O3' merged.json memory-allocators.json"
+	rm -f $(OUTPUT_DIR_NAME)/memory-allocators.json
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-O3-v7|boehmgc-O3|dmalloc-O3|diehard-O3|jemalloc-O3|hoard-O3|freeguard-O3|libdislocator-O3|dlmalloc-O3|tlsf-O3' merged.json memory-allocators.json"
 
 $(OUTPUT_DIR_NAME)/llvm-versions.json: $(CLANG_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/llvm-versions.json
@@ -204,6 +205,11 @@ $(OUTPUT_DIR_NAME)/special-clang-flags.json: $(CLANG_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/special-clang-flags.json
 	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='(clang-O3-v7|clang-fno-delete-null-pointer-checks-O3-v7|clang-fno-strict-aliasing-O3-v7|clang-fno-strict-overflow-O3-v7|clang-mno-retpoline-O3-v7)' $(CLANG_TARGET_JSON) special-clang-flags.json"
 
+
+
+$(OUTPUT_DIR_NAME)/loc.csv: $(OUTPUT_DIR_NAME)/gcc-8.json
+	rm -f $(OUTPUT_DIR_NAME)/loc.csv
+	../tools/extract_gcov.py --filter-runtime gcc-gcov-line-numbers-v8 $(OUTPUT_DIR_NAME)/gcc-8.json > $(OUTPUT_DIR_NAME)/loc.csv
 
 $(OUTPUT_DIR_NAME)/Rplots.pdf: $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) PLOT_ARGS="--benchfile=/data/merged.json --base-runtime=$(BENCHMARK_BASE_RUNTIME)"
