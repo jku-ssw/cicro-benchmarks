@@ -5,7 +5,7 @@ FROM cicro/benchmark-clang-base:${CACHE_TAG}
 
 # install our enviroment for the specific benchmark
 RUN apt-get install -y --no-install-recommends git
-RUN git clone https://github.com/mattconte/tlsf
+RUN git clone --depth 1 --single-branch https://github.com/mattconte/tlsf
 RUN cd tlsf && gcc -c -fpic tlsf.c -o tlsf.a && gcc -shared tlsf.a -o tlsf.so
 
 

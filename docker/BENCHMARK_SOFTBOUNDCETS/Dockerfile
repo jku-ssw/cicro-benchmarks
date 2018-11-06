@@ -6,7 +6,7 @@ FROM cicro/benchmark-base:${CACHE_TAG}
 
 # install our enviroment for the specific benchmark
 RUN apt-get update && apt-get install -y --no-install-recommends python git
-RUN git clone https://github.com/santoshn/softboundcets-34/
+RUN git clone --depth 1 --single-branch https://github.com/santoshn/softboundcets-34
 RUN cd softboundcets-34/softboundcets-llvm-clang34 && chmod +x configure && ./configure --enable-assertions --enable-optimized && make -j8
 ENV PATH="/softboundcets-34/softboundcets-llvm-clang34/Release+Asserts/bin:${PATH}"
 RUN sed -i 's#bits/errno.h#errno.h#g' /softboundcets-34/softboundcets-lib/softboundcets-wrappers.c && \

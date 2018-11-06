@@ -4,9 +4,8 @@ FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 FROM cicro/benchmark-clang-base:${CACHE_TAG}
 
 RUN apt-get update && apt-get install -y --no-install-recommends git autoconf autotools-dev automake libtool
-RUN git clone https://github.com/gperftools/gperftools
-RUN cd gperftools && ./autogen.sh
-RUN cd gperftools/ && ./configure && make install
+RUN git clone --depth 1 --single-branch https://github.com/gperftools/gperftools
+RUN cd gperftools && ./autogen.sh && ./configure && make install
 
 
 # our benchmarking project
