@@ -27,12 +27,12 @@ HIGH_TIMEOUT = --timeout 7200
 LLVM_VERSION_COMPARISON_RUNTIMES = clang-O3
 GCC_VERSION_COMPARISON_RUNTIMES = gcc-O3
 
-PLOTS = tools-overview.pdf  LLVM-versions.pdf GCC-versions.pdf compiler-flags.pdf Rplots.pdf instruction-mix-clang.pdf instruction-mix-gcc.pdf memory-allocators.pdf
+PLOTS = tools-overview.pdf  LLVM-versions.pdf GCC-versions.pdf compiler-flags.pdf Rplots.pdf instruction-mix-clang.pdf instruction-mix-gcc.pdf memory-allocators.pdf loc.pdf
 PLOT_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(PLOTS))
 
 .PHONY: all build clean
 
-all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/loc.csv $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(PLOT_PATHS)
+all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(PLOT_PATHS)
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
@@ -235,6 +235,9 @@ $(OUTPUT_DIR_NAME)/tools-overview.pdf: $(OUTPUT_DIR_NAME)/overview.json
 
 $(OUTPUT_DIR_NAME)/memory-allocators.pdf: $(OUTPUT_DIR_NAME)/memory-allocators.json
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/memory-allocators.json --base-runtime=clang-O3-v7 --outputfile=/data/memory-allocators.pdf"
+
+$(OUTPUT_DIR_NAME)/loc.pdf: $(OUTPUT_DIR_NAME)/loc.csv
+	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_loc.R" PLOT_ARGS="--inputfile=/data/loc.csv --outputfile=/data/loc.pdf"
 
 
 $(OUTPUT_DIR_NAME)/instruction-mix-clang.pdf: $(OUTPUT_DIR_NAME)/clang-7.0.json
