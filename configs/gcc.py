@@ -1,5 +1,7 @@
 from functools import partial
-import os, subprocess, json
+import os
+import subprocess
+import json
 
 gcc_kwargs = {'build_system_func': partial(build_system_executor, cc_version='--version', as_version='--version')}
 
@@ -42,14 +44,16 @@ def default_executor(filepath, workdir, exec_args, **kwargs):
 
             return None, stderr_decoded
 
+
 def execute_gcov(filepath, workdir, exec_args, **kwargs):
     with subprocess.Popen(['gcov', filepath, '-o', workdir, '-i'], cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
         stdout, stderr = process.communicate(timeout=kwargs.get('timeout', 240))
         stdout_decoded = stdout.decode('utf-8') if stdout else None
     return stdout_decoded
 
+
 def gcov_executor(filepath, workdir, exec_args, **kwargs):
-    json, _  = default_executor(filepath, workdir, exec_args) # execute file
+    json, _ = default_executor(filepath, workdir, exec_args)  # execute file
     stderr_decoded = execute_gcov(filepath, workdir, exec_args, **kwargs)
     import glob
     assert(filepath.endswith('_test'))
@@ -64,4 +68,4 @@ def gcov_executor(filepath, workdir, exec_args, **kwargs):
 
 gcc_kwargs = {'build_system_func': partial(build_system_executor, cc_version='--version', as_version='--version'), 'exec_func': gcov_executor}
 
-harness.add_runtime('gcc-gcov-line-numbers', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-g -std=gnu99 -O0 -fprofile-arcs -ftest-coverage", "LDFLAGS" : "-ftest-coverage"}, **gcc_kwargs)
+harness.add_runtime('gcc-gcov-line-numbers', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-g -std=gnu99 -O0 -fprofile-arcs -ftest-coverage", "LDFLAGS": "-ftest-coverage"}, **gcc_kwargs)

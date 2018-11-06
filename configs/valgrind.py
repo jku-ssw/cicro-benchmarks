@@ -45,8 +45,10 @@ def qemu_build_system_executor(make_env):
 def boehmgc_build_system_executor(make_env):
     return build_system_executor(make_env, cc_version='--version', as_version='--version')
 
+
 def diehard_build_system_executor(make_env):
     return build_system_executor(make_env, cc_version='--version', as_version='--version')
+
 
 def execute_binary_analysis_tool(filepath, workdir, tool, exec_args, env=None, **kwargs):
     env_tool = [os.path.expandvars(value) if type(value) is str else value for value in tool]
