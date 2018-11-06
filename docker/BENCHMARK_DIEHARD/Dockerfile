@@ -4,7 +4,9 @@ FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 FROM cicro/benchmark-clang-base:${CACHE_TAG}
 
 RUN apt-get update && apt-get install -y --no-install-recommends git
-RUN git clone --depth 1 --single-branch --recursive https://github.com/emeryberger/DieHard
+
+ARG DIEHARD_GIT_TAG=5a0f8a521a2c7a2c88ed860d5115d2ee30c617ad
+RUN git clone --single-branch --recursive https://github.com/emeryberger/DieHard && cd DieHard && git checkout "${DIEHARD_GIT_TAG}"
 RUN cd DieHard/src && make linux-gcc-x86-64
 
 # our benchmarking project
