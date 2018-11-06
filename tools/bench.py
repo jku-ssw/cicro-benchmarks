@@ -35,6 +35,8 @@ BENCHMARK_DIR = os.path.join(BASE_DIR, 'benchmarks')
 CONFIG_DIR = os.path.join(BASE_DIR, 'configs')
 
 ENV_FILE = os.path.join(CONFIG_DIR, 'env')
+ENV_RUN_FILE = os.path.join(CONFIG_DIR, 'env.run')
+run_env = {}
 ENV_EXAMPLE_FILE = os.path.join(CONFIG_DIR, 'env.example')
 
 
@@ -177,7 +179,11 @@ class BenchmarkingHarness(object):
         assert os.path.isdir(workdir)
 
         args = [filepath, '--output=json'] + exec_args
-        with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+        env = os.environ.copy()
+        for key, val in run_env.items():
+            env[key] = val
+
+        with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env) as process:
             stdout, stderr = process.communicate(timeout=kwargs.get('timeout', 240))
 
             stdout_decoded = stdout.decode('utf-8') if stdout else None
@@ -450,6 +456,11 @@ def add_default_runtimes(harness):
                 os.environ[key] = value
     else:
         logger.warning('no "env" file found in "%s"', CONFIG_DIR)
+    if os.path.isfile(ENV_RUN_FILE):
+        with open(ENV_RUN_FILE) as f:
+            for line in f:
+                key, value = line.rstrip().split('=', 1)
+                run_env[key] = value
 
     def wllvm_make(workdir, make_env, **kwargs):
             if 'LLVM_COMPILER' not in os.environ:
