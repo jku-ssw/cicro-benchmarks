@@ -1,5 +1,5 @@
 GIT_TAG = "master"
-SULONG_GIT_TAG = "master"
+GRAAL_GIT_TAG = "vm-1.0.0-rc9"
 
 .PHONY: build pull
 
@@ -57,13 +57,16 @@ $(PULL_BENCHMARK_TARGETS_ALL):
 
 # Docker containers for sulong
 build_SULONG:
-	$(MAKE) -C SULONG build SULONG_GIT_TAG=$(SULONG_GIT_TAG)
+	$(MAKE) -C SULONG build GRAAL_GIT_TAG=$(GRAAL_GIT_TAG)
 
 pull_SULONG:
-	$(MAKE) -C SULONG build pull
+	$(MAKE) -C SULONG build pull GRAAL_GIT_TAG=$(GRAAL_GIT_TAG)
 
 build_BENCHMARK_SULONG: build_BENCHMARK_BASE build_SULONG
-	$(MAKE) -C BENCHMARK_SULONG build
+	$(MAKE) -C BENCHMARK_SULONG build GRAAL_GIT_TAG=$(GRAAL_GIT_TAG)
+
+pull_BENCHMARK_SULONG:
+	$(MAKE) -C BENCHMARK_SULONG pull GRAAL_GIT_TAG=$(GRAAL_GIT_TAG)
 
 # Docker container for various stuff of our harness
 build_MERGE:

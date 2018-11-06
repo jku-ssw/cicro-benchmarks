@@ -2,7 +2,9 @@ ARG CACHE_TAG=latest
 
 FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 
-FROM cicro/sulong:master
+ARG GRAAL_GIT_TAG=vm-1.0.0-rc9
+
+FROM cicro/sulong:${GRAAL_GIT_TAG}
 
 MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
 
