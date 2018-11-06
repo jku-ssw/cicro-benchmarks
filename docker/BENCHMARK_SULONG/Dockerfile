@@ -1,8 +1,7 @@
 ARG CACHE_TAG=latest
+ARG GRAAL_GIT_TAG=vm-1.0.0-rc9
 
 FROM cicro/benchmark-harness:${CACHE_TAG} as harness
-
-ARG GRAAL_GIT_TAG=vm-1.0.0-rc9
 
 FROM cicro/sulong:${GRAAL_GIT_TAG}
 
