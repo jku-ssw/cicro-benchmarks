@@ -59,13 +59,12 @@ def gcov_executor(filepath, workdir, exec_args, **kwargs):
     assert(filepath.endswith('_test'))
     benchmark_dir_name = filepath[:-5]
     for filename in glob.iglob(benchmark_dir_name + '/**/*.c', recursive=True):
-        print('filename: ' + filename)
         gcov_info = execute_gcov(filename, workdir, exec_args, **kwargs)
         if gcov_info is not None:
             stderr_decoded += gcov_info
     return json, stderr_decoded
 
-
 gcc_kwargs = {'build_system_func': partial(build_system_executor, cc_version='--version', as_version='--version'), 'exec_func': gcov_executor}
 
-harness.add_runtime('gcc-gcov-line-numbers', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-g -std=gnu99 -O0 -fprofile-arcs -ftest-coverage", "LDFLAGS": "-ftest-coverage"}, **gcc_kwargs)
+
+harness.add_runtime('gcc-gcov-line-numbers', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-g -std=gnu99 -O0 --coverage", "LDFLAGS": "--coverage"}, **gcc_kwargs)

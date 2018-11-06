@@ -11,6 +11,7 @@ from util.color_logger import get_logger
 
 logger = get_logger('extract_gcov')
 
+
 def parse_gcov_output(benchmark_name, output):
     lines = output.splitlines()
     result_lines = []
@@ -23,9 +24,9 @@ def parse_gcov_output(benchmark_name, output):
             percentage_executed = 0.0
             total_loc = 0
         else:
-            percentage_executed = float(loc_matcher.group(1))
+            percentage_executed = float(loc_matcher.group(1))/100
             total_loc = int(loc_matcher.group(2))
-        executed_loc = int(percentage_executed/100 * total_loc)
+        executed_loc = int(percentage_executed * total_loc)
         result_lines.append('%s;%s;%d;%d' % (benchmark_name, file_name, executed_loc, total_loc))
     return result_lines
 

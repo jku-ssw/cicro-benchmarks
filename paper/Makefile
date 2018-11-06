@@ -32,7 +32,7 @@ PLOT_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(PLOTS))
 
 .PHONY: all build clean
 
-all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(PLOT_PATHS) $(OUTPUT_DIR_NAME)/loc.csv
+all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/loc.csv $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(PLOT_PATHS)
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
@@ -102,7 +102,11 @@ $(OUTPUT_DIR_NAME)/gcc-7.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --ignore-errors --filter-runtime '$(GCC_VERSION_COMPARISON_RUNTIMES)'"
 
 $(OUTPUT_DIR_NAME)/gcc-8.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --ignore-errors $(HIGH_TIMEOUT)" # high timeout for MPX
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --ignore-errors $(HIGH_TIMEOUT) '/data/gcc-8.json'" # high timeout for MPX
+
+$(OUTPUT_DIR_NAME)/gcov.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --filter-runtime gcc-gcov-line-numbers --ignore-errors '/data/gcov.json'"
+
 
 # benchmark sanitizers (based on clang-6.0)
 $(OUTPUT_DIR_NAME)/sanitizers.json: $(OUTPUT_DIR_NAME)/asan.json $(OUTPUT_DIR_NAME)/msan.json $(OUTPUT_DIR_NAME)/tsan.json $(OUTPUT_DIR_NAME)/ubsan.json
@@ -207,9 +211,9 @@ $(OUTPUT_DIR_NAME)/special-clang-flags.json: $(CLANG_TARGET_PATHS)
 
 
 
-$(OUTPUT_DIR_NAME)/loc.csv: $(OUTPUT_DIR_NAME)/gcc-8.json
+$(OUTPUT_DIR_NAME)/loc.csv: $(OUTPUT_DIR_NAME)/gcov.json
 	rm -f $(OUTPUT_DIR_NAME)/loc.csv
-	../tools/extract_gcov.py --filter-runtime gcc-gcov-line-numbers-v8 $(OUTPUT_DIR_NAME)/gcc-8.json > $(OUTPUT_DIR_NAME)/loc.csv
+	../tools/extract_gcov.py --filter-runtime gcc-gcov-line-numbers-v8 $(OUTPUT_DIR_NAME)/gcov.json > $(OUTPUT_DIR_NAME)/loc.csv
 
 $(OUTPUT_DIR_NAME)/Rplots.pdf: $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) PLOT_ARGS="--benchfile=/data/merged.json --base-runtime=$(BENCHMARK_BASE_RUNTIME)"
