@@ -6,7 +6,7 @@ FROM cicro/benchmark-clang-base:${CACHE_TAG}
 RUN apt-get update && apt-get install -y --no-install-recommends git
 
 ARG HOARD_GIT_TAG=3.12
-RUN git clone --depth 1 --single-branch --branch "${HOARD_GIT_TAG}" https://github.com/emeryberger/Hoard
+RUN git clone --depth 1 https://github.com/emeryberger/Hoard
 RUN sed -i 's/fprintf(stderr, versionMessage);//g' Hoard/src/source/libhoard.cpp  # replace version message output to stderr
 RUN cd Hoard/src && make
 
