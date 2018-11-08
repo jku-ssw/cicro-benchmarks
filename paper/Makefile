@@ -32,7 +32,7 @@ PLOT_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(PLOTS))
 
 .PHONY: all build clean
 
-all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(PLOT_PATHS)
+all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/branch-counters.json $(OUTPUT_DIR_NAME)/instruction-mix.json $(OUTPUT_DIR_NAME)/cache-misses.json $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(PLOT_PATHS)
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
@@ -76,6 +76,16 @@ $(OUTPUT_DIR_NAME)/clang-6.0.json:
 
 $(OUTPUT_DIR_NAME)/clang-7.0.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --filter-runtime clang"
+
+$(OUTPUT_DIR_NAME)/branch-counters.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_BR_INS,PAPI_BR_UCN,PAPI_BR_CN,PAPI_BR_MSP,PAPI_BR_PRC' --filter-runtime clang-O3 /data/branch-counters.json"
+
+$(OUTPUT_DIR_NAME)/instruction-mix.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_BR_INS,PAPI_LD_INS,PAPI_SR_INS,PAPI_TOT_INS' --filter-runtime clang-O3 /data/instruction-mix.json"
+
+$(OUTPUT_DIR_NAME)/cache-misses.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_L1_TCM,PAPI_L2_TCM,PAPI_L3_TCM' --filter-runtime clang-O3 /data/cache-misses.json"
+
 
 # benchmark compcert
 $(OUTPUT_DIR_NAME)/compcert.json:
