@@ -5,23 +5,23 @@ FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 FROM cicro/benchmark-base:${CACHE_TAG}
 
 # install our enviroment for the specific benchmark
-RUN apt-get update && apt-get install -y --no-install-recommends python git
-RUN git clone --depth 1 --single-branch https://github.com/santoshn/softboundcets-34
-RUN cd softboundcets-34/softboundcets-llvm-clang34 && chmod +x configure && ./configure --enable-assertions --enable-optimized && make -j8
-ENV PATH="/softboundcets-34/softboundcets-llvm-clang34/Release+Asserts/bin:${PATH}"
-RUN sed -i 's#bits/errno.h#errno.h#g' /softboundcets-34/softboundcets-lib/softboundcets-wrappers.c && \
-    sed -i 's#bits/errno.h#errno.h#g' /softboundcets-34/softboundcets-lib/softboundmpx-wrappers.c
-# In file included from softboundcets-wrappers.c:45:
-# /usr/include/x86_64-linux-gnu/bits/errno.h:23:3: error: "Never include <bits/errno.h> directly; use <errno.h> instead."
-# # error "Never include <bits/errno.h> directly; use <errno.h> instead."
-# ^
-# 1 error generated.
+RUN apt-get update && apt-get install -y --no-install-recommends python git libomp-dev
+
+ARG SOFTBOUND_GIT_TAG=9c4b6c2b1701923304ed3caea97ec6edd524ff38
+RUN git clone --depth 1 --single-branch https://github.com/santoshn/softboundcets-3.8.0 && cd softboundcets-3.8.0 && git checkout "${SOFTBOUND_GIT_TAG}"
+RUN cd softboundcets-3.8.0/llvm-38 && mkdir build && cd build && cmake .. && make -j4
+
+ENV PATH="/softboundcets-3.8.0/llvm-38/build/bin:${PATH}"
+RUN sed -i 's#bits/errno.h#errno.h#g' /softboundcets-3.8.0/runtime/*.c  # FIX: error "Never include <bits/errno.h> directly; use <errno.h> instead."
+RUN cd softboundcets-3.8.0/runtime && make -j8
 
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
+RUN ls /softboundcets-3.8.0/runtime
+
 # configure benchmark enviroment
-RUN echo "CLANG=/softboundcets-34/softboundcets-llvm-clang34/Release+Asserts/bin/clang" >> /benchmarks/configs/env && \
-    echo "SOFTBOUND_RUNTIME_DIR=/softboundcets-34/softboundcets-lib" >> /benchmarks/configs/env
+RUN echo "CLANG=/softboundcets-3.8.0/llvm-38/build/bin/clang" >> /benchmarks/configs/env && \
+    echo "SOFTBOUND_RUNTIME_DIR=/softboundcets-3.8.0/runtime" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/softboundcets.json", "--filter-runtime=softboundcets"] FOREGROUND
