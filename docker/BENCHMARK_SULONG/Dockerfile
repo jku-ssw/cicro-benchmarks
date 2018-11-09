@@ -21,6 +21,6 @@ COPY --from=harness /benchmarks /benchmarks
 RUN echo "CLANG=/usr/bin/clang-6.0" > /benchmarks/configs/env \
     && echo "LLVM_COMPILER=clang" >> /benchmarks/configs/env \
     && echo "WLLVM_DIR=/usr/local/bin" >> /benchmarks/configs/env \
-    && echo "SULONG_DIR=/graalvm/sulong" >> /benchmarks/configs/env
+    && echo "SULONG_DIR=/graalvm/graal/sulong" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/sulong.json", "--no-papi"] FOREGROUND

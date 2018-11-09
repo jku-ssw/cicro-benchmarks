@@ -20,7 +20,7 @@ def graalvm_build_system_executor(make_env):
 def sulong_build_system_executor(make_env):
     result = build_system_executor(make_env, cc_version='--version', as_version='--version')
 
-    args = ['mx', '-p', os.path.expandvars('${SULONG_DIR}'), 'lli', '--version']
+    args = ['mx', '--dynamicimport', '/compiler', '--jdk', 'jvmci', '-p', os.path.expandvars('${SULONG_DIR}'), 'lli', '--version']
     with subprocess.Popen(args, stdout=subprocess.PIPE) as p:
         stdout, _ = p.communicate(timeout=1)
 

@@ -18,4 +18,4 @@ ARG GRAAL_GIT_TAG=vm-1.0.0-rc9
 RUN git clone --depth 1 --single-branch --branch "${GRAAL_GIT_TAG}" https://github.com/oracle/graal.git /graalvm/graal
 RUN echo "JAVA_HOME=/graalvm/`ls /graalvm | grep jvmci`" > /graalvm/graal/sulong/mx.sulong/env
 
-RUN cd graalvm/graal/sulong && mx build
+RUN cd graalvm/graal/sulong && mx --dynamicimport /compiler build
