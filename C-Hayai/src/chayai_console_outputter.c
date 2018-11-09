@@ -65,7 +65,7 @@ static void chayai_console_outputter_begin(unsigned int bechmarksCount)
     const double clockResolutionMeasuredUs = chayai_clock_resolution_measured() / 1e3;
 
     chayai_console_change_color(OUTPUT_STREAM, CHAYAI_TEXT_PURPLE);
-    fprintf(OUTPUT_STREAM, "CLOCK SOURCE \"%s\" with resolution of (%f us / %f us)\n", CHAYAI_CLOCK_TYPE, clockResolutionUs, clockResolutionMeasuredUs);
+    fprintf(OUTPUT_STREAM, "CLOCK SOURCE \"%s\" with resolution of (%f us / %f us)\n", chayai_clock_type_str(), clockResolutionUs, clockResolutionMeasuredUs);
     chayai_console_change_color(OUTPUT_STREAM, CHAYAI_TEXT_DEFAULT);
 
     chayai_console_change_color(OUTPUT_STREAM, CHAYAI_TEXT_GREEN);

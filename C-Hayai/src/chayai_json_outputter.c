@@ -126,7 +126,7 @@ static void chayai_json_outputter_end_benchmark(
     fprintf(OUTPUT_STREAM, "\"mean\":%f,", runTimeAvgUs);
     fprintf(OUTPUT_STREAM, "\"std_dev\":%f,", standardDerivationUs);
 
-    fprintf(OUTPUT_STREAM, "\"clock_type\":\"%s\",", CHAYAI_CLOCK_TYPE);
+    fprintf(OUTPUT_STREAM, "\"clock_type\":\"%s\",", chayai_clock_type_str());
 
     const double clockResolutionUs = chayai_clock_resolution() / 1e3;
     fprintf(OUTPUT_STREAM, "\"clock_resolution\":%f,", clockResolutionUs);

@@ -54,6 +54,10 @@ int64_t chayai_clock_resolution() {
     return resolution > 0L ? resolution : 1L;
 }
 
+char* chayai_clock_type_str() {
+    return "QueryPerformanceCounter";
+}
+
 // Apple    
 #elif defined(__APPLE__) && defined(__MACH__)
 
@@ -72,6 +76,10 @@ int64_t chayai_clock_duration(CHayaiTimePoint startTime, CHayaiTimePoint endTime
 
 int64_t chayai_clock_resolution() {
     return 1L; // TODO: theroretical maximal resolution
+}
+
+char* chayai_clock_type_str() {
+    return "mach_absolute_time";
 }
 
 // Unix
@@ -94,22 +102,41 @@ int64_t chayai_clock_resolution() {
     return 1L; // TODO: theroretical maximal resolution
 }
 
+char* chayai_clock_type_str() {
+    return "gethrtime";
+}
+
 // clock_gettime
 #   elif defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
- 
+
+clockid_t chayai_clock_gettime_fetch_clockid() {
+    struct timespec tmp;
+#if defined(CLOCK_MONOTONIC_RAW)
+    if(clock_gettime(CLOCK_MONOTONIC_RAW, &tmp) == 0) {
+        return CLOCK_MONOTONIC_RAW;
+    }
+#endif
+#if defined(CLOCK_MONOTONIC)
+    if(clock_gettime(CLOCK_MONOTONIC, &tmp) == 0) {
+        return CLOCK_MONOTONIC;
+    }
+#endif
+#if defined(CLOCK_REALTIME)
+    if(clock_gettime(CLOCK_REALTIME, &tmp) == 0) {
+        return CLOCK_REALTIME;
+    }
+#endif
+    return (clockid_t)-1;
+}
 
 CHayaiTimePoint chayai_clock_now()
 {
+    static clockid_t clk_id = -1;
+    if(clk_id == -1) {
+        clk_id = chayai_clock_gettime_fetch_clockid();
+    }
     CHayaiTimePoint result;
-# if   defined(CLOCK_MONOTONIC_RAW)
-    clock_gettime(CLOCK_MONOTONIC_RAW, &result);
-# elif defined(CLOCK_MONOTONIC)
-    clock_gettime(CLOCK_MONOTONIC, &result);
-# elif defined(CLOCK_REALTIME)
-    clock_gettime(CLOCK_REALTIME, &result);
-# else
-    clock_gettime((clockid_t)-1, &result);
-# endif
+    clock_gettime(clk_id, &result);
     return result;
 }
 
@@ -132,16 +159,49 @@ int64_t chayai_clock_duration(CHayaiTimePoint startTime, CHayaiTimePoint endTime
 
 int64_t chayai_clock_resolution() {
     struct timespec res;
-# if   defined(CLOCK_MONOTONIC_RAW)
-    clock_getres(CLOCK_MONOTONIC_RAW, &res);
-# elif defined(CLOCK_MONOTONIC)
-    clock_getres(CLOCK_MONOTONIC, &res);
-# elif defined(CLOCK_REALTIME)
-    clock_getres(CLOCK_REALTIME, &res);
-# else
-    clock_gettime((clockid_t)-1, &res);
-# endif
+    clock_getres(chayai_clock_gettime_fetch_clockid(), &res);
     return res.tv_sec * 1000000000L + res.tv_nsec;
+}
+
+char* chayai_clock_type_str() {
+    clockid_t clk_id = chayai_clock_gettime_fetch_clockid();
+
+    switch(clk_id) {
+#if defined(CLOCK_MONOTONIC_RAW)
+    case CLOCK_MONOTONIC_RAW:
+        return "clock_gettime(CLOCK_MONOTONIC_RAW)";
+#endif
+#if defined(CLOCK_MONOTONIC_COARSE)
+    case CLOCK_MONOTONIC_COARSE:
+        return "clock_gettime(CLOCK_MONOTONIC_COARSE)";
+#endif
+#if defined(CLOCK_MONOTONIC)
+    case CLOCK_MONOTONIC:
+        return "clock_gettime(CLOCK_MONOTONIC)";
+#endif
+#if defined(CLOCK_REALTIME_COARSE)
+    case CLOCK_REALTIME_COARSE:
+        return "clock_gettime(CLOCK_REALTIME_COARSE)";
+#endif
+#if defined(CLOCK_REALTIME)
+    case CLOCK_REALTIME:
+        return "clock_gettime(CLOCK_REALTIME)";
+#endif
+#if defined(CLOCK_BOOTTIME)
+    case CLOCK_BOOTTIME:
+        return "clock_gettime(CLOCK_BOOTTIME)";
+#endif
+#if defined(CLOCK_PROCESS_CPUTIME_ID)
+    case CLOCK_PROCESS_CPUTIME_ID:
+        return "clock_gettime(CLOCK_PROCESS_CPUTIME_ID)";
+#endif
+#if defined(CLOCK_THREAD_CPUTIME_ID)
+    case CLOCK_THREAD_CPUTIME_ID:
+        return "clock_gettime(CLOCK_THREAD_CPUTIME_ID)";
+#endif
+    default:
+        return "clock_gettime(unknow)";
+    }
 }
 
 // gettimeofday
@@ -162,6 +222,10 @@ int64_t chayai_clock_duration(CHayaiTimePoint startTime, CHayaiTimePoint endTime
 
 int64_t chayai_clock_resolution() {
     return 1000L; // TODO: theroretical maximal resolution
+}
+
+char* chayai_clock_type_str() {
+    return "gettimeofday";
 }
 
 #   endif
