@@ -1,15 +1,15 @@
 ARG CACHE_TAG=latest
-ARG GRAAL_GIT_TAG=vm-1.0.0-rc9
 
 FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 
-FROM cicro/sulong:${GRAAL_GIT_TAG}
+FROM cicro/benchmark-base:${CACHE_TAG}
 
-MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
-
-# our main dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake file clang-6.0 llvm-6.0 libomp-dev ca-certificates libpapi-dev python3 python3-psutil python3-pip python3-setuptools
+# install our enviroment for the specific benchmark
+RUN apt-get update && apt-get install -y --no-install-recommends file clang-6.0 llvm-6.0 libomp-dev python3 python3-pip python3-setuptools
 RUN pip3 install wllvm
+
+ARG GRAALVM_DIR
+COPY ${GRAALVM_DIR} graalvm
 
 # place to store results
 VOLUME /data
@@ -23,6 +23,6 @@ RUN echo "CLANG=/usr/bin/clang-6.0" > /benchmarks/configs/env \
     && echo "LLVM_CC_NAME=clang-6.0" >> /benchmarks/configs/env \
     && echo "LLVM_CXX_NAME=clang-6.0" >> /benchmarks/configs/env \
     && echo "WLLVM_DIR=/usr/local/bin" >> /benchmarks/configs/env \
-    && echo "SULONG_DIR=/graalvm/graal/sulong" >> /benchmarks/configs/env
+    && echo "GRAALVM_DIR=/graalvm/bin" >> /benchmarks/configs/env
 
-ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/sulong.json", "--no-papi"] FOREGROUND
+ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/graalvm.json", "--filter-runtime=(sulong-graalvm)", "--no-papi"] FOREGROUND
