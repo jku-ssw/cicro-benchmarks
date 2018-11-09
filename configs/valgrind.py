@@ -15,6 +15,7 @@ def valgrind_build_system_executor(make_env):
 
     return result
 
+
 def ltrace_build_system_executor(make_env):
     result = build_system_executor(make_env, cc_version='--version', as_version='--version')
 
@@ -27,6 +28,7 @@ def ltrace_build_system_executor(make_env):
 
     return result
 
+
 def strace_build_system_executor(make_env):
     result = build_system_executor(make_env, cc_version='--version', as_version='--version')
 
@@ -38,6 +40,7 @@ def strace_build_system_executor(make_env):
             result['STRACE_version'] = stdout_decoded
 
     return result
+
 
 def drmemory_build_system_executor(make_env):
     result = build_system_executor(make_env, cc_version='--version', as_version='--version')
@@ -106,8 +109,10 @@ def drmemory_executor(filepath, workdir, exec_args, **kwargs):
 def qemu_executor(filepath, workdir, exec_args, **kwargs):
     return execute_binary_analysis_tool(filepath, workdir, ['qemu-x86_64'], exec_args, **kwargs)
 
+
 def strace_executor(filepath, workdir, exec_args, **kwargs):
     return execute_binary_analysis_tool(filepath, workdir, ['strace', '-o', 'test'], exec_args, **kwargs)
+
 
 def ltrace_executor(filepath, workdir, exec_args, **kwargs):
     return execute_binary_analysis_tool(filepath, workdir, ['ltrace', '-o', 'test'], exec_args, **kwargs)
