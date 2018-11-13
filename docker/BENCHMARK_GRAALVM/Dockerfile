@@ -5,7 +5,7 @@ FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 FROM cicro/benchmark-base:${CACHE_TAG}
 
 # install our enviroment for the specific benchmark
-RUN apt-get update && apt-get install -y --no-install-recommends file clang-6.0 llvm-6.0 libomp-dev python3 python3-pip python3-setuptools
+RUN apt-get update && apt-get install -y --no-install-recommends file clang-6.0 llvm libomp-dev python3 python3-pip python3-setuptools
 RUN pip3 install wllvm
 
 ARG GRAALVM_DIR
