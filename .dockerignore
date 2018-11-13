@@ -3,4 +3,5 @@
 ./.git/**
 ./paper/**
 ./docker/**
+./docker-failed/**
 ./docs/**
