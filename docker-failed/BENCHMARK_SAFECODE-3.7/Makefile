@@ -1,4 +1,4 @@
-DOCKER_IMAGE_NAME = "cicro/benchmark-safecode"
+DOCKER_IMAGE_NAME = "cicro/benchmark-safecode-3.7"
 
 DOCKER_RUN_ARGS = --privileged
 
