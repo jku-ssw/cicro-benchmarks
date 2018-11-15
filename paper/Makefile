@@ -190,9 +190,6 @@ $(OUTPUT_DIR_NAME)/tlsf.json:
 $(OUTPUT_DIR_NAME)/strace.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_STRACE run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime strace-O3 --ignore-errors $(HIGH_TIMEOUT)"
 
-$(OUTPUT_DIR_NAME)/ltrace.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_LTRACE run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime ltrace-O3 --ignore-errors $(HIGH_TIMEOUT)"
-
 #no-papi.json:
 #	../tools/bench.py -y --filter-runtime="(gcc|clang)-(O0|O3)" no-papi.json --no-papi --suffix='-no-papi' --runs=${RUNS}
 
