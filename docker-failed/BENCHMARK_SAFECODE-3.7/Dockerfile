@@ -9,7 +9,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends python git libo
 
 ARG SAFECODE_GIT_TAG=7a4fe7379e9bc07cbb663ee7d9f7820b1bacf3c2
 RUN git clone --depth 1 --single-branch https://github.com/jtcriswell/safecode-llvm37 && cd safecode-llvm37 && git checkout "${SAFECODE_GIT_TAG}"
-RUN cd safecode-llvm37 && mkdir build && cd build && cmake .. && make -j4
+
+RUN sed -i 's#bits/errno.h#errno.h#g' /safecode-llvm37/projects/safecode/runtime/SoftBoundRuntime/*.c  # FIX: error "Never include <bits/errno.h> directly; use <errno.h> instead."
+RUN cd safecode-llvm37 && mkdir build && cd build && ../configure --enable-optimized && make -j 4
 
 # TODO: implement remaining stuff
 
