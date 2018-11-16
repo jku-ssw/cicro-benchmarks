@@ -1,6 +1,8 @@
-*_test
+*_test*
 *.o*
 *.bc
+*.profraw
+*.profraw.merged
 
 tmp/
 

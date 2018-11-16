@@ -156,6 +156,9 @@ class BenchmarkingHarness(object):
             make_params.append('-i')  # -i = ignore-errors
             logger.warning('errors during "make" will be ignored and a 0 exit code will be returned')
 
+        if 'make_target' in  kwargs:
+            make_params.append(kwargs['make_target'])
+
         logger.info('build benchmarks with "%s"', ' '.join(make_params))
         with subprocess.Popen(['make'] + make_params, cwd=args.testdir) as process:
             process.communicate()
@@ -248,9 +251,6 @@ class BenchmarkingHarness(object):
             logger.error('runtime not found: "%s"', runtime)
             return False
 
-        exec_kwargs = kwargs.copy()
-        del exec_kwargs['exec_args']
-
         runtime_name = runtime + kwargs.get('suffix', '')
 
         found_runtime = self.registered_runtimes[runtime]
@@ -258,6 +258,11 @@ class BenchmarkingHarness(object):
 
         if kwargs['no_papi']:
             make_env["PAPI"] = 0
+
+        kwargs['make_env_copy'] = make_env  # when we need to compile something in the execution again (PGO)
+
+        exec_kwargs = kwargs.copy()
+        del exec_kwargs['exec_args']
 
         build_system_func = found_runtime['build_system_func']
         make_func = found_runtime['make_func']
@@ -524,10 +529,13 @@ def add_default_runtimes(harness):
 
     for config in glob.glob(os.path.join(CONFIG_DIR, '*.py')):
         with open(config) as f:
-            exec(f.read(), {'wllvm_make': wllvm_make,
+            exec(f.read(), {'default_clean': BenchmarkingHarness.default_clean,
+                            'default_make': BenchmarkingHarness.default_make,
+                            'default_executor': BenchmarkingHarness.default_executor,
+                            'wllvm_make': wllvm_make,
                             'wllvm_executor': wllvm_executor,
                             'build_system_executor': build_system_executor,
-                            'harness': harness, 'logger': logger})
+                            'harness': harness, 'logger': logger, 'run_env': run_env})
 
 
 if __name__ == "__main__":
