@@ -156,7 +156,7 @@ class BenchmarkingHarness(object):
             make_params.append('-i')  # -i = ignore-errors
             logger.warning('errors during "make" will be ignored and a 0 exit code will be returned')
 
-        if 'make_target' in  kwargs:
+        if 'make_target' in kwargs:
             make_params.append(kwargs['make_target'])
 
         logger.info('build benchmarks with "%s"', ' '.join(make_params))

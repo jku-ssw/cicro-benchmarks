@@ -30,6 +30,7 @@ def parse_gcov_output(benchmark_name, output):
         result_lines.append('%s;%s;%d;%d' % (benchmark_name, file_name, executed_loc, total_loc))
     return result_lines
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Merge benchmark results into one file',
                                      formatter_class=lambda prog: argparse.HelpFormatter(prog,

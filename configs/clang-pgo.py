@@ -71,7 +71,7 @@ def pgo_exec(filepath, workdir, exec_args, **kwargs):
                 return None, stderr.decode('utf-8') if stderr else None
 
         # merge profiling files (required)
-        with subprocess.Popen(['llvm-profdata', 'merge', '-output='+profraw_file_merged, profraw_file], cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env) as process:
+        with subprocess.Popen(['llvm-profdata', 'merge', '-output=' + profraw_file_merged, profraw_file], cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env) as process:
             stdout, stderr = process.communicate(timeout=10)
             if process.returncode is not 0 or not os.path.isfile(profraw_file_merged):
                 logger.error('cannot merge profdata')
@@ -102,4 +102,4 @@ def pgo_exec(filepath, workdir, exec_args, **kwargs):
 
 clang_pgo_kwargs = {'build_system_func': partial(build_system_executor, cc_version='--version', as_version='--version'), 'clean_func': pgo_cleam, 'make_func': pgo_make, 'exec_func': pgo_exec}
 
-harness.add_runtime('clang-pgo-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-O3", "CFLAGS_PGO": "-O3 -flto -fprofile-instr-generate", "LDFLAGS_PGO": "-fprofile-instr-generate"}, **clang_pgo_kwargs)
+harness.add_runtime('clang-pgo-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-O3", "CFLAGS_PGO": "-O3 -flto -fprofile-instr-generate", "LDFLAGS_PGO": "-fprofile-instr-generate"}, **clang_pgo_kwargs)  # NOQA: E501
