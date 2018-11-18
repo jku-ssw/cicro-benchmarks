@@ -20,7 +20,7 @@ GCC_TARGET_JSON = $(GCC_TARGET_NAMES:=.json)
 GCC_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(GCC_TARGET_JSON))
 
 
-ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert sanitizers lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf strace rpmalloc
+ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert sanitizers lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf strace rpmalloc polly
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 7200
@@ -100,6 +100,10 @@ $(OUTPUT_DIR_NAME)/freeguard.json:
 
 $(OUTPUT_DIR_NAME)/rpmalloc.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_RPMALLOC run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors"
+
+$(OUTPUT_DIR_NAME)/polly.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_POLLY run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors"
+
 
 # benchmark gcc
 $(OUTPUT_DIR_NAME)/gcc-4.8.json:
@@ -210,11 +214,11 @@ $(OUTPUT_DIR_NAME)/memory-allocators.json: $(OUTPUT_DIR_NAME)/merged.json
 
 $(OUTPUT_DIR_NAME)/bug-finding-tools.json: $(OUTPUT_DIR_NAME)/merged.json
 	rm -f $(OUTPUT_DIR_NAME)/bug-finding-tools.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-O3-v7|gcc-mpx-O3-v8|msan-O3|asan-O3|tsan-O3|ubsan-O3|lowfat-O3|softboundcets-O3|valgrind-O3|drmemory-O3' merged.json bug-finding-tools.json"
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-O3-v7|gcc-mpx-O3-v8|msan-O3|asan-O3|tsan-O3|ubsan-O3|cfi-O3|lowfat-O3|softboundcets-O3|valgrind-O3|drmemory-O3' merged.json bug-finding-tools.json"
 
 $(OUTPUT_DIR_NAME)/productivity-tools.json: $(OUTPUT_DIR_NAME)/merged.json
 	rm -f $(OUTPUT_DIR_NAME)/productivity-tools.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-O3-v7|gcc-gcov-O0-v8|qemu-O3|callgrind-O3' merged.json productivity-tools.json"
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='polly-O3|sulong|clang-O3-v7|gcc-gcov-O0-v8|qemu-O3|callgrind-O3|strace-O3' merged.json productivity-tools.json"
 
 $(OUTPUT_DIR_NAME)/llvm-versions.json: $(CLANG_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/llvm-versions.json
