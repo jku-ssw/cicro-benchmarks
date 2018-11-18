@@ -20,7 +20,7 @@ GCC_TARGET_JSON = $(GCC_TARGET_NAMES:=.json)
 GCC_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(GCC_TARGET_JSON))
 
 
-ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert sanitizers lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf strace
+ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert sanitizers lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf strace rpmalloc
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 7200
@@ -97,6 +97,9 @@ $(OUTPUT_DIR_NAME)/dmalloc.json:
 
 $(OUTPUT_DIR_NAME)/freeguard.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_FREEGUARD run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors --filter-harness '(?!(wolkykim-qlibc))'" # wolkykim-qlibc gets stuck during execution
+
+$(OUTPUT_DIR_NAME)/rpmalloc.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_RPMALLOC run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors"
 
 # benchmark gcc
 $(OUTPUT_DIR_NAME)/gcc-4.8.json:
@@ -203,7 +206,7 @@ $(OUTPUT_DIR_NAME)/overview.json: $(OUTPUT_DIR_NAME)/merged.json
 
 $(OUTPUT_DIR_NAME)/memory-allocators.json: $(OUTPUT_DIR_NAME)/merged.json
 	rm -f $(OUTPUT_DIR_NAME)/memory-allocators.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-O3-v7|boehmgc-O3|dmalloc-O3|diehard-O3|jemalloc-O3|hoard-O3|freeguard-O3|libdislocator-O3|dlmalloc-O3|tlsf-O3' merged.json memory-allocators.json"
+	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='rpmalloc-O3|clang-O3-v7|boehmgc-O3|dmalloc-O3|diehard-O3|jemalloc-O3|hoard-O3|freeguard-O3|libdislocator-O3|dlmalloc-O3|tlsf-O3' merged.json memory-allocators.json"
 
 $(OUTPUT_DIR_NAME)/bug-finding-tools.json: $(OUTPUT_DIR_NAME)/merged.json
 	rm -f $(OUTPUT_DIR_NAME)/bug-finding-tools.json

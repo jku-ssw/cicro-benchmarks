@@ -7,12 +7,13 @@ FROM cicro/benchmark-clang-base:${CACHE_TAG}
 RUN apt-get install -y --no-install-recommends git unzip
 RUN wget -O - https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-linux.zip > ninja-linux.zip && unzip ninja-linux.zip
 RUN wget -O - https://github.com/rampantpixels/rpmalloc/archive/1.3.1.tar.gz | tar xz
-RUN cd rpmalloc-1.3.1 && python3 configure.py && /ninja
+RUN apt-get -y install python # see https://github.com/rampantpixels/rpmalloc/issues/77
+RUN cd rpmalloc-1.3.1 && python configure.py && /ninja
 
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
 # configure benchmark enviroment
-RUN echo "LD_PRELOAD=/afl-2.52b/libdislocator/libdislocator.so" >> /benchmarks/configs/env.run
+RUN echo "LD_PRELOAD=/rpmalloc-1.3.1/bin/linux/release/x86-64/librpmallocwrap.so" >> /benchmarks/configs/env.run
 
-ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/libdislocator.json", "--filter-runtime=(libdislocator-O3)"] FOREGROUND
+ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/rpmalloc.json", "--filter-runtime=(rpmalloc-O3)"] FOREGROUND
