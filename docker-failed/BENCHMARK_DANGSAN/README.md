@@ -5,6 +5,13 @@
 The installation script builds its own ld, make,... and one of the configure steps causes the (custom) linker to
 not recognize one of the arguments. This argument is likely inserted by some package on our ubuntu 18.04 system
 
+This issue is related to https://github.com/jku-ssw/cicro-benchmarks/issues/49 because the flag is inserted from an
+internal spec-file. We need to somehow overwrite the specfile and drop this option if possible
+
+```
+ gcc -dumpspecs
+```
+
 ```
 configure:3405: checking for C compiler version
 configure:3414: gcc --version >&5
