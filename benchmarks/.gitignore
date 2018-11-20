@@ -1,6 +1,7 @@
 *_test*
 *.o*
 *.bc
+*.gcda
 *.profraw
 *.profraw.merged
 
