@@ -124,7 +124,7 @@ def gcc_pgo_exec(filepath, workdir, exec_args, **kwargs):
         pgo_file = os.path.abspath(os.path.join(workdir, filepath + GCC_PGO_FILE_SUFFIX))
 
         res = default_executor(filepath, workdir, exec_args, **kwargs)
-        if res[0] == None:
+        if res[0] is None:
             return res
 
         # remove library to cause recompilation
@@ -145,13 +145,13 @@ clang_pgo_kwargs = {'build_system_func': partial(build_system_executor, cc_versi
                     'clean_func': partial(pgo_clean, suffix=CLANG_PGO_SUFFIX, profile_files=[CLANG_PGO_PROFRAW_FILE_SUFFIX, CLANG_PGO_PROFRAW_MERGED_FILE_SUFFIX]),
                     'make_func': pgo_make,
                     'exec_func': clang_pgo_exec
-}
+                    }
 
 gcc_pgo_kwargs = {'build_system_func': partial(build_system_executor, cc_version='--version', as_version='--version'),
                   'clean_func': partial(pgo_clean, suffix=GCC_PGO_SUFFIX, profile_files=[GCC_PGO_FILE_SUFFIX]),
                   'make_func': pgo_make,
                   'exec_func': gcc_pgo_exec
-}
+                  }
 
 harness.add_runtime('clang-pgo-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-O3", "CFLAGS_PGO": "-O3 -flto -fprofile-instr-generate", "LDFLAGS_PGO": "-fprofile-instr-generate"}, **clang_pgo_kwargs)  # NOQA: E501
-harness.add_runtime('gcc-pgo-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3",  "CFLAGS_PGO": "-O3 -fprofile-generate", "LDFLAGS_PGO": "-fprofile-generate"}, **gcc_pgo_kwargs)
+harness.add_runtime('gcc-pgo-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3", "CFLAGS_PGO": "-O3 -fprofile-generate", "LDFLAGS_PGO": "-fprofile-generate"}, **gcc_pgo_kwargs)
