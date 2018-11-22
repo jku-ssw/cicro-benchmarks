@@ -7,6 +7,7 @@ harness.add_runtime('clang-O1', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "
 harness.add_runtime('clang-O2', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O2"}, **clang_kwargs)
 harness.add_runtime('clang-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **clang_kwargs)
 harness.add_runtime('clang-lld-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "LDFLAGS": "-fuse-ld=lld"}, **clang_kwargs)
+harness.add_runtime('clang-gold-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "LDFLAGS": "-fuse-ld=gold"}, **clang_kwargs)
 harness.add_runtime('clang-march-native-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -march=native"}, **clang_kwargs)
 harness.add_runtime('clang-Ofast', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -Ofast"}, **clang_kwargs)
 harness.add_runtime('clang-Os', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -Os"}, **clang_kwargs)
