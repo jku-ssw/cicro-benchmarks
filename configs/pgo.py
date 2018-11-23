@@ -5,13 +5,13 @@ import subprocess
 from functools import partial
 
 
-def pgo_clean(workdir, suffix, profile_files, **kwargs):
+def pgo_clean(workdir, pgo_suffix, profile_files, **kwargs):
     assert os.path.isdir(workdir)
-    assert suffix  # TODO: why empty?
+    assert pgo_suffix
 
     # clean directory with pgo suffix
     logger.info('clean pgo files')
-    with subprocess.Popen(['make', 'clean', 'TEST_SUFFIX=' + suffix], cwd=workdir, stdout=subprocess.DEVNULL) as process:
+    with subprocess.Popen(['make', 'clean', 'TEST_SUFFIX=' + pgo_suffix], cwd=workdir, stdout=subprocess.DEVNULL) as process:
         process.communicate()
 
         if process.returncode != 0:
@@ -90,8 +90,9 @@ def clang_pgo_exec(filepath, workdir, exec_args, **kwargs):
             if not os.path.isfile(profraw_file):
                 return None, stderr.decode('utf-8') if stderr else None
 
+
         # merge profiling files (required)
-        with subprocess.Popen(['llvm-profdata', 'merge', '-output=' + profraw_file_merged, profraw_file], cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env) as process:
+        with subprocess.Popen([os.path.expandvars(env['LLVM_PROFDATA']), 'merge', '-output=' + profraw_file_merged, profraw_file], cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env) as process:
             stdout, stderr = process.communicate(timeout=10)
             if process.returncode is not 0 or not os.path.isfile(profraw_file_merged):
                 logger.error('cannot merge profdata')
@@ -142,16 +143,22 @@ def gcc_pgo_exec(filepath, workdir, exec_args, **kwargs):
 
 
 clang_pgo_kwargs = {'build_system_func': partial(build_system_executor, cc_version='--version', as_version='--version'),
-                    'clean_func': partial(pgo_clean, suffix=CLANG_PGO_SUFFIX, profile_files=[CLANG_PGO_PROFRAW_FILE_SUFFIX, CLANG_PGO_PROFRAW_MERGED_FILE_SUFFIX]),
+                    'clean_func': partial(pgo_clean, pgo_suffix=CLANG_PGO_SUFFIX, profile_files=[CLANG_PGO_PROFRAW_FILE_SUFFIX, CLANG_PGO_PROFRAW_MERGED_FILE_SUFFIX]),
                     'make_func': pgo_make,
                     'exec_func': clang_pgo_exec
                     }
 
 gcc_pgo_kwargs = {'build_system_func': partial(build_system_executor, cc_version='--version', as_version='--version'),
-                  'clean_func': partial(pgo_clean, suffix=GCC_PGO_SUFFIX, profile_files=[GCC_PGO_FILE_SUFFIX]),
+                  'clean_func': partial(pgo_clean, pgo_suffix=GCC_PGO_SUFFIX, profile_files=[GCC_PGO_FILE_SUFFIX]),
                   'make_func': pgo_make,
                   'exec_func': gcc_pgo_exec
                   }
 
-harness.add_runtime('clang-pgo-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-O3", "CFLAGS_PGO": "-O3 -flto -fprofile-instr-generate", "LDFLAGS_PGO": "-fprofile-instr-generate"}, **clang_pgo_kwargs)  # NOQA: E501
-harness.add_runtime('gcc-pgo-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3", "CFLAGS_PGO": "-O3 -fprofile-generate", "LDFLAGS_PGO": "-fprofile-generate"}, **gcc_pgo_kwargs)
+harness.add_runtime('clang-pgo-O3', {"CC": "${CLANG}", "AS": "${CLANG}",
+                                     "CFLAGS": "-O3",
+                                     "CFLAGS_PGO": "-O3 -flto -fprofile-instr-generate",
+                                     "LDFLAGS_PGO": "-fprofile-instr-generate -fuse-ld=lld"}, **clang_pgo_kwargs)  # NOQA: E501
+harness.add_runtime('gcc-pgo-O3', {"CC": "${GCC}", "AS": "as",
+                                   "CFLAGS": "-std=gnu99 -O3",
+                                   "CFLAGS_PGO": "-O3 -fprofile-generate",
+                                   "LDFLAGS_PGO": "-fprofile-generate"}, **gcc_pgo_kwargs)
