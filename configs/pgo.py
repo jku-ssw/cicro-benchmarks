@@ -90,9 +90,9 @@ def clang_pgo_exec(filepath, workdir, exec_args, **kwargs):
             if not os.path.isfile(profraw_file):
                 return None, stderr.decode('utf-8') if stderr else None
 
-
         # merge profiling files (required)
-        with subprocess.Popen([os.path.expandvars(env['LLVM_PROFDATA']), 'merge', '-output=' + profraw_file_merged, profraw_file], cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env) as process:
+        args = [os.path.expandvars(env['LLVM_PROFDATA']), 'merge', '-output=' + profraw_file_merged, profraw_file]
+        with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env) as process:
             stdout, stderr = process.communicate(timeout=10)
             if process.returncode is not 0 or not os.path.isfile(profraw_file_merged):
                 logger.error('cannot merge profdata')
