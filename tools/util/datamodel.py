@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Boolean, Integer, Numeric, String
+from sqlalchemy import Column, ForeignKey, Boolean, Integer, Numeric, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -23,7 +23,7 @@ class Benchmark(Base):
 
     harness = relationship("Harness", back_populates="benchmarks")
 
-    runs = relationship('Runs')
+    runs = relationship('Run')
 
     def __repr__(self):
         return '<Benchmark "{}">'.format(self.name)
@@ -37,31 +37,34 @@ class Configuration(Base):
 
     harness = relationship("Harness", back_populates="configurations")
 
-    runs = relationship('Runs')
+    executions = relationship('Execution')
 
     def __repr__(self):
         return '<Configuration "{}" harness="{}">'.format(self.id, self.harness.name)
 
 
-class Runs(Base):
-    __tablename__ = 'runs'
+class Execution(Base):
+    __tablename__ = 'execution'
     id = Column(Integer, primary_key=True, nullable=False, index=True)
-    benchmark_name = Column(String, ForeignKey('benchmark.name'), nullable=False)
     configuration_id = Column(Integer, ForeignKey('configuration.id'), nullable=False)
+    datetime = Column(DateTime, nullable=False)
+    stderr = Column(String, nullable=True)
+    stdout = Column(String, nullable=True)
+    exit_code = Column(Integer, nullable=True)
 
-    benchmark = relationship("Benchmark", back_populates="runs")
-    configuration = relationship("Configuration", back_populates="runs")
+    configuration = relationship("Configuration", back_populates="executions")
 
     runs = relationship('Run')
 
     def __repr__(self):
-        return '<Runs "{}" configuration={} benchmark="{}">'.format(self.id, self.configuration,  self.benchmark.name)
+        return '<Execution "{}" configuration={}>'.format(self.id, self.configuration)
 
 
 class Run(Base):
     __tablename__ = 'run'
     id = Column(Integer, primary_key=True, nullable=False, index=True)
-    runs_id = Column(Integer, ForeignKey('runs.id'), nullable=False)
+    execution_id = Column(Integer, ForeignKey('execution.id'), nullable=False)
+    benchmark_name = Column(String, ForeignKey('benchmark.name'), nullable=False)
 
     clock_resolution = Column(Numeric, nullable=True)
     clock_resolution_measured = Column(Numeric, nullable=True)
@@ -69,7 +72,8 @@ class Run(Base):
     disabled = Column(Boolean, nullable=False)
     iterations_per_run = Column(Integer, nullable=True)
 
-    runs = relationship("Runs", back_populates="runs")
+    benchmark = relationship("Benchmark", back_populates="runs")
+    execution = relationship("Execution", back_populates="runs")
 
     datapoints = relationship('Datapoint')
 

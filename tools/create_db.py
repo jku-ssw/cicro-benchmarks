@@ -5,6 +5,8 @@ import json
 import logging
 import sys
 
+import dateutil.parser
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -12,7 +14,7 @@ logging.getLogger('sqlalchemy').setLevel(logging.WARNING)
 logging.getLogger('sqlalchemy.engine.base.Engine').setLevel(logging.WARNING)
 logging.getLogger('sqlalchemy.orm.mapper.Mapper').setLevel(logging.WARNING)
 
-from util.datamodel import Base, Harness, Benchmark, Configuration, Runs, Run, Datapoint  # NOQA:E402
+from util.datamodel import Base, Harness, Benchmark, Configuration, Execution, Run, Datapoint  # NOQA:E402
 from util.color_logger import get_logger  # NOQA:E402
 
 logger = get_logger('create_db')
@@ -25,10 +27,10 @@ def get_benchmark_name(benchmark):
 def load_file_in_db(session, file):
     file_data = json.load(file)
 
-    # harness_data = {}
+    harness_data = {}
     if 'benchmark_data' in file_data:
         benchmark_data = file_data['benchmark_data']
-        # harness_data = file_data.get('harness_data', {})
+        harness_data = file_data.get('harness_data', {})
     else:
         benchmark_data = file_data  # old file structure
 
@@ -39,8 +41,8 @@ def load_file_in_db(session, file):
 
             run_id = 0
             for entry in data:
-                # entry_h_data = harness_data.get(entry['harness'], {}).get(runtime, []) if 'harness' in entry else []
-                # h_data = entry_h_data[run_id] if len(entry_h_data) > run_id else None
+                entry_h_data = harness_data.get(entry['harness'], {}).get(runtime, []) if 'harness' in entry else []
+                h_data = entry_h_data[run_id] if len(entry_h_data) > run_id else None
 
                 harness = session.query(Harness).filter_by(name=entry['harness']).one_or_none()
                 if harness is None:
@@ -57,12 +59,15 @@ def load_file_in_db(session, file):
                     config = Configuration(name=runtime, harness=harness)
                     session.add(config)
 
-                runs = session.query(Runs).filter_by(benchmark=benchmark, configuration=config).one_or_none()
-                if runs is None:
-                    runs = Runs(benchmark=benchmark, configuration=config)
-                    session.add(runs)
+                execution = Execution(configuration=config,
+                                      datetime=dateutil.parser.parse(h_data['datetime']),
+                                      stderr=h_data.get('stderr'),
+                                      stdout=h_data.get('stdout'),
+                                      exit_code=h_data.get('exit_code'))
+                session.add(execution)
 
-                run = Run(runs=runs,
+                run = Run(execution=execution,
+                          benchmark=benchmark,
                           clock_resolution=entry['clock_resolution'],
                           clock_resolution_measured=entry['clock_resolution_measured'],
                           clock_type=entry['clock_type'],
