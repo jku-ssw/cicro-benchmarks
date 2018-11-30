@@ -55,9 +55,22 @@ class Execution(Base):
     configuration = relationship("Configuration", back_populates="executions")
 
     runs = relationship('Run')
+    build_system = relationship('ExecutionBuildSystem')
 
     def __repr__(self):
         return '<Execution "{}" configuration={}>'.format(self.id, self.configuration)
+
+
+class ExecutionBuildSystem(Base):
+    __tablename__ = 'execution_build_system'
+    execution_id = Column(Integer, ForeignKey('execution.id'), primary_key=True, nullable=False)
+    key = Column(String,  primary_key=True, nullable=False)
+    value = Column(String, nullable=False)
+
+    execution = relationship("Execution", back_populates="build_system")
+
+    def __repr__(self):
+        return '<ExecutionBuildSystem "{}" "{}"="{}">'.format(self.execution_id, self.key, self.value)
 
 
 class Run(Base):

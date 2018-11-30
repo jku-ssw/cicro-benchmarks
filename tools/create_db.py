@@ -14,7 +14,7 @@ logging.getLogger('sqlalchemy').setLevel(logging.WARNING)
 logging.getLogger('sqlalchemy.engine.base.Engine').setLevel(logging.WARNING)
 logging.getLogger('sqlalchemy.orm.mapper.Mapper').setLevel(logging.WARNING)
 
-from util.datamodel import Base, Harness, Benchmark, Configuration, Execution, Run, Datapoint  # NOQA:E402
+from util.datamodel import Base, Harness, Benchmark, Configuration, Execution, ExecutionBuildSystem, Run, Datapoint  # NOQA:E402
 from util.color_logger import get_logger  # NOQA:E402
 
 logger = get_logger('create_db')
@@ -59,12 +59,16 @@ def load_file_in_db(session, file):
                     config = Configuration(name=runtime, harness=harness)
                     session.add(config)
 
+                # TODO: one Execution can contain multiple RUNS!
                 execution = Execution(configuration=config,
                                       datetime=dateutil.parser.parse(h_data['datetime']),
                                       stderr=h_data.get('stderr'),
                                       stdout=h_data.get('stdout'),
                                       exit_code=h_data.get('exit_code'))
                 session.add(execution)
+
+                session.add_all([ExecutionBuildSystem(execution=execution, key=key, value=value)
+                                 for key, value in h_data.get('build_system', {}).items()])
 
                 run = Run(execution=execution,
                           benchmark=benchmark,
