@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Boolean, Integer, BigInteger, Numeric, String, DateTime
+from sqlalchemy import Column, ForeignKey, Boolean, Integer, BigInteger, Float, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -65,7 +65,7 @@ class Execution(Base):
     runs = relationship('Run')
     build_system = relationship('ExecutionBuildSystem')
     make_env = relationship('ExecutionMakeEnv')
-    sys_cpu = relationship('ExecutionSystemCpu')
+    sys_cpu = relationship('ExecutionSystemCpu', order_by="asc(ExecutionSystemCpu.idx)")
 
     def __repr__(self):
         return '<Execution "{}" configuration={}>'.format(self.id, self.configuration)
@@ -99,10 +99,10 @@ class ExecutionSystemCpu(Base):
     __tablename__ = 'execution_system_cpu'
     execution_id = Column(Integer, ForeignKey('execution.id'), primary_key=True, nullable=False)
     idx = Column(Integer,  primary_key=True, nullable=False)
-    percent = Column(Numeric, nullable=False)
-    cur_clock = Column(Numeric, nullable=False)
-    min_clock = Column(Numeric, nullable=False)
-    max_clock = Column(Numeric, nullable=False)
+    percent = Column(Float, nullable=False)
+    cur_clock = Column(Float, nullable=False)
+    min_clock = Column(Float, nullable=False)
+    max_clock = Column(Float, nullable=False)
 
     execution = relationship("Execution", back_populates="sys_cpu")
 
@@ -116,8 +116,8 @@ class Run(Base):
     execution_id = Column(Integer, ForeignKey('execution.id'), nullable=False)
     benchmark_name = Column(String, ForeignKey('benchmark.name'), nullable=False)
 
-    clock_resolution = Column(Numeric, nullable=True)
-    clock_resolution_measured = Column(Numeric, nullable=True)
+    clock_resolution = Column(Float, nullable=True)
+    clock_resolution_measured = Column(Float, nullable=True)
     clock_type = Column(String, nullable=True)
     disabled = Column(Boolean, nullable=False)
     iterations_per_run = Column(Integer, nullable=True)
@@ -125,7 +125,7 @@ class Run(Base):
     benchmark = relationship("Benchmark", back_populates="runs")
     execution = relationship("Execution", back_populates="runs")
 
-    datapoints = relationship('Datapoint')
+    datapoints = relationship('Datapoint', order_by="asc(Datapoint.idx)")
 
     def __repr__(self):
         return '<Run "{}">'.format(self.id)
@@ -136,7 +136,7 @@ class Datapoint(Base):
     idx = Column(Integer, primary_key=True, nullable=False)
     run_id = Column(Integer, ForeignKey('run.id'), primary_key=True, nullable=False)
     key = Column(String,  primary_key=True, nullable=False)
-    value = Column(Numeric, nullable=False)
+    value = Column(Float, nullable=False)
 
     run = relationship("Run", back_populates="datapoints")
 

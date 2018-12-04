@@ -6,11 +6,22 @@ import util.datamodel as dm
 from util.color_logger import get_logger
 from util.auto_extend_list import auto_extend_list
 
+from datetime import timezone
+
 logger = get_logger('datamodel_helper')
 
 
 def get_benchmark_name(benchmark):
-    return "{}.{}".format(benchmark.get('fixture'), benchmark.get('name'))
+    fixture = benchmark.get('fixture')
+    name = benchmark.get('name')
+    assert ('.' not in fixture) and ('.' not in name)
+    return "{}.{}".format(fixture, name)
+
+
+def split_benchmark_name(benchmark_name):
+    splits = benchmark_name.split('.')
+    assert len(splits) == 2
+    return splits  # fixure, name
 
 
 def load_file_in_db(session, file):
@@ -60,8 +71,10 @@ def load_file_in_db(session, file):
                 if run_id < len(execution_cache_arr) and execution_cache_arr[run_id] is not None:
                     execution = execution_cache[harness_name][runtime][run_id]
                 else:
+                    # store datetime in UTC
+                    dt = date_parse(h_data['datetime']).astimezone(timezone.utc) if 'datetime' in h_data else None
                     execution = dm.Execution(configuration=config,
-                                             datetime=date_parse(h_data['datetime']) if 'datetime' in h_data else None,
+                                             datetime=dt,
                                              stderr=h_data.get('stderr'),
                                              stdout=h_data.get('stdout'),
                                              exit_code=h_data.get('exit_code'),
@@ -107,3 +120,105 @@ def load_file_in_db(session, file):
 
                 run_id += 1
     return True
+
+
+def save_file_as_json(session, file):
+    # initialize base-dictionaries
+    benchmark_data = {}
+    for benchmark in session.query(dm.Benchmark).all():
+        benchmark_data[benchmark.name] = {}
+
+    harness_data = {}
+    for harness in session.query(dm.Harness).all():
+        harness_data[harness.name] = {}
+
+    # store all executions
+    for execution in session.query(dm.Execution).all():
+        config_name = execution.configuration.name
+        harness_name = execution.configuration.harness.name
+
+        exec_harness = {}
+
+        # key: 'build_system'
+        build_system = {}
+        for entry in execution.build_system:
+            build_system[entry.key] = entry.value
+        if len(build_system) > 0:
+            exec_harness['build_system'] = build_system
+
+        # key: 'datetime'
+        if execution.datetime is not None:
+            exec_harness['datetime'] = execution.datetime.replace(tzinfo=timezone.utc).isoformat()
+
+        # key: 'make_env'
+        make_env = {}
+        for entry in execution.make_env:
+            make_env[entry.key] = entry.value
+        if len(make_env) > 0:
+            exec_harness['make_env'] = make_env
+
+        # key: 'system'
+        system = {'platform': execution.sys_platform,
+                  'cpu': {
+                      'cores_logical': execution.sys_cpu_logical,
+                      'cores_physical': execution.sys_cpu_physical,
+                  },
+                  'memory': {
+                    'available': execution.sys_mem_avail,
+                    'free': execution.sys_mem_free,
+                    'total': execution.sys_mem_total,
+                    'used': execution.sys_mem_used
+                  }
+                 }
+
+        cpu_freq = []
+        cpu_percent = []
+        for idx, core in enumerate(execution.sys_cpu):
+            assert idx == core.idx
+            cpu_freq.append([core.cur_clock, core.min_clock, core.max_clock])
+            cpu_percent.append(core.percent)
+
+        system['cpu']['freq'] = cpu_freq
+        system['cpu']['percent'] = cpu_percent
+
+        exec_harness['system'] = system
+
+        # store harness
+        if config_name not in harness_data[harness_name]:
+            harness_data[harness_name][config_name] = []
+        harness_data[harness_name][config_name].append(exec_harness)
+
+        # store a benchmark run of a specific execution
+        for run in execution.runs:
+            bench_name = run.benchmark.name
+
+            fixture, name = split_benchmark_name(bench_name)
+            exec_benchmark = {'clock_resulution': run.clock_resolution,
+                              'clock_resolution_measured': run.clock_resolution_measured,
+                              'clock_type': run.clock_type,
+                              'disabled': run.disabled,
+                              'fixture': fixture,
+                              'harness': harness_name,
+                              'iterations_per_run': run.iterations_per_run,
+                              'mean': None,  # TODO: remove
+                              'name': name,
+                              'std_dev': None  # TODO: remove
+                              }
+
+            runs = []
+            for dp in run.datapoints:
+                assert (dp.idx >= 0) and (len(runs)-1 <= dp.idx <= len(runs))
+                if dp.idx >= len(runs):
+                    runs.append({})
+                runs[dp.idx][dp.key] = dp.value
+
+            exec_benchmark['runs'] = runs
+
+            # store benchmark
+            if config_name not in benchmark_data[bench_name]:
+                benchmark_data[bench_name][config_name] = []
+            benchmark_data[bench_name][config_name].append(exec_benchmark)
+
+    file_data = {'benchmark_data': benchmark_data, 'harness_data': harness_data}
+
+    json.dump(file_data, file, sort_keys=True, indent=4, separators=(',', ': '))
