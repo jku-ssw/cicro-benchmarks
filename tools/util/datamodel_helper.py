@@ -1,4 +1,7 @@
 import json
+import re
+
+from sqlalchemy.orm import selectinload
 
 from dateutil.parser import parse as date_parse
 
@@ -122,20 +125,18 @@ def load_file_in_db(session, file):
     return True
 
 
-def save_file_as_json(session, file):
-    # initialize base-dictionaries
+def save_file_as_json(session, file, runtime_filter='.*'):
     benchmark_data = {}
-    for benchmark in session.query(dm.Benchmark).all():
-        benchmark_data[benchmark.name] = {}
-
     harness_data = {}
-    for harness in session.query(dm.Harness).all():
-        harness_data[harness.name] = {}
 
     # store all executions
-    for execution in session.query(dm.Execution).all():
+    for execution in session.query(dm.Execution).options(selectinload(dm.Execution.configuration)).all():
         config_name = execution.configuration.name
         harness_name = execution.configuration.harness.name
+
+        if not re.match(runtime_filter, config_name):
+            logger.debug('"{}" does not match filter -> skip'.format(config_name))
+            continue
 
         exec_harness = {}
 
@@ -168,8 +169,7 @@ def save_file_as_json(session, file):
                     'free': execution.sys_mem_free,
                     'total': execution.sys_mem_total,
                     'used': execution.sys_mem_used
-                  }
-                 }
+                  }}
 
         cpu_freq = []
         cpu_percent = []
@@ -184,6 +184,8 @@ def save_file_as_json(session, file):
         exec_harness['system'] = system
 
         # store harness
+        if harness_name not in harness_data:
+            harness_data[harness_name] = {}
         if config_name not in harness_data[harness_name]:
             harness_data[harness_name][config_name] = []
         harness_data[harness_name][config_name].append(exec_harness)
@@ -215,6 +217,8 @@ def save_file_as_json(session, file):
             exec_benchmark['runs'] = runs
 
             # store benchmark
+            if bench_name not in benchmark_data:
+                benchmark_data[bench_name] = {}
             if config_name not in benchmark_data[bench_name]:
                 benchmark_data[bench_name][config_name] = []
             benchmark_data[bench_name][config_name].append(exec_benchmark)

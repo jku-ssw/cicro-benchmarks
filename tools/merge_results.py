@@ -4,9 +4,17 @@ import argparse
 import logging
 import sys
 
-from util.bench_results import BenchmarkingResults
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 from util.color_logger import get_logger
 
+logging.getLogger('sqlalchemy').setLevel(logging.WARNING)
+logging.getLogger('sqlalchemy.engine.base.Engine').setLevel(logging.WARNING)
+logging.getLogger('sqlalchemy.orm.mapper.Mapper').setLevel(logging.WARNING)
+
+from util.datamodel import Base  # NOQA:E402
+from util.datamodel_helper import load_file_in_db, save_file_as_json  # NOQA:E402
 
 logger = get_logger('merge_results')
 
@@ -22,6 +30,8 @@ if __name__ == "__main__":
                         help='file where the benchmarks are merged into')
     parser.add_argument('outfile', metavar='OUTFILE', type=argparse.FileType('x'),
                         help='file where the benchmarks are merged into')
+    parser.add_argument('--database', default='sqlite://', type=str,
+                        help='database which is used for procecssing. By default use in-memory sqllite')
     parser.add_argument('--filter-runtime', metavar='REGEX', type=str, default='.*',
                         help='regular expression to select which runtimes should be used')
 
@@ -33,13 +43,22 @@ if __name__ == "__main__":
     if not args.verbose:
         logging.disable(logging.DEBUG)  # we want to set all loggers
 
-    results = BenchmarkingResults()
+    engine = create_engine(args.database)
+    Base.metadata.bind = engine
+    Base.metadata.create_all(engine)
+
+    DBSession = sessionmaker()
+    DBSession.bind = engine
+
+    session = DBSession()
 
     for file in args.infile:
         try:
-            results.load_file(file, append=False, verbose=False)
+            logger.info("load \"{}\"".format(file.name))
+            load_file_in_db(session, file)
         except Exception:
             logger.exception("cannot load file")
             sys.exit()
 
-    results.store_file(args.outfile, args.filter_runtime)
+    logger.info("store into \"{}\"".format(args.outfile.name))
+    save_file_as_json(session, args.outfile, args.filter_runtime)

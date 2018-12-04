@@ -21,7 +21,7 @@ class Benchmark(Base):
     name = Column(String, primary_key=True, nullable=False, index=True)
     harness_name = Column(String, ForeignKey('harness.name'), nullable=False)
 
-    harness = relationship("Harness", back_populates="benchmarks")
+    harness = relationship("Harness", back_populates="benchmarks", lazy="joined")
 
     runs = relationship('Run')
 
@@ -35,7 +35,7 @@ class Configuration(Base):
     harness_name = Column(String, ForeignKey('harness.name'), nullable=False)
     name = Column(String, nullable=False)
 
-    harness = relationship("Harness", back_populates="configurations")
+    harness = relationship("Harness", back_populates="configurations", lazy="joined")
 
     executions = relationship('Execution')
 
@@ -63,9 +63,9 @@ class Execution(Base):
     configuration = relationship("Configuration", back_populates="executions")
 
     runs = relationship('Run')
-    build_system = relationship('ExecutionBuildSystem')
-    make_env = relationship('ExecutionMakeEnv')
-    sys_cpu = relationship('ExecutionSystemCpu', order_by="asc(ExecutionSystemCpu.idx)")
+    build_system = relationship('ExecutionBuildSystem', lazy="selectin")
+    make_env = relationship('ExecutionMakeEnv', lazy="selectin")
+    sys_cpu = relationship('ExecutionSystemCpu', order_by="asc(ExecutionSystemCpu.idx)", lazy="selectin")
 
     def __repr__(self):
         return '<Execution "{}" configuration={}>'.format(self.id, self.configuration)
