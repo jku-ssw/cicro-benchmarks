@@ -27,6 +27,31 @@ def split_benchmark_name(benchmark_name):
     return splits  # fixure, name
 
 
+def get_or_create_harness(session, harness_name):
+    harness = session.query(dm.Harness).filter_by(name=harness_name).one_or_none()
+    if harness is None:
+        harness = dm.Harness(name=harness_name)
+        session.add(harness)
+    return harness
+
+
+def get_or_create_benchmark(session, benchmark_name, harness):
+    benchmark = session.query(dm.Benchmark).filter_by(name=benchmark_name).one_or_none()
+    if benchmark is None:
+        benchmark = dm.Benchmark(name=benchmark_name, harness=harness)
+        session.add(benchmark)
+    assert benchmark.harness == harness
+    return benchmark
+
+
+def get_or_create_config(session, config_name):
+    config = session.query(dm.Configuration).filter_by(name=config_name).one_or_none()
+    if config is None:
+        config = dm.Configuration(name=config_name)
+        session.add(config)
+    return config
+
+
 def load_file_in_db(session, file):
     file_data = json.load(file)
 
@@ -50,21 +75,11 @@ def load_file_in_db(session, file):
                 h_data = entry_h_data[run_id] if len(entry_h_data) > run_id else {}
 
                 harness_name = entry['harness']
-                harness = session.query(dm.Harness).filter_by(name=harness_name).one_or_none()
-                if harness is None:
-                    harness = dm.Harness(name=harness_name)
-                    session.add(harness)
+                harness = get_or_create_harness(session, harness_name)
 
-                benchmark = session.query(dm.Benchmark).filter_by(name=get_benchmark_name(entry)).one_or_none()
-                if benchmark is None:
-                    benchmark = dm.Benchmark(name=get_benchmark_name(entry), harness=harness)
-                    session.add(benchmark)
-                assert benchmark.harness == harness
+                benchmark = get_or_create_benchmark(session, get_benchmark_name(entry), harness)
 
-                config = session.query(dm.Configuration).filter_by(name=runtime).one_or_none()
-                if config is None:
-                    config = dm.Configuration(name=runtime)
-                    session.add(config)
+                config = get_or_create_config(session, runtime)
 
                 h_system = h_data.get('system', {})
                 h_cpu = h_system.get('cpu', {})
