@@ -14,7 +14,7 @@ logging.getLogger('sqlalchemy').setLevel(logging.WARNING)
 logging.getLogger('sqlalchemy.engine.base.Engine').setLevel(logging.WARNING)
 logging.getLogger('sqlalchemy.orm.mapper.Mapper').setLevel(logging.WARNING)
 
-from util.datamodel import Base, Harness, Benchmark, Configuration, Execution, ExecutionBuildSystem,ExecutionMakeEnv, ExecutionSystemCpu, Run, Datapoint  # NOQA:E402
+import util.datamodel as dm  # NOQA:E402
 from util.color_logger import get_logger  # NOQA:E402
 
 logger = get_logger('create_db')
@@ -44,19 +44,19 @@ def load_file_in_db(session, file):
                 entry_h_data = harness_data.get(entry['harness'], {}).get(runtime, []) if 'harness' in entry else []
                 h_data = entry_h_data[run_id] if len(entry_h_data) > run_id else {}
 
-                harness = session.query(Harness).filter_by(name=entry['harness']).one_or_none()
+                harness = session.query(dm.Harness).filter_by(name=entry['harness']).one_or_none()
                 if harness is None:
-                    harness = Harness(name=entry['harness'])
+                    harness = dm.Harness(name=entry['harness'])
                     session.add(harness)
 
-                benchmark = session.query(Benchmark).filter_by(name=get_benchmark_name(entry)).one_or_none()
+                benchmark = session.query(dm.Benchmark).filter_by(name=get_benchmark_name(entry)).one_or_none()
                 if benchmark is None:
-                    benchmark = Benchmark(name=get_benchmark_name(entry), harness=harness)
+                    benchmark = dm.Benchmark(name=get_benchmark_name(entry), harness=harness)
                     session.add(benchmark)
 
-                config = session.query(Configuration).filter_by(name=runtime, harness=harness).one_or_none()
+                config = session.query(dm.Configuration).filter_by(name=runtime, harness=harness).one_or_none()
                 if config is None:
-                    config = Configuration(name=runtime, harness=harness)
+                    config = dm.Configuration(name=runtime, harness=harness)
                     session.add(config)
 
                 # TODO: one Execution can contain multiple RUNS!
@@ -64,41 +64,40 @@ def load_file_in_db(session, file):
                 h_cpu = h_system.get('cpu', {})
                 h_memory = h_system.get('memory', {})
 
-                execution = Execution(configuration=config,
-                                      datetime=date_parse(h_data['datetime']) if 'datetime' in h_data else None,
-                                      stderr=h_data.get('stderr'),
-                                      stdout=h_data.get('stdout'),
-                                      exit_code=h_data.get('exit_code'),
-                                      sys_platform=h_system.get('platform'),
-                                      sys_mem_avail=h_memory.get('available'),
-                                      sys_mem_free=h_memory.get('free'),
-                                      sys_mem_total=h_memory.get('total'),
-                                      sys_mem_used=h_memory.get('used'),
-                                      sys_cpu_logical=h_cpu.get('cores_logical'),
-                                      sys_cpu_physical=h_cpu.get('cores_physical'))
+                execution = dm.Execution(configuration=config,
+                                         datetime=date_parse(h_data['datetime']) if 'datetime' in h_data else None,
+                                         stderr=h_data.get('stderr'),
+                                         stdout=h_data.get('stdout'),
+                                         exit_code=h_data.get('exit_code'),
+                                         sys_platform=h_system.get('platform'),
+                                         sys_mem_avail=h_memory.get('available'),
+                                         sys_mem_free=h_memory.get('free'),
+                                         sys_mem_total=h_memory.get('total'),
+                                         sys_mem_used=h_memory.get('used'),
+                                         sys_cpu_logical=h_cpu.get('cores_logical'),
+                                         sys_cpu_physical=h_cpu.get('cores_physical'))
                 session.add(execution)
 
-                session.add_all([ExecutionBuildSystem(execution=execution, key=key, value=value)
+                session.add_all([dm.ExecutionBuildSystem(execution=execution, key=key, value=value)
                                  for key, value in h_data.get('build_system', {}).items()])
 
-                session.add_all([ExecutionMakeEnv(execution=execution, key=key, value=value)
+                session.add_all([dm.ExecutionMakeEnv(execution=execution, key=key, value=value)
                                  for key, value in h_data.get('make_env', {}).items()])
 
-                session.add_all([ExecutionSystemCpu(execution=execution, idx=idx, percent=val[0],
-                                                    cur_clock=val[1][0], min_clock=val[1][1], max_clock=val[1][2])
+                session.add_all([dm.ExecutionSystemCpu(execution=execution, idx=idx, percent=val[0],
+                                                       cur_clock=val[1][0], min_clock=val[1][1], max_clock=val[1][2])
                                  for idx, val in enumerate(zip(h_cpu.get('percent', []), h_cpu.get('freq', [])))])
 
-                run = Run(execution=execution,
-                          benchmark=benchmark,
-                          clock_resolution=entry.get('clock_resolution'),
-                          clock_resolution_measured=entry.get('clock_resolution_measured'),
-                          clock_type=entry.get('clock_type'),
-                          disabled=entry.get('disabled'),
-                          iterations_per_run=entry.get('iterations_per_run'),
-                          )
+                run = dm.Run(execution=execution,
+                             benchmark=benchmark,
+                             clock_resolution=entry.get('clock_resolution'),
+                             clock_resolution_measured=entry.get('clock_resolution_measured'),
+                             clock_type=entry.get('clock_type'),
+                             disabled=entry.get('disabled'),
+                             iterations_per_run=entry.get('iterations_per_run'))
 
                 for idx, dp in enumerate(entry['runs']):
-                    session.add_all([Datapoint(idx=idx, run=run, key=key, value=value) for key, value in dp.items()])
+                    session.add_all([dm.Datapoint(idx=idx, run=run, key=key, value=value) for key, value in dp.items()])
 
                 session.commit()
 
@@ -125,8 +124,8 @@ if __name__ == "__main__":
         logging.disable(logging.DEBUG)  # we want to set all loggers
 
     engine = create_engine('sqlite:///{}'.format(args.database))
-    Base.metadata.bind = engine
-    Base.metadata.create_all(engine)
+    dm.Base.metadata.bind = engine
+    dm.Base.metadata.create_all(engine)
 
     DBSession = sessionmaker()
     DBSession.bind = engine
