@@ -177,10 +177,10 @@ def save_file_as_json(session, file, runtime_filter='.*'):
                       'cores_physical': execution.sys_cpu_physical,
                   },
                   'memory': {
-                    'available': execution.sys_mem_avail,
-                    'free': execution.sys_mem_free,
-                    'total': execution.sys_mem_total,
-                    'used': execution.sys_mem_used
+                      'available': execution.sys_mem_avail,
+                      'free': execution.sys_mem_free,
+                      'total': execution.sys_mem_total,
+                      'used': execution.sys_mem_used
                   }}
 
         cpu_freq = []
