@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Boolean, Integer, Numeric, String, DateTime
+from sqlalchemy import Column, ForeignKey, Boolean, Integer, BigInteger, Numeric, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -47,15 +47,25 @@ class Execution(Base):
     __tablename__ = 'execution'
     id = Column(Integer, primary_key=True, nullable=False, index=True)
     configuration_id = Column(Integer, ForeignKey('configuration.id'), nullable=False)
-    datetime = Column(DateTime, nullable=False)
+    datetime = Column(DateTime, nullable=True)
     stderr = Column(String, nullable=True)
     stdout = Column(String, nullable=True)
     exit_code = Column(Integer, nullable=True)
+
+    sys_platform = Column(String, nullable=True)
+    sys_mem_avail = Column(BigInteger, nullable=True)
+    sys_mem_free = Column(BigInteger, nullable=True)
+    sys_mem_total = Column(BigInteger, nullable=True)
+    sys_mem_used = Column(BigInteger, nullable=True)
+    sys_cpu_logical = Column(Integer, nullable=True)
+    sys_cpu_physical = Column(Integer, nullable=True)
 
     configuration = relationship("Configuration", back_populates="executions")
 
     runs = relationship('Run')
     build_system = relationship('ExecutionBuildSystem')
+    make_env = relationship('ExecutionMakeEnv')
+    sys_cpu = relationship('ExecutionSystemCpu')
 
     def __repr__(self):
         return '<Execution "{}" configuration={}>'.format(self.id, self.configuration)
@@ -71,6 +81,33 @@ class ExecutionBuildSystem(Base):
 
     def __repr__(self):
         return '<ExecutionBuildSystem "{}" "{}"="{}">'.format(self.execution_id, self.key, self.value)
+
+
+class ExecutionMakeEnv(Base):
+    __tablename__ = 'execution_make_env'
+    execution_id = Column(Integer, ForeignKey('execution.id'), primary_key=True, nullable=False)
+    key = Column(String,  primary_key=True, nullable=False)
+    value = Column(String, nullable=False)
+
+    execution = relationship("Execution", back_populates="make_env")
+
+    def __repr__(self):
+        return '<ExecutionMakeEnv "{}" "{}"="{}">'.format(self.execution_id, self.key, self.value)
+
+
+class ExecutionSystemCpu(Base):
+    __tablename__ = 'execution_system_cpu'
+    execution_id = Column(Integer, ForeignKey('execution.id'), primary_key=True, nullable=False)
+    idx = Column(Integer,  primary_key=True, nullable=False)
+    percent = Column(Numeric, nullable=False)
+    cur_clock = Column(Numeric, nullable=False)
+    min_clock = Column(Numeric, nullable=False)
+    max_clock = Column(Numeric, nullable=False)
+
+    execution = relationship("Execution", back_populates="sys_cpu")
+
+    def __repr__(self):
+        return '<ExecutionSystemCpu "{}-{}" {}%>'.format(self.execution_id, self.idx, self.percent)
 
 
 class Run(Base):

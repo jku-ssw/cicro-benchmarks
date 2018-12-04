@@ -5,7 +5,7 @@ import json
 import logging
 import sys
 
-import dateutil.parser
+from dateutil.parser import parse as date_parse
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -14,7 +14,7 @@ logging.getLogger('sqlalchemy').setLevel(logging.WARNING)
 logging.getLogger('sqlalchemy.engine.base.Engine').setLevel(logging.WARNING)
 logging.getLogger('sqlalchemy.orm.mapper.Mapper').setLevel(logging.WARNING)
 
-from util.datamodel import Base, Harness, Benchmark, Configuration, Execution, ExecutionBuildSystem, Run, Datapoint  # NOQA:E402
+from util.datamodel import Base, Harness, Benchmark, Configuration, Execution, ExecutionBuildSystem,ExecutionMakeEnv, ExecutionSystemCpu, Run, Datapoint  # NOQA:E402
 from util.color_logger import get_logger  # NOQA:E402
 
 logger = get_logger('create_db')
@@ -42,7 +42,7 @@ def load_file_in_db(session, file):
             run_id = 0
             for entry in data:
                 entry_h_data = harness_data.get(entry['harness'], {}).get(runtime, []) if 'harness' in entry else []
-                h_data = entry_h_data[run_id] if len(entry_h_data) > run_id else None
+                h_data = entry_h_data[run_id] if len(entry_h_data) > run_id else {}
 
                 harness = session.query(Harness).filter_by(name=entry['harness']).one_or_none()
                 if harness is None:
@@ -60,31 +60,49 @@ def load_file_in_db(session, file):
                     session.add(config)
 
                 # TODO: one Execution can contain multiple RUNS!
+                h_system = h_data.get('system', {})
+                h_cpu = h_system.get('cpu', {})
+                h_memory = h_system.get('memory', {})
+
                 execution = Execution(configuration=config,
-                                      datetime=dateutil.parser.parse(h_data['datetime']),
+                                      datetime=date_parse(h_data['datetime']) if 'datetime' in h_data else None,
                                       stderr=h_data.get('stderr'),
                                       stdout=h_data.get('stdout'),
-                                      exit_code=h_data.get('exit_code'))
+                                      exit_code=h_data.get('exit_code'),
+                                      sys_platform=h_system.get('platform'),
+                                      sys_mem_avail=h_memory.get('available'),
+                                      sys_mem_free=h_memory.get('free'),
+                                      sys_mem_total=h_memory.get('total'),
+                                      sys_mem_used=h_memory.get('used'),
+                                      sys_cpu_logical=h_cpu.get('cores_logical'),
+                                      sys_cpu_physical=h_cpu.get('cores_physical'))
                 session.add(execution)
 
                 session.add_all([ExecutionBuildSystem(execution=execution, key=key, value=value)
                                  for key, value in h_data.get('build_system', {}).items()])
 
+                session.add_all([ExecutionMakeEnv(execution=execution, key=key, value=value)
+                                 for key, value in h_data.get('make_env', {}).items()])
+
+                session.add_all([ExecutionSystemCpu(execution=execution, idx=idx, percent=val[0],
+                                                    cur_clock=val[1][0], min_clock=val[1][1], max_clock=val[1][2])
+                                 for idx, val in enumerate(zip(h_cpu.get('percent', []), h_cpu.get('freq', [])))])
+
                 run = Run(execution=execution,
                           benchmark=benchmark,
-                          clock_resolution=entry['clock_resolution'],
-                          clock_resolution_measured=entry['clock_resolution_measured'],
-                          clock_type=entry['clock_type'],
-                          disabled=entry['disabled'],
-                          iterations_per_run=entry['iterations_per_run'],
+                          clock_resolution=entry.get('clock_resolution'),
+                          clock_resolution_measured=entry.get('clock_resolution_measured'),
+                          clock_type=entry.get('clock_type'),
+                          disabled=entry.get('disabled'),
+                          iterations_per_run=entry.get('iterations_per_run'),
                           )
 
                 for idx, dp in enumerate(entry['runs']):
                     session.add_all([Datapoint(idx=idx, run=run, key=key, value=value) for key, value in dp.items()])
 
-                run_id += 1
+                session.commit()
 
-    session.commit()
+                run_id += 1
 
 
 if __name__ == "__main__":
