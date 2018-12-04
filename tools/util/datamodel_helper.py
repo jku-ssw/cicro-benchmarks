@@ -151,6 +151,18 @@ def save_file_as_json(session, file, runtime_filter='.*'):
         if execution.datetime is not None:
             exec_harness['datetime'] = execution.datetime.replace(tzinfo=timezone.utc).isoformat()
 
+        # key: 'stderr'
+        if execution.stderr is not None:
+            exec_harness['stderr'] = execution.stderr
+
+        # key: 'stdout'
+        if execution.stdout is not None:
+            exec_harness['stdout'] = execution.stdout
+
+        # key: 'exit_code'
+        if execution.exit_code is not None:
+            exec_harness['exit_code'] = execution.exit_code
+
         # key: 'make_env'
         make_env = {}
         for entry in execution.make_env:
