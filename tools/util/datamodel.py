@@ -7,10 +7,11 @@ Base = declarative_base()
 
 class Harness(Base):
     __tablename__ = 'harness'
-    name = Column(String, primary_key=True, nullable=False, index=True)
+    id = Column(Integer, primary_key=True, nullable=False, index=True)
+    name = Column(String, unique=True, nullable=False)
 
     benchmarks = relationship('Benchmark')
-    configurations = relationship('Configuration')
+    executions = relationship('Execution')
 
     def __repr__(self):
         return '<Harness name="{}" benchmarks={}>'.format(self.name, self.benchmarks)
@@ -18,8 +19,9 @@ class Harness(Base):
 
 class Benchmark(Base):
     __tablename__ = 'benchmark'
-    name = Column(String, primary_key=True, nullable=False, index=True)
-    harness_name = Column(String, ForeignKey('harness.name'), nullable=False)
+    id = Column(Integer, primary_key=True, nullable=False, index=True)
+    name = Column(String, unique=True, nullable=False)
+    harness_id = Column(Integer, ForeignKey('harness.id'), nullable=False)
 
     harness = relationship("Harness", back_populates="benchmarks", lazy="joined")
 
@@ -32,20 +34,18 @@ class Benchmark(Base):
 class Configuration(Base):
     __tablename__ = 'configuration'
     id = Column(Integer, primary_key=True, nullable=False, index=True)
-    harness_name = Column(String, ForeignKey('harness.name'), nullable=False)
-    name = Column(String, nullable=False)
-
-    harness = relationship("Harness", back_populates="configurations", lazy="joined")
+    name = Column(String, unique=True, nullable=False)
 
     executions = relationship('Execution')
 
     def __repr__(self):
-        return '<Configuration "{}" harness="{}">'.format(self.id, self.harness.name)
+        return '<Configuration "{}">'.format(self.name)
 
 
 class Execution(Base):
     __tablename__ = 'execution'
     id = Column(Integer, primary_key=True, nullable=False, index=True)
+    harness_id = Column(Integer, ForeignKey('harness.id'), nullable=False)
     configuration_id = Column(Integer, ForeignKey('configuration.id'), nullable=False)
     datetime = Column(DateTime, nullable=True)
     stderr = Column(String, nullable=True)
@@ -60,7 +60,8 @@ class Execution(Base):
     sys_cpu_logical = Column(Integer, nullable=True)
     sys_cpu_physical = Column(Integer, nullable=True)
 
-    configuration = relationship("Configuration", back_populates="executions")
+    harness = relationship("Harness", back_populates="executions", lazy="joined")
+    configuration = relationship("Configuration", back_populates="executions", lazy="joined")
 
     runs = relationship('Run')
     build_system = relationship('ExecutionBuildSystem', lazy="selectin")
@@ -114,7 +115,7 @@ class Run(Base):
     __tablename__ = 'run'
     id = Column(Integer, primary_key=True, nullable=False, index=True)
     execution_id = Column(Integer, ForeignKey('execution.id'), nullable=False)
-    benchmark_name = Column(String, ForeignKey('benchmark.name'), nullable=False)
+    benchmark_id = Column(Integer, ForeignKey('benchmark.id'), nullable=False)
 
     clock_resolution = Column(Float, nullable=True)
     clock_resolution_measured = Column(Float, nullable=True)

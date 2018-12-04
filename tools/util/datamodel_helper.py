@@ -61,9 +61,9 @@ def load_file_in_db(session, file):
                     session.add(benchmark)
                 assert benchmark.harness == harness
 
-                config = session.query(dm.Configuration).filter_by(name=runtime, harness=harness).one_or_none()
+                config = session.query(dm.Configuration).filter_by(name=runtime).one_or_none()
                 if config is None:
-                    config = dm.Configuration(name=runtime, harness=harness)
+                    config = dm.Configuration(name=runtime)
                     session.add(config)
 
                 h_system = h_data.get('system', {})
@@ -77,6 +77,7 @@ def load_file_in_db(session, file):
                     # store datetime in UTC
                     dt = date_parse(h_data['datetime']).astimezone(timezone.utc) if 'datetime' in h_data else None
                     execution = dm.Execution(configuration=config,
+                                             harness=harness,
                                              datetime=dt,
                                              stderr=h_data.get('stderr'),
                                              stdout=h_data.get('stdout'),
@@ -132,7 +133,7 @@ def save_file_as_json(session, file, runtime_filter='.*'):
     # store all executions
     for execution in session.query(dm.Execution).options(selectinload(dm.Execution.configuration)).all():
         config_name = execution.configuration.name
-        harness_name = execution.configuration.harness.name
+        harness_name = execution.harness.name
 
         if not re.match(runtime_filter, config_name):
             logger.debug('"{}" does not match filter -> skip'.format(config_name))
