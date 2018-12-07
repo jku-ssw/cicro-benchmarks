@@ -104,13 +104,18 @@ def load_file_in_db(session, file):
                                              sys_mem_used=h_memory.get('used'),
                                              sys_cpu_logical=h_cpu.get('cores_logical'),
                                              sys_cpu_physical=h_cpu.get('cores_physical'))
+
+                    if 'build_system' in h_data or 'make_env' in h_data:
+                        compilation = dm.Compilation()  # TODO: clean step is not stored in file
+                        execution.compilation = compilation
+                        session.add(compilation)
+
+                        session.add_all([dm.CompilationBuildSystem(compilation=compilation, key=key, value=value)
+                                         for key, value in h_data.get('build_system', {}).items()])
+
+                        session.add_all([dm.CompilationMakeEnv(compilation=compilation, key=key, value=value)
+                                         for key, value in h_data.get('make_env', {}).items()])
                     session.add(execution)
-
-                    session.add_all([dm.ExecutionBuildSystem(execution=execution, key=key, value=value)
-                                     for key, value in h_data.get('build_system', {}).items()])
-
-                    session.add_all([dm.ExecutionMakeEnv(execution=execution, key=key, value=value)
-                                     for key, value in h_data.get('make_env', {}).items()])
 
                     session.add_all([dm.ExecutionSystemCpu(execution=execution, idx=idx, percent=val[0],
                                                            cur_clock=val[1][0], min_clock=val[1][1],
@@ -157,11 +162,12 @@ def save_file_as_json(session, file, runtime_filter='.*'):
         exec_harness = {}
 
         # key: 'build_system'
-        build_system = {}
-        for entry in execution.build_system:
-            build_system[entry.key] = entry.value
-        if len(build_system) > 0:
-            exec_harness['build_system'] = build_system
+        if execution.compilation:
+            build_system = {}
+            for entry in execution.compilation.build_system:
+                build_system[entry.key] = entry.value
+            if len(build_system) > 0:
+                exec_harness['build_system'] = build_system
 
         # key: 'datetime'
         if execution.datetime is not None:
@@ -180,11 +186,12 @@ def save_file_as_json(session, file, runtime_filter='.*'):
             exec_harness['exit_code'] = execution.exit_code
 
         # key: 'make_env'
-        make_env = {}
-        for entry in execution.make_env:
-            make_env[entry.key] = entry.value
-        if len(make_env) > 0:
-            exec_harness['make_env'] = make_env
+        if execution.compilation:
+            make_env = {}
+            for entry in execution.compilation.make_env:
+                make_env[entry.key] = entry.value
+            if len(make_env) > 0:
+                exec_harness['make_env'] = make_env
 
         # key: 'system'
         system = {'platform': execution.sys_platform,

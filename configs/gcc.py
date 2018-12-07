@@ -1,7 +1,7 @@
 from functools import partial
+import glob
 import os
 import subprocess
-import json
 
 gcc_kwargs = {'build_system_func': partial(build_system_executor, cc_version='--version', as_version='--version')}
 
@@ -46,13 +46,7 @@ def default_executor(filepath, workdir, exec_args, **kwargs):
             stdout_decoded = stdout.decode('utf-8') if stdout else None
             stderr_decoded = stderr.decode('utf-8') if stderr else None
 
-            if stdout_decoded:
-                try:
-                    return json.loads(stdout_decoded), stderr_decoded
-                except ValueError:
-                    logger.exception('invalid benchmark result: \'%s\'', stdout_decoded)
-
-            return None, stderr_decoded
+            return stdout_decoded, stderr_decoded, process.returncode
 
 
 def execute_gcov(filepath, workdir, exec_args, **kwargs):
@@ -63,16 +57,16 @@ def execute_gcov(filepath, workdir, exec_args, **kwargs):
 
 
 def gcov_executor(filepath, workdir, exec_args, **kwargs):
-    json, _ = default_executor(filepath, workdir, exec_args)  # execute file
+    stdout, _, exit_code = default_executor(filepath, workdir, exec_args)  # execute file
+
     stderr_decoded = execute_gcov(filepath, workdir, exec_args, **kwargs)
-    import glob
     assert(filepath.endswith('_test'))
     benchmark_dir_name = filepath[:-5]
     for filename in glob.iglob(benchmark_dir_name + '/**/*.c', recursive=True):
         gcov_info = execute_gcov(filename, workdir, exec_args, **kwargs)
         if gcov_info is not None:
             stderr_decoded += gcov_info
-    return json, stderr_decoded
+    return stdout, stderr_decoded, exit_code
 
 
 gcc_kwargs = {'build_system_func': partial(build_system_executor, cc_version='--version', as_version='--version'), 'exec_func': gcov_executor}

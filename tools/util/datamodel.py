@@ -42,11 +42,50 @@ class Configuration(Base):
         return '<Configuration "{}">'.format(self.name)
 
 
+class Compilation(Base):
+    __tablename__ = 'compilation'
+    id = Column(Integer, primary_key=True, nullable=False, index=True)
+    cleaned = Column(Boolean, nullable=True)
+    datetime = Column(DateTime, nullable=True)
+
+    executions = relationship('Execution')
+    build_system = relationship('CompilationBuildSystem', lazy="selectin")
+    make_env = relationship('CompilationMakeEnv', lazy="selectin")
+
+    def __repr__(self):
+        return '<Compilation "{}">'.format(self.name)
+
+
+class CompilationBuildSystem(Base):
+    __tablename__ = 'compilation_build_system'
+    compilation_id = Column(Integer, ForeignKey('compilation.id'), primary_key=True, nullable=False)
+    key = Column(String,  primary_key=True, nullable=False)
+    value = Column(String, nullable=False)
+
+    compilation = relationship("Compilation", back_populates="build_system")
+
+    def __repr__(self):
+        return '<CompilationBuildSystem "{}" "{}"="{}">'.format(self.compilation_id, self.key, self.value)
+
+
+class CompilationMakeEnv(Base):
+    __tablename__ = 'compilation_make_env'
+    compilation_id = Column(Integer, ForeignKey('compilation.id'), primary_key=True, nullable=False)
+    key = Column(String,  primary_key=True, nullable=False)
+    value = Column(String, nullable=False)
+
+    compilation = relationship("Compilation", back_populates="make_env")
+
+    def __repr__(self):
+        return '<CompilationMakeEnv "{}" "{}"="{}">'.format(self.compilation_id, self.key, self.value)
+
+
 class Execution(Base):
     __tablename__ = 'execution'
     id = Column(Integer, primary_key=True, nullable=False, index=True)
     harness_id = Column(Integer, ForeignKey('harness.id'), nullable=False)
     configuration_id = Column(Integer, ForeignKey('configuration.id'), nullable=False)
+    compilation_id = Column(Integer, ForeignKey('compilation.id'), nullable=True)
     datetime = Column(DateTime, nullable=True)
     stderr = Column(String, nullable=True)
     stdout = Column(String, nullable=True)
@@ -62,38 +101,13 @@ class Execution(Base):
 
     harness = relationship("Harness", back_populates="executions", lazy="joined")
     configuration = relationship("Configuration", back_populates="executions", lazy="joined")
+    compilation = relationship("Compilation", back_populates="executions", lazy="joined")
 
     runs = relationship('Run')
-    build_system = relationship('ExecutionBuildSystem', lazy="selectin")
-    make_env = relationship('ExecutionMakeEnv', lazy="selectin")
     sys_cpu = relationship('ExecutionSystemCpu', order_by="asc(ExecutionSystemCpu.idx)", lazy="selectin")
 
     def __repr__(self):
         return '<Execution "{}" configuration={}>'.format(self.id, self.configuration)
-
-
-class ExecutionBuildSystem(Base):
-    __tablename__ = 'execution_build_system'
-    execution_id = Column(Integer, ForeignKey('execution.id'), primary_key=True, nullable=False)
-    key = Column(String,  primary_key=True, nullable=False)
-    value = Column(String, nullable=False)
-
-    execution = relationship("Execution", back_populates="build_system")
-
-    def __repr__(self):
-        return '<ExecutionBuildSystem "{}" "{}"="{}">'.format(self.execution_id, self.key, self.value)
-
-
-class ExecutionMakeEnv(Base):
-    __tablename__ = 'execution_make_env'
-    execution_id = Column(Integer, ForeignKey('execution.id'), primary_key=True, nullable=False)
-    key = Column(String,  primary_key=True, nullable=False)
-    value = Column(String, nullable=False)
-
-    execution = relationship("Execution", back_populates="make_env")
-
-    def __repr__(self):
-        return '<ExecutionMakeEnv "{}" "{}"="{}">'.format(self.execution_id, self.key, self.value)
 
 
 class ExecutionSystemCpu(Base):
