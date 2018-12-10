@@ -154,7 +154,7 @@ gcc_pgo_kwargs = {'build_system_func': partial(build_system_executor, cc_version
                   'exec_func': gcc_pgo_exec
                   }
 
-harness.add_runtime('clang-pgo-O3', {"CC": "${CLANG}", "AS": "${CLANG}",
+harness.add_runtime('clang-lld-pgo-O3', {"CC": "${CLANG}", "AS": "${CLANG}",
                                      "CFLAGS": "-O3",
                                      "CFLAGS_PGO": "-O3 -flto -fprofile-instr-generate",
                                      "LDFLAGS_PGO": "-fprofile-instr-generate -fuse-ld=lld"}, **clang_pgo_kwargs)  # NOQA: E501

@@ -9,7 +9,16 @@ harness.add_runtime('gcc-O0', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99
 harness.add_runtime('gcc-O1', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O1"}, **gcc_kwargs)
 harness.add_runtime('gcc-O2', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O2"}, **gcc_kwargs)
 harness.add_runtime('gcc-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3"}, **gcc_kwargs)
+harness.add_runtime('gcc-Oz', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -Oz"}, **gcc_kwargs)
+harness.add_runtime('gcc-lto-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -flto", "LDFLAGS": "-flto"}, **gcc_kwargs)
+harness.add_runtime('gcc-stack-protector-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -fstack-protector"}, **gcc_kwargs)
+harness.add_runtime('gcc-nostack-protector-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -fno-stack-protector"}, **gcc_kwargs)
+harness.add_runtime('gcc-stack-protector-strong-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -fstack-protector-strong"}, **gcc_kwargs)
+harness.add_runtime('gcc-stack-protector-all-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -fstack-protector-all"}, **gcc_kwargs)
 harness.add_runtime('gcc-march-native-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -march=native"}, **gcc_kwargs)
+harness.add_runtime('gcc-execstack-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -z execstack"}, **gcc_kwargs)
+harness.add_runtime('gcc-nopie-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -no-pie"}, **gcc_kwargs)
+harness.add_runtime('gcc-no-stack-protector-no-exec-stack-no-pie-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -fno-stack-protector -no-pie -z execstack"}, **gcc_kwargs)
 harness.add_runtime('gcc-Ofast', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -Ofast"}, **gcc_kwargs)
 harness.add_runtime('gcc-Os', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -Os"}, **gcc_kwargs)
 harness.add_runtime('gcc-fno-strict-aliasing-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O3 -fno-strict-aliasing"}, **gcc_kwargs)
@@ -18,6 +27,7 @@ harness.add_runtime('gcc-fno-delete-null-pointer-checks-O3', {"CC": "${GCC}", "A
 harness.add_runtime('gcc-gcov-O0', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O0 -fprofile-arcs -ftest-coverage"}, **gcc_kwargs)
 harness.add_runtime('gcc-gprof-O0', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O0 -pg"}, **gcc_kwargs)
 harness.add_runtime('gcc-mpx-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": " -std=gnu99 -O3 -mmpx -fcheck-pointer-bounds -lmpxwrappers"}, **gcc_kwargs)
+harness.add_runtime('introspection-mpx-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": " -std=gnu99 -O3 -mmpx -fcheck-pointer-bounds -lmpxwrappers -Wl,-E -include /safe-libc/libc.h /libc-mpx.o /mpx.o"}, **gcc_kwargs)
 
 
 # get line number coverage
