@@ -14,6 +14,9 @@ def query_yes_no(question, default="yes", on_keyboard_int=None):
     else:
         raise ValueError("invalid default answer: '%s'" % default)
 
+    sys.stdout.flush()
+    sys.stderr.flush()
+
     while 1:
         sys.stdout.write(question + prompt)
 
