@@ -22,7 +22,7 @@ def sulong_build_system_executor(make_env):
 
     args = ['mx', '--dynamicimport', '/compiler', '--jdk', 'jvmci', '-p', os.path.expandvars('${SULONG_DIR}'), 'lli', '--version']
     with subprocess.Popen(args, stdout=subprocess.PIPE) as p:
-        stdout, _ = p.communicate(timeout=1)
+        stdout, _ = p.communicate(timeout=50)
 
         stdout_decoded = stdout.decode('utf-8').rstrip() if stdout else None
         if p.returncode == 0 and stdout_decoded:
