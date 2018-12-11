@@ -31,26 +31,10 @@ harness.add_runtime('introspection-mpx-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS
 
 
 # get line number coverage
-
-# todo: duplicated from bench.py
-def default_executor(filepath, workdir, exec_args, **kwargs):
-        assert os.path.isfile(filepath)
-        assert os.path.isdir(workdir)
-
-        args = [filepath, '--output=json'] + exec_args
-        env = os.environ.copy()
-
-        with subprocess.Popen(args, cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env) as process:
-            stdout, stderr = process.communicate(timeout=kwargs.get('timeout', 240))
-
-            stdout_decoded = stdout.decode('utf-8') if stdout else None
-            stderr_decoded = stderr.decode('utf-8') if stderr else None
-
-            return stdout_decoded, stderr_decoded, process.returncode
-
-
 def execute_gcov(filepath, workdir, exec_args, **kwargs):
-    with subprocess.Popen(['gcov', filepath, '-o', workdir, '-i'], cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+    env = os.environ.copy()
+    env['LC_ALL'] = 'C'
+    with subprocess.Popen(['gcov', filepath, '-o', workdir, '-i'], cwd=workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env) as process:
         stdout, stderr = process.communicate(timeout=kwargs.get('timeout', 240))
         stdout_decoded = stdout.decode('utf-8') if stdout else None
     return stdout_decoded
