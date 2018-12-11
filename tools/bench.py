@@ -25,7 +25,7 @@ logging.getLogger('sqlalchemy.engine.base.Engine').setLevel(logging.WARNING)
 logging.getLogger('sqlalchemy.orm.mapper.Mapper').setLevel(logging.WARNING)
 
 import util.datamodel as dm  # NOQA:E402
-from util.datamodel_helper import get_benchmark_name, get_or_create_config, get_or_create_harness,get_or_create_benchmark, load_file_in_db, save_file_as_json  # NOQA:E402
+from util.datamodel_helper import get_benchmark_name, get_or_create_config, get_or_create_harness, get_or_create_benchmark, load_file_in_db, save_file_as_json  # NOQA:E402
 
 logger = get_logger('bench')
 
