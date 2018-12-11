@@ -2,7 +2,7 @@ import json
 import re
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, selectinload
+from sqlalchemy.orm import sessionmaker, joinedload
 
 from dateutil.parser import parse as date_parse
 
@@ -164,7 +164,7 @@ def save_file_as_json(session, file, runtime_filter='.*'):
     harness_data = {}
 
     # store all executions
-    for execution in session.query(dm.Execution).options(selectinload(dm.Execution.configuration)).all():
+    for execution in session.query(dm.Execution).options(joinedload(dm.Execution.configuration)).all():
         config_name = execution.configuration.name
         harness_name = execution.harness.name
 

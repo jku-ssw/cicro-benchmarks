@@ -440,7 +440,7 @@ wolkykim-qlibc_$(TEST_SUFFIX): wolkykim-qlibc wolkykim-qlibc_test.c $(C_HAYAI_LI
 
 wolkykim-qlibc_clean:
 ifneq ("$(wildcard ./wolkykim-qlibc/Makefile)","")
-	(cd ./wolkykim-qlibc && $(MAKE) distclean && rm -f Makefile)
+	(cd ./wolkykim-qlibc && $(MAKE) distclean RM=rm && rm -f Makefile)
 endif
 	rm -f "$(TEST_DIR)/wolkykim-qlibc_$(TEST_SUFFIX)"
 

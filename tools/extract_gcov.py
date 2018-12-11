@@ -6,7 +6,7 @@ import logging
 import sys
 import re
 
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload
 
 from util.color_logger import get_logger
 import util.datamodel as dm
@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
     # store all execution
     writer.writeheader()
-    for execution in session.query(dm.Execution).options(selectinload(dm.Execution.configuration)).all():
+    for execution in session.query(dm.Execution).options(joinedload(dm.Execution.configuration)).all():
         config_name = execution.configuration.name
         harness_name = execution.harness.name
 

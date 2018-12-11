@@ -49,8 +49,8 @@ class Compilation(Base):
     datetime = Column(DateTime, nullable=True)
 
     executions = relationship('Execution')
-    build_system = relationship('CompilationBuildSystem', lazy="selectin")
-    make_env = relationship('CompilationMakeEnv', lazy="selectin")
+    build_system = relationship('CompilationBuildSystem', lazy="joined")
+    make_env = relationship('CompilationMakeEnv', lazy="joined")
 
     def __repr__(self):
         return '<Compilation "{}">'.format(self.name)
@@ -104,7 +104,7 @@ class Execution(Base):
     compilation = relationship("Compilation", back_populates="executions", lazy="joined")
 
     runs = relationship('Run')
-    sys_cpu = relationship('ExecutionSystemCpu', order_by="asc(ExecutionSystemCpu.idx)", lazy="selectin")
+    sys_cpu = relationship('ExecutionSystemCpu', order_by="asc(ExecutionSystemCpu.idx)", lazy="subquery")
 
     def __repr__(self):
         return '<Execution "{}" configuration={}>'.format(self.id, self.configuration)
