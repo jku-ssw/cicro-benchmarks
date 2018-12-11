@@ -27,7 +27,7 @@ harness.add_runtime('gcc-fno-delete-null-pointer-checks-O3', {"CC": "${GCC}", "A
 harness.add_runtime('gcc-gcov-O0', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O0 -fprofile-arcs -ftest-coverage"}, **gcc_kwargs)
 harness.add_runtime('gcc-gprof-O0', {"CC": "${GCC}", "AS": "as", "CFLAGS": "-std=gnu99 -O0 -pg"}, **gcc_kwargs)
 harness.add_runtime('gcc-mpx-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": " -std=gnu99 -O3 -mmpx -fcheck-pointer-bounds -lmpxwrappers"}, **gcc_kwargs)
-harness.add_runtime('introspection-mpx-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": " -std=gnu99 -O3 -mmpx -fcheck-pointer-bounds -lmpxwrappers -Wl,-E -include /safe-libc/libc.h /libc-mpx.o /mpx.o"}, **gcc_kwargs)
+harness.add_runtime('introspection-mpx-O3', {"CC": "${GCC}", "AS": "as", "CFLAGS": " -std=gnu99 -O3 -mmpx -fcheck-pointer-bounds -lmpxwrappers -Wl,-E -include /safe-libc/libc.h /libc-mpx.o /mpx.o"}, **gcc_kwargs)  # NOQA: E501
 
 
 # get line number coverage
