@@ -1,7 +1,8 @@
 import json
 import re
 
-from sqlalchemy.orm import selectinload
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, selectinload
 
 from dateutil.parser import parse as date_parse
 
@@ -12,6 +13,18 @@ from util.auto_extend_list import auto_extend_list
 from datetime import timezone
 
 logger = get_logger('datamodel_helper')
+
+
+def create_db_session(db_engine='sqlite://'):
+    logger.debug('create database session. Engine: "{}"'.format(db_engine))
+    engine = create_engine(db_engine)
+    dm.Base.metadata.bind = engine
+    dm.Base.metadata.create_all(engine)
+
+    DBSession = sessionmaker()
+    DBSession.bind = engine
+
+    return DBSession()
 
 
 def get_benchmark_name(benchmark):
