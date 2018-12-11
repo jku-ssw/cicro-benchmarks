@@ -12,12 +12,14 @@ import subprocess
 import sys
 import tempfile
 
-from datetime import datetime, timezone
+from datetime import datetime
 
-from util.bench_results import BenchmarkingResults
 from util.color_logger import get_logger
 from util.console import query_yes_no
 
+import util.datamodel as dm
+from util.datamodel_helper import create_db_session, load_file_in_db, save_file_as_json,\
+    get_benchmark_name, get_or_create_config, get_or_create_harness, get_or_create_benchmark
 
 logger = get_logger('bench')
 
@@ -113,6 +115,32 @@ def is_papi_installed():
             return len(stdout) != 0
 
 
+def execution_add_system_info(session, execution):
+    execution.sys_cpu_logical = os.cpu_count()
+
+    # get some additional statistics which could be of interest
+    if psutil_imported:
+        try:
+            execution.sys_cpu_physical = psutil.cpu_count(logical=False)
+
+            cpu_freq = psutil.cpu_freq(percpu=True)
+            cpu_percent = psutil.cpu_percent(interval=0.5, percpu=True)
+            for idx, (percent, freq) in enumerate(zip(cpu_percent, cpu_freq)):
+                core = dm.ExecutionSystemCpu(execution=execution, idx=idx, percent=percent,
+                                             cur_clock=freq.current, min_clock=freq.min, max_clock=freq.max)
+                session.add(core)
+
+            virtual_memory = psutil.virtual_memory()
+            execution.sys_mem_avail = virtual_memory.available
+            execution.sys_mem_free = virtual_memory.free
+            execution.sys_mem_total = virtual_memory.total
+            execution.sys_mem_used = virtual_memory.used
+        except KeyboardInterrupt:
+            raise
+        except:  # NOQA: E722
+            logger.exception('cannot extract system informations with psutil')
+
+
 class BenchmarkingHarness(object):
     def __init__(self, testdir):
         assert os.path.isdir(testdir)
@@ -192,13 +220,7 @@ class BenchmarkingHarness(object):
             stdout_decoded = stdout.decode('utf-8') if stdout else None
             stderr_decoded = stderr.decode('utf-8') if stderr else None
 
-            if stdout_decoded:
-                try:
-                    return json.loads(stdout_decoded), stderr_decoded
-                except ValueError:
-                    logger.exception('invalid benchmark result: \'%s\'', stdout_decoded)
-
-            return None, stderr_decoded
+            return stdout_decoded, stderr_decoded, process.returncode
 
     def add_runtime(self, name, make_env,
                     build_system_func=None,
@@ -235,23 +257,22 @@ class BenchmarkingHarness(object):
             if re.match(filter, runtime):
                 yield runtime
 
-    def execute_runtimes(self, filter, bench_results, **kwargs):
+    def execute_runtimes(self, filter, session, **kwargs):
         no_failures = True
         for runtime in self.filtered_runtime_iterator(filter):
-            if self.execute_single_runtime(runtime, bench_results, **kwargs) is not True:
+            if self.execute_single_runtime(runtime, session, **kwargs) is not True:
                 logger.error('runtime "%s" did not finish successful', runtime)
                 no_failures = False
 
         return no_failures
 
-    def execute_single_runtime(self, runtime, bench_results, **kwargs):
-        assert type(bench_results) is BenchmarkingResults
-
+    def execute_single_runtime(self, runtime, session, **kwargs):
         if runtime not in self.registered_runtimes:
             logger.error('runtime not found: "%s"', runtime)
             return False
 
-        runtime_name = runtime + kwargs.get('suffix', '')
+        config = get_or_create_config(session, runtime + kwargs.get('suffix', ''))
+        session.commit()
 
         found_runtime = self.registered_runtimes[runtime]
         make_env = found_runtime.get('make_env', {}).copy()
@@ -271,23 +292,9 @@ class BenchmarkingHarness(object):
 
         result_writer_func = kwargs['result_writer_func']
 
-        only_missing = kwargs.get('only_missing', False)
-
         no_error = True
 
         logger.info('start with the execution of the runtime enviroment "%s"', runtime)
-
-        result_harness_data = {
-            'system': {'platform': platform.platform(True),
-                       'cpu': {'cores_logical': os.cpu_count()}}}
-
-        if psutil_imported:
-            try:
-                result_harness_data['system']['cpu']['cores_physical'] = psutil.cpu_count(logical=False)
-            except KeyboardInterrupt:
-                raise
-            except:  # NOQA: E722
-                logger.exception('cannot extract system informations with psutil')
 
         try:
             # clean step
@@ -302,121 +309,129 @@ class BenchmarkingHarness(object):
             # compilation step
             if kwargs.get('skip_compilation', False):
                 logger.warning('compilation step skipped for "%s"', runtime)
+                compilation = None
             else:
                 logger.info('execute compilation step for "%s"', runtime)
+                compilation = dm.Compilation(cleaned=not kwargs.get('skip_clean', False), datetime=datetime.utcnow())
+                session.add(compilation)
+                session.commit()
+
                 if not make_func(self.testdir, make_env, **kwargs):
                     logger.error('compilation step for "%s" failed', runtime)
                     return False
 
-                result_harness_data['make_env'] = {}
+                exp_make_env = {}
                 for key, value in make_env.items():
                     exp_value = os.path.expandvars(value) if type(value) is str else value
-                    result_harness_data['make_env'][key] = exp_value
+                    session.add(dm.CompilationMakeEnv(compilation=compilation, key=key, value=exp_value))
+                    exp_make_env[key] = exp_value
 
                 if build_system_func:
                     try:
                         # Use our expanded enviroment variables
-                        build_system_data = build_system_func(result_harness_data.get('make_env', {}))
+                        build_system_data = build_system_func(exp_make_env)
                         if build_system_data:
                             logger.debug('build system extracted: %s', build_system_data)
-                            result_harness_data['build_system'] = build_system_data
+                            session.add_all([dm.CompilationBuildSystem(compilation=compilation, key=key, value=value)
+                                             for key, value in build_system_data.items()])
                     except KeyboardInterrupt:
                         raise
                     except:  # NOQA: E722
                         logger.exception('cannot extract build system informations')
 
+                session.commit()
+
             # execution step
             for run_id in range(kwargs.get('runs', 1)):
                 logger.info('run %d of %d with the runtime enviroment "%s"', run_id+1, kwargs.get('runs', 1), runtime)
-                for harness in self.find_all_harness():
-                    harness_name = harness[:-len('_test')] if harness.endswith('_test') else harness
-                    harness_path = os.path.join(self.testdir, harness)
+                for _harness in self.find_all_harness():
+                    harness_name = _harness[:-len('_test')] if _harness.endswith('_test') else _harness
+                    harness_path = os.path.join(self.testdir, _harness)
+                    harness = get_or_create_harness(session, harness_name)
 
-                    if not re.match(kwargs.get('filter_harness', '.*'), harness):
-                        logger.debug('benchmark: "%s:%s" did not match filter rule', harness_name, runtime_name)
+                    if not re.match(kwargs.get('filter_harness', '.*'), harness_name):
+                        logger.debug('benchmark: "%s:%s" did not match filter rule', harness_name, config.name)
                         continue
 
-                    if only_missing and bench_results.is_run_present(harness_name, runtime_name):
-                        logger.warning('benchmark run of "%s:%s" already present, skip', harness_name, runtime_name)
+                    if kwargs.get('only_missing', False) and\
+                            session.query(dm.Execution).filter_by(configuration=config, harness=harness).first():
+                        logger.warning('benchmark run of "%s:%s" already present, skip', harness_name, config.name)
                         continue
 
-                    # get some additional statistics which could be of interest
-                    if psutil_imported:
-                        try:
-                            result_harness_data['system']['cpu']['percent'] = psutil.cpu_percent(interval=0.5,
-                                                                                                 percpu=True)
-                            result_harness_data['system']['cpu']['freq'] = psutil.cpu_freq(percpu=True)
+                    execution = dm.Execution(harness=harness, configuration=config, compilation=compilation)
+                    execution.sys_platform = platform.platform(True)
 
-                            virtual_memory = psutil.virtual_memory()
-                            result_harness_data['system']['memory'] = {'total': virtual_memory.total,
-                                                                       'available': virtual_memory.available,
-                                                                       'used': virtual_memory.used,
-                                                                       'free': virtual_memory.free}
-                        except KeyboardInterrupt:
-                            raise
-                        except:  # NOQA: E722
-                            logger.exception('cannot extract system informations with psutil')
+                    execution_add_system_info(session, execution)
 
-                    result_harness_data['datetime'] = datetime.now(timezone.utc).astimezone().isoformat()
+                    execution.datetime = datetime.utcnow()
+                    session.add(execution)
+                    session.commit()
 
                     try:
                         exec_args = [x for x in kwargs.get('exec_args', '').split(' ') if x]
 
-                        iteration_overwrite = kwargs.get('iterdata', {}).get(harness + ".c")
+                        iteration_overwrite = kwargs.get('iterdata', {}).get(harness.name + ".c")
                         if iteration_overwrite is not None:
                             if type(iteration_overwrite) is int:
                                 exec_args.append("--iterations={}".format(iteration_overwrite))
                             else:
                                 logger.error('"%s" is not of type int, ignore iteration overwrite', iteration_overwrite)
 
-                        logger.info('benchmark: "%s:%s"', harness_name, runtime_name)
+                        logger.info('benchmark: "%s:%s"', harness.name, config.name)
                         if exec_args:
                             logger.info(' * additional args set: "%s"', " ".join(exec_args))
 
-                        exec_ret = exec_func(harness_path, self.testdir, exec_args, **exec_kwargs)
+                        stdout, stderr, exit_code = exec_func(harness_path, self.testdir, exec_args, **exec_kwargs)
 
-                        # either we only return the data, or stderr as second element
-                        if type(exec_ret) is tuple:
-                            result_data = exec_ret[0]
-                            result_stderr = exec_ret[1]
+                        execution.stdout = stdout
+                        execution.stderr = stderr
+                        execution.exit_code = exit_code
+                        session.commit()
 
-                            if result_stderr:
-                                logger.warning("benchmark harness had some output on stderr:\n%s", result_stderr)
-                                result_harness_data['stderr'] = result_stderr
+                        if stderr:
+                            logger.warning("benchmark harness had some output on stderr:\n%s", stderr)
+                            no_error = False
+
+                            if kwargs.get('ignore_invalid_measurements', False):
+                                continue
+
+                        if stdout:
+                            try:
+                                data = json.loads(stdout)
+                                if type(data) is dict and len(data.get('benchmarks', [])) != 0:
+                                    for benchmark_dict in data.get('benchmarks', []):
+                                        bench_name = get_benchmark_name(benchmark_dict)
+                                        benchmark = get_or_create_benchmark(session, bench_name, harness)
+
+                                        run = dm.Run(execution=execution,
+                                                     benchmark=benchmark,
+                                                     clock_resolution=benchmark_dict.get('clock_resolution'),
+                                                     clock_resolution_measured=benchmark_dict.get('clock_resolution_measured'),  # NOQA: E501
+                                                     clock_type=benchmark_dict.get('clock_type'),
+                                                     disabled=benchmark_dict.get('disabled'),
+                                                     iterations_per_run=benchmark_dict.get('iterations_per_run'))
+                                        session.add(run)
+
+                                        for idx, dp in enumerate(benchmark_dict['runs']):
+                                            session.add_all([dm.Datapoint(idx=idx, run=run, key=key, value=value)
+                                                             for key, value in dp.items()])
+
+                                    session.commit()
+                                else:
+                                    logger.error('benchmark run of "%s:%s" did not return valid data: "%s"',
+                                                 harness.name, config.name, stdout)
+                                    no_error = False
+                            except ValueError:
+                                logger.exception('invalid benchmark result: \'%s\'', stdout)
                                 no_error = False
-                                if kwargs.get('ignore_invalid_measurements', False) and result_data:
-                                    for benchmark in result_data.get('benchmarks', []):
-                                        logger.debug("remove data from measurement:\n%s", benchmark)
-                                        if 'runs' in benchmark:
-                                            benchmark['runs'] = []
-                                        if 'mean' in benchmark:
-                                            benchmark['mean'] = None
-                                        if 'std_dev' in benchmark:
-                                            benchmark['std_dev'] = None
                         else:
-                            result_data = exec_ret
-
-                        if (type(result_data) is dict and len(result_data) != 0) or 'stderr' in result_harness_data:
-                            # cleanup database entries
-                            if kwargs.get('replace_runs'):
-                                if run_id == 0:
-                                    bench_results.remove_all_runs(harness_name, runtime_name)
-
-                                bench_results.set_single_run(harness_name, runtime_name, result_data,
-                                                             harness_data=result_harness_data,
-                                                             overwrite=True, run_id=run_id)
-                            else:
-                                bench_results.append_single_run(harness_name, runtime_name, result_data,
-                                                                harness_data=result_harness_data)
-                        else:
-                            logger.error('benchmark run of "%s:%s" did not return valid data: "%s"',
-                                         harness_name, runtime_name, result_data)
+                            logger.error('stdout was empty')
                             no_error = False
                     except KeyboardInterrupt:
                         raise
                     except:  # NOQA: E722
                         logger.exception('Something went wrong while running the benchmark: "%s:%s"',
-                                         harness_name, runtime_name)
+                                         harness.name, config.name)
                         no_error = False
 
                 # write results after every run
@@ -495,13 +510,7 @@ def add_default_runtimes(harness):
                 stdout_decoded = stdout.decode('utf-8') if stdout else None
                 stderr_decoded = stderr.decode('utf-8') if stderr else None
 
-                if stdout_decoded:
-                    try:
-                        return json.loads(stdout_decoded), stderr_decoded
-                    except ValueError:
-                        logger.exception('invalid benchmark result: \'%s\'', stdout_decoded)
-
-                return None, stderr_decoded
+                return stdout_decoded, stderr_decoded, p.returncode
 
     def build_system_executor(make_env, cc_version, as_version):
         result = {}
@@ -567,12 +576,12 @@ if __name__ == "__main__":
     parser.add_argument('--iterfile', metavar='ITERFILE', nargs='?', type=argparse.FileType('r'),
                         help='file which overwrites the number of iterations per harness')
 
+    parser.add_argument('--database', default='sqlite://', type=str,
+                        help='database which is used for procecssing. By default use in-memory sqllite')
     parser.add_argument('--no-papi', action='store_true',
                         help='do not compile performance counter library into benchmarks')
     parser.add_argument('--only-missing', action='store_true',
                         help='only execute benchmarks which are missing in the benchfile')
-    parser.add_argument('--replace-runs', action='store_true',
-                        help='overwrite runs instead of appending to them')
     parser.add_argument('--list-runtimes', action=_ListAllRuntimeAction,
                         help='show a list of all runtimes which can be executed')
     # parser.add_argument('--no-color', action='store_true',
@@ -616,20 +625,30 @@ if __name__ == "__main__":
         for runtime in runtimes_to_execute:
             logger.info(' * %s', runtime)
 
-    results = BenchmarkingResults()
+    try:
+        session = create_db_session(args.database)
+    except Exception:
+        logger.exception('cannot create SQL engine')
+        sys.exit(1)
 
     if args.workdir:
         os.environ["CHAYAI_WORKDIR"] = os.path.abspath(args.workdir)
 
     if os.path.isfile(args.benchfile):
-        try:
-            with open(args.benchfile, 'r') as f:
-                results.load_file(f)
-        except Exception:
-            logger.exception("cannot load file")
-            corrupted_msg = 'Do you want to continue? The given file exists, but does not contain valid data'
+        if args.database != 'sqlite://':
+            logger.warning('External database selected. Existing Benchfile fill not be imported!')
+            corrupted_msg = 'Do you want to continue? The given file will be overwritten'
             if not args.yes and query_yes_no(corrupted_msg, default="no", on_keyboard_int="no") == 'no':
                 sys.exit()
+        else:
+            try:
+                with open(args.benchfile, 'r') as f:
+                    load_file_in_db(session, f)
+            except Exception:
+                logger.exception("cannot load file")
+                corrupted_msg = 'Do you want to continue? The given file exists, but does not contain valid data'
+                if not args.yes and query_yes_no(corrupted_msg, default="no", on_keyboard_int="no") == 'no':
+                    sys.exit()
 
     if args.iterfile:
         logger.warning("benchmark iteration count will be forced to your specified value")
@@ -645,7 +664,8 @@ if __name__ == "__main__":
             with tempfile.NamedTemporaryFile('w', dir=os.path.dirname(args.benchfile),
                                              prefix=".bench_", suffix='.json', delete=False) as f:
                 # write results
-                results.store_file(f)
+                save_file_as_json(session, f)
+
                 os.fsync(f.fileno())
 
                 # if the file exists, move it somewhere else
@@ -669,7 +689,7 @@ if __name__ == "__main__":
             logger.debug(str(e))
             with open(args.benchfile, 'w') as f:
                 # write results directly into result file
-                results.store_file(f)
+                save_file_as_json(session, f)
                 os.fsync(f.fileno())
 
     execution_kwargs = {
@@ -682,7 +702,6 @@ if __name__ == "__main__":
         'timeout': args.timeout,
         'suffix': args.suffix,
         'runs': args.runs,
-        'replace_runs': args.replace_runs,
         'exec_args': args.exec_args,
         'iterdata': iterdata,
         'no_papi': args.no_papi,
@@ -696,7 +715,7 @@ if __name__ == "__main__":
 
     no_failures = True
     try:
-        no_failures = harness.execute_runtimes(args.filter_runtime, results, **execution_kwargs)
+        no_failures = harness.execute_runtimes(args.filter_runtime, session, **execution_kwargs)
     except KeyboardInterrupt:
         pass
     except:  # NOQA: E722

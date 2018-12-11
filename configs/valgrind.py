@@ -1,4 +1,3 @@
-import json
 import os
 import subprocess
 
@@ -85,13 +84,7 @@ def execute_binary_analysis_tool(filepath, workdir, tool, exec_args, env=None, *
         stdout_decoded = stdout.decode('utf-8') if stdout else None
         stderr_decoded = stderr.decode('utf-8') if stderr and process.returncode != 0 else None
 
-        if stdout_decoded:
-            try:
-                return json.loads(stdout_decoded), stderr_decoded
-            except ValueError:
-                logger.exception('invalid benchmark result: \'%s\'', stdout_decoded)
-
-        return None, stderr_decoded
+        return stdout_decoded, stderr_decoded, process.returncode
 
 
 def valgrind_executor(filepath, workdir, exec_args, **kwargs):

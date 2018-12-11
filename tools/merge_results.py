@@ -4,9 +4,8 @@ import argparse
 import logging
 import sys
 
-from util.bench_results import BenchmarkingResults
 from util.color_logger import get_logger
-
+from util.datamodel_helper import create_db_session, load_file_in_db, save_file_as_json
 
 logger = get_logger('merge_results')
 
@@ -22,6 +21,8 @@ if __name__ == "__main__":
                         help='file where the benchmarks are merged into')
     parser.add_argument('outfile', metavar='OUTFILE', type=argparse.FileType('x'),
                         help='file where the benchmarks are merged into')
+    parser.add_argument('--database', default='sqlite://', type=str,
+                        help='database which is used for procecssing. By default use in-memory sqllite')
     parser.add_argument('--filter-runtime', metavar='REGEX', type=str, default='.*',
                         help='regular expression to select which runtimes should be used')
 
@@ -33,13 +34,15 @@ if __name__ == "__main__":
     if not args.verbose:
         logging.disable(logging.DEBUG)  # we want to set all loggers
 
-    results = BenchmarkingResults()
+    session = create_db_session(args.database)
 
     for file in args.infile:
         try:
-            results.load_file(file, append=False, verbose=False)
+            logger.info("load \"{}\"".format(file.name))
+            load_file_in_db(session, file)
         except Exception:
             logger.exception("cannot load file")
             sys.exit()
 
-    results.store_file(args.outfile, args.filter_runtime)
+    logger.info("store into \"{}\"".format(args.outfile.name))
+    save_file_as_json(session, args.outfile, args.filter_runtime)

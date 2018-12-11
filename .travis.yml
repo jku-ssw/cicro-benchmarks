@@ -15,6 +15,8 @@ script:
   - echo "ASAN_SYMBOLIZER_PATH=/usr/lib/llvm-3.4/bin/llvm-symbolizer" >> configs/env
   - echo "ASAN_OPTIONS=symbolize=1" >> configs/env
   - ./tools/bench.py -y my_results.json --filter-runtime=$FILTER_RUNTIME --filter-harness=$FILTER_HARNESS --exec-args="--warmup=0 --iterations=1" -j=4
+  - ./tools/merge_results.py my_results.json merged.json
+  - ./tools/stats.py my_results.json
 matrix:
   include:
   - env: FILTER_RUNTIME='bugfinder-asan-gcc-O2' FILTER_HARNESS='.*'

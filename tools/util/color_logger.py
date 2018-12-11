@@ -33,8 +33,8 @@ class ColoredFormatter(logging.Formatter):
 class ColoredLogger(logging.Logger):
     COLOR_FORMAT = "[%(asctime)s] [ %(levelname)-19s ]  %(message)s (%(filename)s:%(lineno)d)"
 
-    def __init__(self, name):
-        logging.Logger.__init__(self, name, logging.DEBUG)
+    def __init__(self, name, level=logging.NOTSET):
+        logging.Logger.__init__(self, name, level)
 
         console = logging.StreamHandler()
         console.setFormatter(ColoredFormatter(self.COLOR_FORMAT))
