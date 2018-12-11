@@ -4,17 +4,8 @@ import argparse
 import logging
 import sys
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 from util.color_logger import get_logger
-
-logging.getLogger('sqlalchemy').setLevel(logging.WARNING)
-logging.getLogger('sqlalchemy.engine.base.Engine').setLevel(logging.WARNING)
-logging.getLogger('sqlalchemy.orm.mapper.Mapper').setLevel(logging.WARNING)
-
-from util.datamodel import Base  # NOQA:E402
-from util.datamodel_helper import load_file_in_db, save_file_as_json  # NOQA:E402
+from util.datamodel_helper import create_db_session, load_file_in_db, save_file_as_json
 
 logger = get_logger('merge_results')
 
@@ -43,14 +34,7 @@ if __name__ == "__main__":
     if not args.verbose:
         logging.disable(logging.DEBUG)  # we want to set all loggers
 
-    engine = create_engine(args.database)
-    Base.metadata.bind = engine
-    Base.metadata.create_all(engine)
-
-    DBSession = sessionmaker()
-    DBSession.bind = engine
-
-    session = DBSession()
+    session = create_db_session(args.database)
 
     for file in args.infile:
         try:

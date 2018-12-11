@@ -4,17 +4,12 @@ import argparse
 import logging
 import sys
 
-from sqlalchemy import create_engine, func
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import func
 
 from util.color_logger import get_logger
 
-logging.getLogger('sqlalchemy').setLevel(logging.WARNING)
-logging.getLogger('sqlalchemy.engine.base.Engine').setLevel(logging.WARNING)
-logging.getLogger('sqlalchemy.orm.mapper.Mapper').setLevel(logging.WARNING)
-
-import util.datamodel as dm  # NOQA:E402
-from util.datamodel_helper import load_file_in_db  # NOQA:E402
+import util.datamodel as dm
+from util.datamodel_helper import create_db_session, load_file_in_db
 
 logger = get_logger('stats')
 
@@ -69,14 +64,7 @@ if __name__ == "__main__":
     if not args.verbose:
         logging.disable(logging.DEBUG)  # we want to set all loggers
 
-    engine = create_engine('sqlite://')
-    dm.Base.metadata.bind = engine
-    dm.Base.metadata.create_all(engine)
-
-    DBSession = sessionmaker()
-    DBSession.bind = engine
-
-    session = DBSession()
+    session = create_db_session()
 
     try:
         logger.info("load file")

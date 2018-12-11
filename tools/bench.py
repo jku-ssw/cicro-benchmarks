@@ -14,18 +14,12 @@ import tempfile
 
 from datetime import datetime
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 from util.color_logger import get_logger
 from util.console import query_yes_no
 
-logging.getLogger('sqlalchemy').setLevel(logging.WARNING)
-logging.getLogger('sqlalchemy.engine.base.Engine').setLevel(logging.WARNING)
-logging.getLogger('sqlalchemy.orm.mapper.Mapper').setLevel(logging.WARNING)
-
-import util.datamodel as dm  # NOQA:E402
-from util.datamodel_helper import get_benchmark_name, get_or_create_config, get_or_create_harness, get_or_create_benchmark, load_file_in_db, save_file_as_json  # NOQA:E402
+import util.datamodel as dm
+from util.datamodel_helper import create_db_session, load_file_in_db, save_file_as_json,\
+    get_benchmark_name, get_or_create_config, get_or_create_harness, get_or_create_benchmark
 
 logger = get_logger('bench')
 
@@ -632,17 +626,10 @@ if __name__ == "__main__":
             logger.info(' * %s', runtime)
 
     try:
-        engine = create_engine(args.database)
+        session = create_db_session(args.database)
     except Exception:
         logger.exception('cannot create SQL engine')
         sys.exit(1)
-    dm.Base.metadata.bind = engine
-    dm.Base.metadata.create_all(engine)
-
-    DBSession = sessionmaker()
-    DBSession.bind = engine
-
-    session = DBSession()
 
     if args.workdir:
         os.environ["CHAYAI_WORKDIR"] = os.path.abspath(args.workdir)
