@@ -243,7 +243,7 @@ def save_file_as_json(session, file, runtime_filter='.*'):
             bench_name = run.benchmark.name
 
             fixture, name = split_benchmark_name(bench_name)
-            exec_benchmark = {'clock_resulution': run.clock_resolution,
+            exec_benchmark = {'clock_resolution': run.clock_resolution,
                               'clock_resolution_measured': run.clock_resolution_measured,
                               'clock_type': run.clock_type,
                               'disabled': run.disabled,
