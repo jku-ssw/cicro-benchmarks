@@ -58,7 +58,7 @@ class Compilation(Base):
 
 class CompilationBuildSystem(Base):
     __tablename__ = 'compilation_build_system'
-    compilation_id = Column(Integer, ForeignKey('compilation.id'), primary_key=True, nullable=False)
+    compilation_id = Column(Integer, ForeignKey('compilation.id'), primary_key=True, nullable=False, index=True)
     key = Column(String,  primary_key=True, nullable=False)
     value = Column(String, nullable=False)
 
@@ -70,7 +70,7 @@ class CompilationBuildSystem(Base):
 
 class CompilationMakeEnv(Base):
     __tablename__ = 'compilation_make_env'
-    compilation_id = Column(Integer, ForeignKey('compilation.id'), primary_key=True, nullable=False)
+    compilation_id = Column(Integer, ForeignKey('compilation.id'), primary_key=True, nullable=False, index=True)
     key = Column(String,  primary_key=True, nullable=False)
     value = Column(String, nullable=False)
 
@@ -99,12 +99,12 @@ class Execution(Base):
     sys_cpu_logical = Column(Integer, nullable=True)
     sys_cpu_physical = Column(Integer, nullable=True)
 
-    harness = relationship("Harness", back_populates="executions", lazy="joined")
-    configuration = relationship("Configuration", back_populates="executions", lazy="joined")
-    compilation = relationship("Compilation", back_populates="executions", lazy="joined")
+    harness = relationship("Harness", back_populates="executions", lazy="subquery")
+    configuration = relationship("Configuration", back_populates="executions")
+    compilation = relationship("Compilation", back_populates="executions", lazy="subquery")
 
-    runs = relationship('Run')
-    sys_cpu = relationship('ExecutionSystemCpu', order_by="asc(ExecutionSystemCpu.idx)", lazy="subquery")
+    runs = relationship('Run', lazy="subquery")
+    sys_cpu = relationship('ExecutionSystemCpu', order_by="asc(ExecutionSystemCpu.idx)", lazy="joined")
 
     def __repr__(self):
         return '<Execution "{}" configuration={}>'.format(self.id, self.configuration)
@@ -112,7 +112,7 @@ class Execution(Base):
 
 class ExecutionSystemCpu(Base):
     __tablename__ = 'execution_system_cpu'
-    execution_id = Column(Integer, ForeignKey('execution.id'), primary_key=True, nullable=False)
+    execution_id = Column(Integer, ForeignKey('execution.id'), primary_key=True, nullable=False, index=True)
     idx = Column(Integer,  primary_key=True, nullable=False)
     percent = Column(Float, nullable=False)
     cur_clock = Column(Float, nullable=False)
@@ -137,10 +137,10 @@ class Run(Base):
     disabled = Column(Boolean, nullable=False)
     iterations_per_run = Column(Integer, nullable=True)
 
-    benchmark = relationship("Benchmark", back_populates="runs")
+    benchmark = relationship("Benchmark", back_populates="runs", lazy="joined")
     execution = relationship("Execution", back_populates="runs")
 
-    datapoints = relationship('Datapoint', order_by="asc(Datapoint.idx)")
+    datapoints = relationship('Datapoint', order_by="asc(Datapoint.idx)", lazy="subquery")
 
     def __repr__(self):
         return '<Run "{}">'.format(self.id)
@@ -149,7 +149,7 @@ class Run(Base):
 class Datapoint(Base):
     __tablename__ = 'datapoint'
     idx = Column(Integer, primary_key=True, nullable=False)
-    run_id = Column(Integer, ForeignKey('run.id'), primary_key=True, nullable=False)
+    run_id = Column(Integer, ForeignKey('run.id'), primary_key=True, nullable=False, index=True)
     key = Column(String,  primary_key=True, nullable=False)
     value = Column(Float, nullable=False)
 
