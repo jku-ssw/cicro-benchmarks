@@ -65,7 +65,58 @@ def get_or_create_config(session, config_name):
     return config
 
 
+class DatabaseCache(object):
+    def __init__(self, session):
+        self.session = session
+
+        self.configuration_cache = {}
+        self.harness_cache = {}
+        self.benchmark_cache = {}
+
+        self._load_configuration_cache()
+        self._load_harness_cache()
+        self._load_benchmark_cache()
+
+    def _load_configuration_cache(self):
+        for config in self.session.query(dm.Configuration.id, dm.Configuration.name).all():
+            self.configuration_cache[config.name] = config
+
+    def _load_harness_cache(self):
+        for harness in self.session.query(dm.Harness.id, dm.Harness.name).all():
+            self.harness_cache[harness.name] = harness
+
+    def _load_benchmark_cache(self):
+        for benchmark in self.session.query(dm.Benchmark).all():
+            self.benchmark_cache[benchmark.name] = benchmark
+
+    def get_or_create_config(self, config_name):
+        if config_name in self.configuration_cache:
+            return self.configuration_cache[config_name]
+        else:
+            config = get_or_create_config(self.session, config_name)
+            self.configuration_cache[config_name] = config
+            return config
+
+    def get_or_create_harness(self, harness_name):
+        if harness_name in self.harness_cache:
+            return self.harness_cache[harness_name]
+        else:
+            harness = get_or_create_harness(self.session, harness_name)
+            self.harness_cache[harness_name] = harness
+            return harness
+
+    def get_or_create_benchmark(self, benchmark_name, harness):
+        if benchmark_name in self.benchmark_cache:
+            return self.benchmark_cache[benchmark_name]
+        else:
+            benchmark = get_or_create_benchmark(self.session, benchmark_name, harness)
+            self.benchmark_cache[benchmark_name] = benchmark
+            return benchmark
+
+
 def load_file_in_db(session, file):
+    cache = DatabaseCache(session)
+
     file_data = json.load(file)
 
     harness_data = {}
@@ -82,25 +133,23 @@ def load_file_in_db(session, file):
             if type(data) is not list:
                 data = [data]  # old file structure
 
+            config = cache.get_or_create_config(runtime)
+
             run_id = 0
             for entry in data:
                 entry_h_data = harness_data.get(entry['harness'], {}).get(runtime, []) if 'harness' in entry else []
                 h_data = entry_h_data[run_id] if len(entry_h_data) > run_id else {}
 
-                harness_name = entry['harness']
-                harness = get_or_create_harness(session, harness_name)
-
-                benchmark = get_or_create_benchmark(session, get_benchmark_name(entry), harness)
-
-                config = get_or_create_config(session, runtime)
+                harness = cache.get_or_create_harness(entry['harness'])
+                benchmark = cache.get_or_create_benchmark(get_benchmark_name(entry), harness)
 
                 h_system = h_data.get('system', {})
                 h_cpu = h_system.get('cpu', {})
                 h_memory = h_system.get('memory', {})
 
-                execution_cache_arr = execution_cache.get(harness_name, {}).get(runtime, [])
+                execution_cache_arr = execution_cache.get(harness.name, {}).get(runtime, [])
                 if run_id < len(execution_cache_arr) and execution_cache_arr[run_id] is not None:
-                    execution = execution_cache[harness_name][runtime][run_id]
+                    execution = execution_cache[harness.name][runtime][run_id]
                 else:
                     # store datetime in UTC
                     dt = date_parse(h_data['datetime']).astimezone(timezone.utc) if 'datetime' in h_data else None
@@ -128,19 +177,20 @@ def load_file_in_db(session, file):
 
                         session.add_all([dm.CompilationMakeEnv(compilation=compilation, key=key, value=value)
                                          for key, value in h_data.get('make_env', {}).items()])
-                    session.add(execution)
 
+                    session.add(execution)
                     session.add_all([dm.ExecutionSystemCpu(execution=execution, idx=idx, percent=val[0],
                                                            cur_clock=val[1][0], min_clock=val[1][1],
                                                            max_clock=val[1][2])
-                                     for idx, val in enumerate(zip(h_cpu.get('percent', []), h_cpu.get('freq', [])))])
+                                     for idx, val in
+                                     enumerate(zip(h_cpu.get('percent', []), h_cpu.get('freq', [])))])
 
                     # store in execution cache
-                    if harness_name not in execution_cache:
-                        execution_cache[harness_name] = {}
-                    if runtime not in execution_cache[harness_name]:
-                        execution_cache[harness_name][runtime] = auto_extend_list(None)
-                    execution_cache[harness_name][runtime][run_id] = execution
+                    if harness.name not in execution_cache:
+                        execution_cache[harness.name] = {}
+                    if runtime not in execution_cache[harness.name]:
+                        execution_cache[harness.name][runtime] = auto_extend_list(None)
+                    execution_cache[harness.name][runtime][run_id] = execution
 
                 run = dm.Run(execution=execution,
                              benchmark=benchmark,
@@ -149,13 +199,17 @@ def load_file_in_db(session, file):
                              clock_type=entry.get('clock_type'),
                              disabled=entry.get('disabled'),
                              iterations_per_run=entry.get('iterations_per_run'))
+                session.add(run)
 
+                datapoints = []
                 for idx, dp in enumerate(entry['runs']):
-                    session.add_all([dm.Datapoint(idx=idx, run=run, key=key, value=value) for key, value in dp.items()])
-
-                session.commit()
+                    datapoints += [dm.Datapoint(idx=idx, run=run, key=key, value=value)
+                                   for key, value in dp.items()]
+                session.add_all(datapoints)
 
                 run_id += 1
+
+    session.commit()
     return True
 
 

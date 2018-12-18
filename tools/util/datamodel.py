@@ -8,7 +8,7 @@ Base = declarative_base()
 class Harness(Base):
     __tablename__ = 'harness'
     id = Column(Integer, primary_key=True, nullable=False, index=True)
-    name = Column(String, unique=True, nullable=False)
+    name = Column(String, unique=True, nullable=False, index=True)
 
     benchmarks = relationship('Benchmark')
     executions = relationship('Execution')
@@ -20,7 +20,7 @@ class Harness(Base):
 class Benchmark(Base):
     __tablename__ = 'benchmark'
     id = Column(Integer, primary_key=True, nullable=False, index=True)
-    name = Column(String, unique=True, nullable=False)
+    name = Column(String, unique=True, nullable=False, index=True)
     harness_id = Column(Integer, ForeignKey('harness.id'), nullable=False)
 
     harness = relationship("Harness", back_populates="benchmarks", lazy="joined")
