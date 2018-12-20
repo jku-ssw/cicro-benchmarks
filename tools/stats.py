@@ -26,6 +26,9 @@ def log_general_stats(session):
                              .group_by(dm.Configuration.name)
                              ).scalar()
 
+        if num_of_benchmarks is None:
+            num_of_benchmarks = 0
+
         logger.info('runtime "%s" has %d benchmarks', config.name, num_of_benchmarks)
 
         query_incl_benchmarks = (session.query(dm.Benchmark.id.distinct())
