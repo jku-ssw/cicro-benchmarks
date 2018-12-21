@@ -1,10 +1,12 @@
 #!/usr/bin/env Rscript
 
-packages <- c('tidyverse', 'optparse', 'devtools', 'jsonlite')
-cran_repos <- 'http://cran.rstudio.com/'
+packages <- c('tidyverse', 'optparse', 'devtools', 'jsonlite', 'modules')
+cran_repos <- 'file:///benchmarks/CRAN'
 jobs <- 8
 
-install.packages(packages, repos=cran_repos, Ncpus=jobs)
-
-# modules
-devtools::install_github('klmr/modules', ref='version-0.9.10', threads=jobs)
+install.packages(packages, repos=cran_repos, Ncpus=jobs, clean=TRUE)
+for(x in packages) {
+  if (!require(x,character.only = TRUE)) {
+    quit(1)
+  }
+}
