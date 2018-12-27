@@ -87,8 +87,12 @@ $(OUTPUT_DIR_NAME)/clang-7.0-gold.json:
 $(OUTPUT_DIR_NAME)/branch-counters.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_BR_INS,PAPI_BR_UCN,PAPI_BR_CN,PAPI_BR_MSP,PAPI_BR_PRC' --filter-runtime clang-O3 /data/branch-counters.json"
 
-$(OUTPUT_DIR_NAME)/instruction-mix.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_BR_INS,PAPI_LD_INS,PAPI_SR_INS,PAPI_TOT_INS' --filter-runtime clang-O3 /data/instruction-mix.json"
+$(OUTPUT_DIR_NAME)/instruction-mix1.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_SR_INS,PAPI_TOT_INS' --filter-runtime clang-O3 /data/instruction-mix1.json"
+
+$(OUTPUT_DIR_NAME)/instruction-mix2.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_BR_INS,PAPI_LD_INS' --filter-runtime clang-O3 /data/instruction-mix2.json"
+
 
 $(OUTPUT_DIR_NAME)/cache-misses.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_L1_TCM,PAPI_L2_TCM,PAPI_L3_TCM' --filter-runtime clang-O3 /data/cache-misses.json"
@@ -294,7 +298,7 @@ $(OUTPUT_DIR_NAME)/loc.pdf: $(OUTPUT_DIR_NAME)/loc.csv
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_loc.R" PLOT_ARGS="--inputfile=/data/loc.csv --outputfile=/data/loc.pdf"
 
 
-$(OUTPUT_DIR_NAME)/instruction-mix-clang.pdf: $(OUTPUT_DIR_NAME)/clang-7.0.json
+$(OUTPUT_DIR_NAME)/instruction-mix-clang.pdf: $(OUTPUT_DIR_NAME)/instruction-mix1.json $(OUTPUT_DIR_NAME)/instruction-mix2.json
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_instruction_mix.R" PLOT_ARGS="--benchfile=/data/clang-7.0.json --base-runtime=clang-O3-v7 --outputfile=/data/instruction-mix-clang.pdf"
 
 $(OUTPUT_DIR_NAME)/instruction-mix-gcc.pdf: $(OUTPUT_DIR_NAME)/gcc-8.json
