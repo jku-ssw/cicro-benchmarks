@@ -130,7 +130,7 @@ $(OUTPUT_DIR_NAME)/gcc-7.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--ignore-errors --filter-runtime '$(GCC_VERSION_COMPARISON_RUNTIMES)'"
 
 $(OUTPUT_DIR_NAME)/gcc-8.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS_PAPI)' --ignore-errors $(HIGH_TIMEOUT) '/data/gcc-8.json'" # high timeout for MPX
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--ignore-errors $(HIGH_TIMEOUT) '/data/gcc-8.json'" # high timeout for MPX
 
 $(OUTPUT_DIR_NAME)/gcov.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--filter-runtime gcc-gcov-line-numbers --ignore-errors '/data/gcov.json'"
