@@ -78,11 +78,11 @@ class DatabaseCache(object):
         self._load_benchmark_cache()
 
     def _load_configuration_cache(self):
-        for config in self.session.query(dm.Configuration.id, dm.Configuration.name).all():
+        for config in self.session.query(dm.Configuration).all():
             self.configuration_cache[config.name] = config
 
     def _load_harness_cache(self):
-        for harness in self.session.query(dm.Harness.id, dm.Harness.name).all():
+        for harness in self.session.query(dm.Harness).all():
             self.harness_cache[harness.name] = harness
 
     def _load_benchmark_cache(self):
