@@ -27,7 +27,7 @@ HIGH_TIMEOUT = --timeout 7200
 LLVM_VERSION_COMPARISON_RUNTIMES = clang-O3
 GCC_VERSION_COMPARISON_RUNTIMES = gcc-O3
 
-PLOTS = tools-overview.pdf  LLVM-versions.pdf GCC-versions.pdf compiler-flags.pdf Rplots.pdf instruction-mix-clang.pdf instruction-mix-gcc.pdf memory-allocators.pdf loc.pdf bug-finding-tools.pdf attacker-mitigation-tools.pdf productivity-tools.pdf linkers.pdf
+PLOTS = loc.pdf
 PLOT_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(PLOTS))
 
 .PHONY: all build clean
