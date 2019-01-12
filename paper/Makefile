@@ -144,11 +144,6 @@ $(OUTPUT_DIR_NAME)/gcov.json:
 $(OUTPUT_DIR_NAME)/introspection.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_INTROSPECTION run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--filter-runtime introspection-mpx-O3 --filter-harness '(?!(codeplea-tinyexpr|vmg-crustache|adamdunkels-ubasic))'  --ignore-errors $(HIGH_TIMEOUT) '/data/introspection.json'" # high timeout for MPX
 
-# benchmark sanitizers (based on clang-6.0)
-$(OUTPUT_DIR_NAME)/sanitizers.json: $(OUTPUT_DIR_NAME)/asan.json $(OUTPUT_DIR_NAME)/msan.json $(OUTPUT_DIR_NAME)/tsan.json $(OUTPUT_DIR_NAME)/ubsan.json
-	rm -f $(OUTPUT_DIR_NAME)/sanitizers.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="asan.json msan.json tsan.json ubsan.json sanitizers.json"
-
 $(OUTPUT_DIR_NAME)/asan.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_SANITIZERS run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime asan-O3 $(HIGH_TIMEOUT)" OUTPUT_FILE="/$(OUTPUT_DIR_NAME)/asan.json"
 
@@ -216,96 +211,13 @@ $(OUTPUT_DIR_NAME)/tlsf.json:
 $(OUTPUT_DIR_NAME)/strace.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_STRACE run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime strace-O3 --ignore-errors $(HIGH_TIMEOUT)"
 
-#no-papi.json:
-#	../tools/bench.py -y --filter-runtime="(gcc|clang)-(O0|O3)" no-papi.json --no-papi --suffix='-no-papi' --runs=${RUNS}
-
 $(OUTPUT_DIR_NAME)/merged.json: $(ALL_TARGET_PATHS)
 	rm -f $(OUTPUT_DIR_NAME)/merged.json
 	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="$(ALL_TARGET_JSON) merged.json"
-
-$(OUTPUT_DIR_NAME)/overview.json: $(OUTPUT_DIR_NAME)/merged.json
-	rm -f $(OUTPUT_DIR_NAME)/overview.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='boehmgc-O3|clang-O3-v7|gcc-O3-v8|gcc-mpx-O3-v8|gcc-gcov-O0-v8|asan-O3|msan-O3|tsan-O3|ubsan-O3|compcert-O|lowfat-O3|softboundcets-O3|sulong-graalvm|tcc|valgrind-O3|callgrind-O3|drmemory-O3|qemu-O3|dmalloc-O3|diehard-O3|jemalloc-O3|hoard-O3|freeguard-O3|libdislocator-O3' merged.json overview.json"
-
-$(OUTPUT_DIR_NAME)/memory-allocators.json: $(OUTPUT_DIR_NAME)/merged.json
-	rm -f $(OUTPUT_DIR_NAME)/memory-allocators.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='diehard-O3|dlmalloc-O3|rpmalloc-O3|clang-O3-v7|boehmgc-O3|dmalloc-O3|jemalloc-O3|hoard-O3|freeguard-O3|libdislocator-O3|tlsf-O3' merged.json memory-allocators.json"
-
-$(OUTPUT_DIR_NAME)/bug-finding-tools.json: $(OUTPUT_DIR_NAME)/merged.json
-	rm -f $(OUTPUT_DIR_NAME)/bug-finding-tools.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-O3-v7|gcc-mpx-O3-v8|msan-O3|asan-O3|tsan-O3|ubsan-O3|introspection|lowfat-O3|softboundcets-O3|valgrind-O3|drmemory-O3' merged.json bug-finding-tools.json"
-
-$(OUTPUT_DIR_NAME)/attacker-mitigation-tools.json: $(OUTPUT_DIR_NAME)/merged.json
-	rm -f $(OUTPUT_DIR_NAME)/attacker-mitigation-tools.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='gcc-execstack-O3|cfi-O3|gcc-nopie-O3|gcc-no-stack-protector-no-exec-stack-no-pie-O3|gcc-nostack-protector-O3-v8|gcc-stack-protector-|clang-safe-stack-O3|clang-lld-cfi|clang-O3-v7|cfi-O3' merged.json attacker-mitigation-tools.json"
-
-$(OUTPUT_DIR_NAME)/productivity-tools.json: $(OUTPUT_DIR_NAME)/merged.json
-	rm -f $(OUTPUT_DIR_NAME)/productivity-tools.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='polly-O3|sulong|clang-O3-v7|gcc-gcov-O0-v8|qemu-O3|callgrind-O3|strace-O3' merged.json productivity-tools.json"
-
-$(OUTPUT_DIR_NAME)/linkers.json: $(OUTPUT_DIR_NAME)/merged.json
-	rm -f $(OUTPUT_DIR_NAME)/linkers.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='clang-gold-O3|clang-O3-v7|clang-lld(?!(-cfi|-pgo|-lto))' merged.json linkers.json"
-
-$(OUTPUT_DIR_NAME)/llvm-versions.json: $(CLANG_TARGET_PATHS)
-	rm -f $(OUTPUT_DIR_NAME)/llvm-versions.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='$(LLVM_VERSION_COMPARISON_RUNTIMES)' $(CLANG_TARGET_JSON) llvm-versions.json"
-
-$(OUTPUT_DIR_NAME)/gcc-versions.json: $(GCC_TARGET_PATHS)
-	rm -f $(OUTPUT_DIR_NAME)/gcc-versions.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='$(GCC_VERSION_COMPARISON_RUNTIMES)' $(GCC_TARGET_JSON) gcc-versions.json"
-
-$(OUTPUT_DIR_NAME)/compiler-flags.json: $(OUTPUT_DIR_NAME)/merged.json
-	rm -f $(OUTPUT_DIR_NAME)/compiler-flags.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='(clang-visibility-hidden|clang-lld-lto-O3-v7|clang-lld-pgo-O3-v7|tcc|gcc-pgo-O3|clang-pgo-O3|gcc-O0-v8|gcc-O1-v8|gcc-O2-v8|gcc-Oz-v8|gcc-O3-v8|gcc-Os-v8|clang-O0-v7|clang-O1-v7|clang-Oz-v7|clang-O2-v7|clang-O3-v7|clang-Os-v7|clang-Ofast-v7|clang-march-native-O3-v7|gcc-march-native-O3-v8|gcc-Ofast|compcert-O|compcert-OO|compcert-Os)' merged.json compiler-flags.json"
-
-$(OUTPUT_DIR_NAME)/special-clang-flags.json: $(CLANG_TARGET_PATHS)
-	rm -f $(OUTPUT_DIR_NAME)/special-clang-flags.json
-	$(MAKE) -C $(DOCKER_DIR)/MERGE run OUTPUT_DIR=$(OUTPUT_DIR) MERGE_ARGS="--filter-runtime='(clang-O3-v7|clang-fno-delete-null-pointer-checks-O3-v7|clang-fno-strict-aliasing-O3-v7|clang-fno-strict-overflow-O3-v7|clang-mno-retpoline-O3-v7)' $(CLANG_TARGET_JSON) special-clang-flags.json"
-
-
 
 $(OUTPUT_DIR_NAME)/loc.csv: $(OUTPUT_DIR_NAME)/gcov.json
 	rm -f $(OUTPUT_DIR_NAME)/loc.csv
 	../tools/extract_gcov.py --filter-runtime gcc-gcov-line-numbers-v8 $(OUTPUT_DIR_NAME)/gcov.json > $(OUTPUT_DIR_NAME)/loc.csv
 
-$(OUTPUT_DIR_NAME)/Rplots.pdf: $(OUTPUT_DIR_NAME)/merged.json
-	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) PLOT_ARGS="--benchfile=/data/merged.json --base-runtime=$(BENCHMARK_BASE_RUNTIME)"
-
-$(OUTPUT_DIR_NAME)/LLVM-versions.pdf: $(OUTPUT_DIR_NAME)/llvm-versions.json
-	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/llvm-versions.json --base-runtime=clang-O3-v3.3 --outputfile=/data/LLVM-versions.pdf"
-
-$(OUTPUT_DIR_NAME)/GCC-versions.pdf: $(OUTPUT_DIR_NAME)/gcc-versions.json
-	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/gcc-versions.json --base-runtime=gcc-O3-v4.8 --outputfile=/data/GCC-versions.pdf"
-
-$(OUTPUT_DIR_NAME)/compiler-flags.pdf: $(OUTPUT_DIR_NAME)/compiler-flags.json
-	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/compiler-flags.json --base-runtime=clang-O0-v7 --outputfile=/data/compiler-flags.pdf"
-
-$(OUTPUT_DIR_NAME)/clang-compiler-flags.pdf: $(OUTPUT_DIR_NAME)/special-clang-flags.json
-	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/special-clang-flags.json --base-runtime=clang-O3-v7 --outputfile=/data/special-clang-flags.pdf"
-
-$(OUTPUT_DIR_NAME)/memory-allocators.pdf: $(OUTPUT_DIR_NAME)/memory-allocators.json
-	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/memory-allocators.json --base-runtime=clang-O3-v7 --outputfile=/data/memory-allocators.pdf"
-
-$(OUTPUT_DIR_NAME)/bug-finding-tools.pdf: $(OUTPUT_DIR_NAME)/bug-finding-tools.json
-	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/bug-finding-tools.json --base-runtime=clang-O3-v7 --outputfile=/data/bug-finding-tools.pdf"
-
-$(OUTPUT_DIR_NAME)/attacker-mitigation-tools.pdf: $(OUTPUT_DIR_NAME)/attacker-mitigation-tools.json
-	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/attacker-mitigation-tools.json --base-runtime=clang-O3-v7 --outputfile=/data/attacker-mitigation-tools.pdf"
-
-$(OUTPUT_DIR_NAME)/productivity-tools.pdf: $(OUTPUT_DIR_NAME)/productivity-tools.json
-	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/productivity-tools.json --base-runtime=clang-O3-v7 --outputfile=/data/productivity-tools.pdf"
-
-$(OUTPUT_DIR_NAME)/linkers.pdf: $(OUTPUT_DIR_NAME)/linkers.json
-	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_compiler_versions.R" PLOT_ARGS="--benchfile=/data/linkers.json --base-runtime=clang-O3-v7 --outputfile=/data/linkers.pdf"
-
-
 $(OUTPUT_DIR_NAME)/loc.pdf: $(OUTPUT_DIR_NAME)/loc.csv
 	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_loc.R" PLOT_ARGS="--inputfile=/data/loc.csv --outputfile=/data/loc.pdf"
-
-
-$(OUTPUT_DIR_NAME)/instruction-mix-clang.pdf: $(OUTPUT_DIR_NAME)/instruction-mix1.json $(OUTPUT_DIR_NAME)/instruction-mix2.json
-	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_instruction_mix.R" PLOT_ARGS="--benchfile=/data/clang-7.0.json --base-runtime=clang-O3-v7 --outputfile=/data/instruction-mix-clang.pdf"
-
-$(OUTPUT_DIR_NAME)/instruction-mix-gcc.pdf: $(OUTPUT_DIR_NAME)/gcc-8.json
-	$(MAKE) -C $(DOCKER_DIR)/PLOT run OUTPUT_DIR=$(OUTPUT_DIR) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/plot_instruction_mix.R" PLOT_ARGS="--benchfile=/data/gcc-8.json --base-runtime=gcc-O3-v8 --outputfile=/data/instruction-mix-gcc.pdf"
