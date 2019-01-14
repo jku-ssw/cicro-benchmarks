@@ -32,7 +32,7 @@ PLOT_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(PLOTS))
 
 .PHONY: all build clean
 
-all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/branch-counters.json $(OUTPUT_DIR_NAME)/instruction-mix.json $(OUTPUT_DIR_NAME)/cache-misses.json $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(PLOT_PATHS)
+all: build $(ALL_TARGET_PATHS) $(OUTPUT_DIR_NAME)/branch-counters.json $(OUTPUT_DIR_NAME)/instruction-mix1.json $(OUTPUT_DIR_NAME)/instruction-mix2.json $(OUTPUT_DIR_NAME)/cache-misses.json $(OUTPUT_DIR_NAME)/benchmark-classification.tex $(PLOT_PATHS)
 
 build:
 	$(MAKE) -C $(DOCKER_DIR) build
