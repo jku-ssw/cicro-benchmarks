@@ -2,6 +2,7 @@
 
 ## Build errors
 
+```
 ===> libpcc
 make[1]: Entering directory '/pcc-libs-20170101/libpcc'
 pcc -O -I. -DTARGET_LITTLE_ENDIAN=1 -Dos_linux -Dmach_amd64 -isystem ../libpcc/include  -c cmpdi2.c
@@ -34,3 +35,8 @@ pcc -O -I. -DTARGET_LITTLE_ENDIAN=1 -Dos_linux -Dmach_amd64 -isystem ../libpcc/i
 error: /usr/lib/x86_64-linux-gnu/ccom terminated with status 1
 Makefile:52: recipe for target 'unwind.o' failed
 make[1]: Leaving directory '/pcc-libs-20170101/libpcc'
+```
+
+## Bug reports
+
+The issue tracker on http://pcc.ludd.ltu.se/jira is down.
