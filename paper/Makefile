@@ -15,12 +15,12 @@ CLANG_TARGET_NAMES = clang-3.3 clang-3.4 clang-3.5 clang-3.6 clang-3.7 clang-3.8
 CLANG_TARGET_JSON = $(CLANG_TARGET_NAMES:=.json)
 CLANG_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(CLANG_TARGET_JSON))
 
-GCC_TARGET_NAMES = gcc-4.6 gcc-4.7 gcc-4.8 gcc-5 gcc-6 gcc-7 gcc-8
+GCC_TARGET_NAMES = gcc-4.6 gcc-4.7 gcc-4.8 gcc-4.9 gcc-5 gcc-6 gcc-7 gcc-8
 GCC_TARGET_JSON = $(GCC_TARGET_NAMES:=.json)
 GCC_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(GCC_TARGET_JSON))
 
 
-ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert sanitizers lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf strace rpmalloc polly clang-7.0-lld clang-7.0-gold introspection
+ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert sanitizers lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf strace rpmalloc polly clang-7.0-lld clang-7.0-gold introspection usr-bin-time
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 7200
@@ -116,6 +116,9 @@ $(OUTPUT_DIR_NAME)/polly.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_POLLY run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --ignore-errors"
 
 
+$(OUTPUT_DIR_NAME)/usr-bin-time.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_USR-BIN-TIME run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--ignore-errors"
+
 # benchmark gcc
 $(OUTPUT_DIR_NAME)/gcc-4.6.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-4.6 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--ignore-errors --filter-runtime '$(GCC_VERSION_COMPARISON_RUNTIMES)'"
@@ -125,6 +128,9 @@ $(OUTPUT_DIR_NAME)/gcc-4.7.json:
 
 $(OUTPUT_DIR_NAME)/gcc-4.8.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-4.8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--ignore-errors --filter-runtime '$(GCC_VERSION_COMPARISON_RUNTIMES)'"
+
+$(OUTPUT_DIR_NAME)/gcc-4.9.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-4.9 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--ignore-errors --filter-runtime '$(GCC_VERSION_COMPARISON_RUNTIMES)'"
 
 $(OUTPUT_DIR_NAME)/gcc-5.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_GCC-5 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--ignore-errors --filter-runtime '$(GCC_VERSION_COMPARISON_RUNTIMES)'"
