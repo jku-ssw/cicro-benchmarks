@@ -27,6 +27,7 @@ def ltrace_build_system_executor(make_env):
 
     return result
 
+
 def time_build_system_executor(make_env):
     result = build_system_executor(make_env, cc_version='--version', as_version='--version')
 
@@ -94,7 +95,7 @@ def execute_binary_analysis_tool(filepath, workdir, tool, exec_args, env=None, *
         stdout, stderr = process.communicate(timeout=kwargs.get('timeout', 240))
 
         stdout_decoded = stdout.decode('utf-8') if stdout else None
-        stderr_decoded = stderr.decode('utf-8') if stderr and process.returncode != 0 else None
+        stderr_decoded = stderr.decode('utf-8') if stderr else None
 
         return stdout_decoded, stderr_decoded, process.returncode
 
@@ -121,6 +122,7 @@ def strace_executor(filepath, workdir, exec_args, **kwargs):
 
 def ltrace_executor(filepath, workdir, exec_args, **kwargs):
     return execute_binary_analysis_tool(filepath, workdir, ['ltrace', '-o', 'test'], exec_args, **kwargs)
+
 
 def time_executor(filepath, workdir, exec_args, **kwargs):
     return execute_binary_analysis_tool(filepath, workdir, ['/usr/bin/time', '--verbose'], exec_args, **kwargs)
@@ -150,4 +152,4 @@ harness.add_runtime('dlmalloc-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS"
 harness.add_runtime('tlsf-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
 harness.add_runtime('strace-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **strace_kwargs)
 harness.add_runtime('ltrace-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"}, **ltrace_kwargs)
-harness.add_runtime('usr-bin-time-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "PAPI": 0}, **valgrind_kwargs)
+harness.add_runtime('usr-bin-time-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3", "PAPI": 0}, **time_kwargs)
