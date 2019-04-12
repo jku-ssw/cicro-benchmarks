@@ -1,0 +1,5 @@
+{
+    "working" : "yes",
+    "based_on" : ["llvm"],
+    "source" : "https://github.com/GJDuck/LowFat"
+}

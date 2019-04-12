@@ -1,0 +1,6 @@
+{
+    "working" : "no",
+    "based_on" : ["llvm"],
+    "type" : "mature-research",
+    "source" : "https://github.com/jtcriswell/safecode-llvm37"
+}

@@ -1,0 +1,9 @@
+{
+    "working" : "no",
+    "links_reported_issues" : {
+        "https://github.com/vusec/safeinit/issues/1" : "unresolved"
+    },
+    "based_on" : ["llvm"],
+    "type" : "research",
+    "source" : "https://github.com/vusec/safeinit"
+}
