@@ -1,0 +1,8 @@
+{
+    "working" : "no",
+    "links_reported_issues" : {
+        "https://github.com/stephenrkell/liballocs/issues/10" : "resolved",
+        "https://github.com/stephenrkell/libcrunch/issues/2" : "unresolved"
+    },
+    "source" : "https://github.com/stephenrkell/libcrunch"
+}

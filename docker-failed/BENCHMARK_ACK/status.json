@@ -1,0 +1,10 @@
+{
+    "working" : "no",
+    "fails_during" : "runtime",
+    "links_reported_issues" : {
+        "https://github.com/davidgiven/ack/issues/179" : "unresolved"
+    },
+    "issue_explanation" : "ACK fails to compile the benchmark harness because it uses 64-bit integers, which are not supported by ACK. Furthermore, ACK supports only C89 compliant programs, which might result in the failure of supporting some of our benchmarks.",
+    "type" : "mature-research",
+    "source" : "https://github.com/davidgiven/ack"
+}

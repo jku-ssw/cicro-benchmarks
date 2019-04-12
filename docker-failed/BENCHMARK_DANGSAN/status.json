@@ -1,0 +1,10 @@
+{
+    "working" : "no",
+    "links_reported_issues" : {
+        "https://github.com/vusec/dangsan/issues/1" : "unanswered"
+    },
+    "suspected_issue" : "incompatible distribution",
+    "suspected_issue_details" : "Ubuntu 18.04 adds --push-state, which is not supported by their custom linker (see https://github.com/jku-ssw/cicro-benchmarks/issues/49)",
+    "type" : "research",
+    "source" : "https://github.com/vusec/dangsan"
+}

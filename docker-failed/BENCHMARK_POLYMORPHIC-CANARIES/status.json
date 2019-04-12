@@ -1,0 +1,16 @@
+{
+    "working" : "no",
+    "issues" : [
+        "bash commands are not copy-pastable",
+        "versions not specified"
+    ],
+    "links_reported_issues" : {
+        "https://github.com/zhilongwang/PolymorphicCanaries/issues/2" : "unanswered"
+    },
+    "links_opened_prs" : {
+        "https://github.com/zhilongwang/PolymorphicCanaries/pull/1" : "merged"
+    },
+    "based_on" : [ "llvm", "gcc" ],
+    "type" : "research",
+    "source" : "https://github.com/zhilongwang/PolymorphicCanaries"
+}
