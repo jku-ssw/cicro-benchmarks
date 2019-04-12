@@ -1,0 +1,5 @@
+{
+    "working" : "no",
+    "based_upon" : ["llvm"],
+    "source" : "https://github.com/graalvm/sulong"
+}
