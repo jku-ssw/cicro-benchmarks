@@ -3,6 +3,6 @@
     "type" : "mature-research",
     "source" : "https://github.com/rose-compiler/rose",
     "links_reported_issues" : {
-        "https://github.com/rose-compiler/rose/issues/36" : "unanswered"
+        "https://github.com/rose-compiler/rose/issues/36" : "unresolved"
     }
 }
