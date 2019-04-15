@@ -1,0 +1,9 @@
+{
+    "working" : "no",
+    "based_on" : ["llvm"],
+    "type" : "research",
+    "source" : "https://github.com/HexHive/HexVASAN",
+    "links_reported_issues" : {
+        "https://github.com/HexHive/HexVASAN/issues/2" : "unanswered"
+    }
+}
