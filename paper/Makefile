@@ -1,7 +1,7 @@
 BENCHMARK_EXEC_ARGS =
 BENCHMARK_EXEC_ARGS_PAPI = $(BENCHMARK_EXEC_ARGS) --papi=PAPI_LD_INS,PAPI_SR_INS,PAPI_BR_INS,PAPI_TOT_INS,PAPI_TOT_CYC
 
-BENCHMARK_RUNS = 1
+BENCHMARK_RUNS = 3
 
 BENCHMARK_BASE_RUNTIME = clang-O3-v7  # TODO: change
 
@@ -20,7 +20,7 @@ GCC_TARGET_JSON = $(GCC_TARGET_NAMES:=.json)
 GCC_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(GCC_TARGET_JSON))
 
 
-ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf strace rpmalloc polly clang-7.0-lld clang-7.0-gold introspection usr-bin-time
+ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf strace rpmalloc polly clang-8.0-lld clang-8.0-gold introspection usr-bin-time
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 7200
@@ -80,25 +80,25 @@ $(OUTPUT_DIR_NAME)/clang-7.0.json:
 $(OUTPUT_DIR_NAME)/clang-8.0.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--filter-runtime '(clang(?!(-lld|-gold)))'"
 
-$(OUTPUT_DIR_NAME)/clang-7.0-lld.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7-LLD run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--filter-runtime 'clang-lld' --ignore-errors"
+$(OUTPUT_DIR_NAME)/clang-8.0-lld.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-8-LLD run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--filter-runtime 'clang-lld' --ignore-errors"
 
-$(OUTPUT_DIR_NAME)/clang-7.0-gold.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7-GOLD-LD run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--filter-runtime 'clang-gold' --ignore-errors"
+$(OUTPUT_DIR_NAME)/clang-8.0-gold.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-8-GOLD-LD run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--filter-runtime 'clang-gold' --ignore-errors"
 
 
 $(OUTPUT_DIR_NAME)/branch-counters.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_BR_INS,PAPI_BR_UCN,PAPI_BR_CN,PAPI_BR_MSP,PAPI_BR_PRC' --filter-runtime clang-O3 /data/branch-counters.json"
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_BR_INS,PAPI_BR_UCN,PAPI_BR_CN,PAPI_BR_MSP,PAPI_BR_PRC' --filter-runtime clang-O3 /data/branch-counters.json"
 
 $(OUTPUT_DIR_NAME)/instruction-mix1.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_SR_INS,PAPI_TOT_INS' --filter-runtime clang-O3 /data/instruction-mix1.json"
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_SR_INS,PAPI_TOT_INS' --filter-runtime clang-O3 /data/instruction-mix1.json"
 
 $(OUTPUT_DIR_NAME)/instruction-mix2.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_BR_INS,PAPI_LD_INS' --filter-runtime clang-O3 /data/instruction-mix2.json"
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_BR_INS,PAPI_LD_INS' --filter-runtime clang-O3 /data/instruction-mix2.json"
 
 
 $(OUTPUT_DIR_NAME)/cache-misses.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-7 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_L1_TCM,PAPI_L2_TCM,PAPI_L3_TCM' --filter-runtime clang-O3 /data/cache-misses.json"
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) DOCKER_RUN_ARGS="--entrypoint=/benchmarks/tools/bench.py --privileged" BENCHMARK_ARGS="--exec-args='--papi=PAPI_L1_TCM,PAPI_L2_TCM,PAPI_L3_TCM' --filter-runtime clang-O3 /data/cache-misses.json"
 
 
 # benchmark compcert

@@ -1,7 +1,8 @@
 {
     "working" : "yes",
     "links_reported_issues" : {
-        "https://github.com/rampantpixels/rpmalloc/issues/77" : "resolved"
+        "https://github.com/rampantpixels/rpmalloc/issues/77" : "resolved",
+        "https://github.com/rampantpixels/rpmalloc/issues/86" : "resolved"
     },
     "source" : "https://github.com/rampantpixels/rpmalloc"
 }
