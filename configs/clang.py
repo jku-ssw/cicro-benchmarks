@@ -16,6 +16,7 @@ harness.add_runtime('clang-Os', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "
 harness.add_runtime('clang-Oz', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -Oz"}, **clang_kwargs)
 harness.add_runtime('clang-fno-strict-aliasing-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fno-strict-aliasing"}, **clang_kwargs)
 harness.add_runtime('clang-fno-strict-overflow-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fno-strict-overflow"}, **clang_kwargs)
+harness.add_runtime('clang-ftrivial-auto-var-init-pattern-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -ftrivial-auto-var-init=pattern"}, **clang_kwargs)
 harness.add_runtime('clang-fno-delete-null-pointer-checks-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fno-delete-null-pointer-checks"}, **clang_kwargs)
 harness.add_runtime('clang-safe-stack-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fsanitize=safe-stack"}, **clang_kwargs)
 harness.add_runtime('clang-lld-cfi-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3 -fsanitize=cfi -flto -fvisibility=hidden", "LDFLAGS": "-fuse-ld=lld"}, **clang_kwargs)
