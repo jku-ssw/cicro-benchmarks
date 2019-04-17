@@ -8,7 +8,7 @@ FROM cicro/sulong:${GRAAL_GIT_TAG}
 MAINTAINER Thomas Pointhuber <thomas.pointhuber@gmx.at>
 
 # our main dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential cmake file clang-6.0 llvm libomp-dev ca-certificates libpapi-dev python3 python3-psutil python3-pip python3-setuptools
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential cmake file clang-6.0 llvm libomp-dev ca-certificates libpapi-dev python3 python3-psutil python3-pip python3-setuptools python3-sqlalchemy python3-dateutil
 RUN pip3 install wllvm
 
 # place to store results
