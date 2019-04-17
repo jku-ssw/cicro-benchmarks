@@ -37,6 +37,7 @@ COPY --from=harness /benchmarks /benchmarks
 # configure benchmark enviroment
 RUN echo "CLANG=/usr/bin/clang" >> /benchmarks/configs/env \
     && echo "KLEE=/klee_build_dir/bin/klee" >> /benchmarks/configs/env \
-    && echo "WLLVM_DIR=/usr/local/bin" >> /benchmarks/configs/env
+    && echo "WLLVM_DIR=/usr/local/bin" >> /benchmarks/configs/env \
+    && echo "LLVM_COMPILER=clang" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/klee.json", "--filter-runtime=klee"] FOREGROUND
