@@ -1,0 +1,8 @@
+{
+    "working" : "yes",
+    "based_on" : ["llvm"],
+    "source" : "https://github.com/santoshn/softboundcets-3.8.0",
+    "links_reported_issues" : {
+        "https://github.com/santoshn/softboundcets-3.8.0/issues/9" : "unanswered"
+    }
+}
