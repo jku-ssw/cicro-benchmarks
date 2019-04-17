@@ -20,7 +20,7 @@ GCC_TARGET_JSON = $(GCC_TARGET_NAMES:=.json)
 GCC_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(GCC_TARGET_JSON))
 
 
-ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf strace rpmalloc polly clang-8.0-lld clang-8.0-gold introspection usr-bin-time
+ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert lowfat tcc memcheck callgrind qemu softboundcets sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf strace rpmalloc polly clang-8.0-lld clang-8.0-gold introspection usr-bin-time scalloc
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 7200
@@ -160,16 +160,16 @@ $(OUTPUT_DIR_NAME)/introspection.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_INTROSPECTION run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--filter-runtime introspection-mpx-O3 --filter-harness '(?!(codeplea-tinyexpr|vmg-crustache|adamdunkels-ubasic))'  --ignore-errors $(HIGH_TIMEOUT) '/data/introspection.json'" # high timeout for MPX
 
 $(OUTPUT_DIR_NAME)/asan.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_SANITIZERS run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime asan-O3 $(HIGH_TIMEOUT)" OUTPUT_FILE="/$(OUTPUT_DIR_NAME)/asan.json"
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime asan-O3 $(HIGH_TIMEOUT)" OUTPUT_FILE="/$(OUTPUT_DIR_NAME)/asan.json"
 
 $(OUTPUT_DIR_NAME)/msan.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_SANITIZERS run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime msan-O3 $(HIGH_TIMEOUT)" OUTPUT_FILE="/$(OUTPUT_DIR_NAME)/msan.json"
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime msan-O3 $(HIGH_TIMEOUT)" OUTPUT_FILE="/$(OUTPUT_DIR_NAME)/msan.json"
 
 $(OUTPUT_DIR_NAME)/tsan.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_SANITIZERS run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime tsan-O3 $(HIGH_TIMEOUT)" OUTPUT_FILE="/$(OUTPUT_DIR_NAME)/tsan.json"
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime tsan-O3 $(HIGH_TIMEOUT)" OUTPUT_FILE="/$(OUTPUT_DIR_NAME)/tsan.json"
 
 $(OUTPUT_DIR_NAME)/ubsan.json:
-	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_SANITIZERS run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime ubsan-O3 $(HIGH_TIMEOUT)" OUTPUT_FILE="/$(OUTPUT_DIR_NAME)/ubsan.json"
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_CLANG-8 run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime ubsan-O3 $(HIGH_TIMEOUT)" OUTPUT_FILE="/$(OUTPUT_DIR_NAME)/ubsan.json"
 
 # benchmark sulong (based on clang-6.0)
 $(OUTPUT_DIR_NAME)/sulong.json:
@@ -216,6 +216,9 @@ $(OUTPUT_DIR_NAME)/libdislocator.json:
 
 $(OUTPUT_DIR_NAME)/tcmalloc.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_TCMALLOC run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime tcmalloc-O3 --ignore-errors"
+
+$(OUTPUT_DIR_NAME)/scalloc.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_SCALLOC run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime scalloc-O3 --ignore-errors"
 
 $(OUTPUT_DIR_NAME)/dlmalloc.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_DLMALLOC run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime dlmalloc-O3 --ignore-errors"
