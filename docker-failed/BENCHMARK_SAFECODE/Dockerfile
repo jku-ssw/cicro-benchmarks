@@ -12,6 +12,8 @@ RUN git clone --depth 1 --single-branch https://github.com/jtcriswell/safecode-l
 
 RUN sed -i 's#bits/errno.h#errno.h#g' /safecode-llvm37/projects/safecode/runtime/SoftBoundRuntime/*.c  # FIX: error "Never include <bits/errno.h> directly; use <errno.h> instead."
 RUN cd safecode-llvm37 && mkdir build && cd build && ../configure --enable-optimized && make -j 4
+RUN cd safecode-llvm37/projects/poolalloc && ./configure && make -j4
+RUN cd safecode-llvm37/projects/safecode && ./configure && make -j4
 
 # TODO: implement remaining stuff
 
@@ -19,6 +21,6 @@ RUN cd safecode-llvm37 && mkdir build && cd build && ../configure --enable-optim
 COPY --from=harness /benchmarks /benchmarks
 
 # configure benchmark enviroment
-RUN echo "" >> /benchmarks/configs/env.run
+RUN echo "CLANG=/safecode-llvm37/build/Release+Asserts/bin/clang\nSAFECODE_DIR=/safecode-llvm37/build/Release+Asserts" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/safecode.json", "--filter-runtime=(safecode-O3)"] FOREGROUND

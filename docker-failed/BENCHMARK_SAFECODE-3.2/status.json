@@ -1,6 +1,0 @@
-{
-    "working" : "no",
-    "based_on" : ["llvm"],
-    "type" : "mature-research",
-    "source" : "http://llvm.org/svn/llvm-project/safecode/branches/release_32"
-}
