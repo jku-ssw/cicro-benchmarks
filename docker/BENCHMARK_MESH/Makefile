@@ -1,4 +1,4 @@
-DOCKER_IMAGE_NAME = "cicro/benchmark-scalloc"
+DOCKER_IMAGE_NAME = "cicro/benchmark-mesh"
 
 DOCKER_RUN_ARGS = --privileged
 
