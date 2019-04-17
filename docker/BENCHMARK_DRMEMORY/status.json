@@ -1,7 +1,8 @@
 {
-    "working" : "yes",
+    "working" : "no",
     "links_reported_issues" : {
-        "https://github.com/DynamoRIO/drmemory/issues/2133" : "resolved"
+        "https://github.com/DynamoRIO/drmemory/issues/2133" : "resolved",
+        "https://github.com/DynamoRIO/drmemory/issues/2191" : "unanswered"
     },
     "source" : "https://github.com/DynamoRIO/drmemory"
 }
