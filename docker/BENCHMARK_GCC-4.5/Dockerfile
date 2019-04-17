@@ -6,8 +6,9 @@ FROM cicro/benchmark-base:${CACHE_TAG}
 
 # install our enviroment for the specific benchmark
 RUN apt-get update && apt-get install -y gpg dirmngr
-RUN apt-key adv --keyserver keys.gnupg.net --recv-keys 40976EAF437D05B5 630239CC130E1A7FD81A27B140976EAF437D05B5
-RUN apt-add-repository "deb [trusted=yes] http://us.archive.ubuntu.com/ubuntu/ precise universe" && apt-add-repository "deb [trusted=yes] http://us.archive.ubuntu.com/ubuntu/ precise main restricted"
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
+RUN echo "deb [trusted=yes] http://us.archive.ubuntu.com/ubuntu/ precise universe" >> /etc/apt/sources.list \
+	&& echo "deb [trusted=yes] http://us.archive.ubuntu.com/ubuntu/ precise main restricted" >> /etc/apt/sources.list
 RUN apt-get update && apt-get install -y --no-install-recommends gcc++-4.5
 
 # our benchmarking project
