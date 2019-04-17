@@ -20,7 +20,7 @@ GCC_TARGET_JSON = $(GCC_TARGET_NAMES:=.json)
 GCC_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(GCC_TARGET_JSON))
 
 
-ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert lowfat tcc memcheck callgrind qemu sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf strace rpmalloc polly clang-8.0-lld clang-8.0-gold introspection usr-bin-time scalloc
+ALL_TARGET_NAMES = $(CLANG_TARGET_NAMES) $(GCC_TARGET_NAMES) drmemory compcert lowfat tcc memcheck callgrind qemu sulong boehmgc dmalloc diehard jemalloc hoard freeguard libdislocator tcmalloc dlmalloc tlsf strace rpmalloc polly clang-8.0-lld clang-8.0-gold introspection usr-bin-time scalloc lockfree-malloc
 ALL_TARGET_JSON = $(ALL_TARGET_NAMES:=.json)
 ALL_TARGET_PATHS = $(addprefix $(OUTPUT_DIR_NAME)/, $(ALL_TARGET_JSON))
 HIGH_TIMEOUT = --timeout 7200
@@ -219,6 +219,9 @@ $(OUTPUT_DIR_NAME)/scalloc.json:
 
 $(OUTPUT_DIR_NAME)/dlmalloc.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_DLMALLOC run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime dlmalloc-O3 --ignore-errors"
+
+$(OUTPUT_DIR_NAME)/lockfree-malloc.json:
+	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_LOCKFREE-MALLOC run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime lockfree-malloc-O3 --ignore-errors"
 
 $(OUTPUT_DIR_NAME)/tlsf.json:
 	$(MAKE) -C $(DOCKER_DIR)/BENCHMARK_TLSF run OUTPUT_DIR=$(OUTPUT_DIR) BENCHMARK_RUNS=$(BENCHMARK_RUNS) BENCHMARK_ARGS="--exec-args='$(BENCHMARK_EXEC_ARGS)' --filter-runtime tlsf-O3 --ignore-errors"
