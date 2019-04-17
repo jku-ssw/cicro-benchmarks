@@ -1,4 +1,4 @@
-DOCKER_IMAGE_NAME = "cicro/benchmark-compcert"
+DOCKER_IMAGE_NAME = "cicro/benchmark-pcc"
 
 DOCKER_RUN_ARGS = --privileged
 
