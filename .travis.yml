@@ -24,7 +24,7 @@ matrix:
   - env: FILTER_RUNTIME='bugfinder-msan-clang-O3' FILTER_HARNESS='(?!(chrismoos-hash-ring))'
 #  - env: FILTER_RUNTIME='bugfinder-ubsan-clang-O3' FILTER_HARNESS='.*'
   - env: FILTER_RUNTIME='bugfinder-tsan-clang-O3' FILTER_HARNESS='(?!(troydhanson-tpl))'  # "troydhanson-tpl" only fails on gate?
-  - env: FILTER_RUNTIME='valgrind-O3' FILTER_HARNESS='(?!(antirez-rax|chrismoos-hash-ring))'
+#  - env: FILTER_RUNTIME='valgrind-O3' FILTER_HARNESS='(?!(antirez-rax|chrismoos-hash-ring))'
   allow_failures:
   - env: FILTER_RUNTIME='bugfinder-ubsan-clang-O3' FILTER_HARNESS='.*'
 after_failure:
