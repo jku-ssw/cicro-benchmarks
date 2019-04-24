@@ -1,4 +1,4 @@
-GRAAL_GIT_TAG = "vm-1.0.0-rc9"
+GRAALVM_VERSION = "graalvm-ce-1.0.0-rc16"
 
 DOCKER_IMAGE_NAME = "cicro/benchmark-sulong"
 
@@ -12,7 +12,7 @@ BENCHMARK_RUNS = 2
 .PHONY: build run
 
 build: Dockerfile
-	docker build --build-arg GRAAL_GIT_TAG=$(GRAAL_GIT_TAG) -t $(DOCKER_IMAGE_NAME) ./
+	docker build --build-arg GRAALVM_VERSION=$(GRAALVM_VERSION) -t $(DOCKER_IMAGE_NAME) ./
 
 pull:
 	docker pull $(DOCKER_IMAGE_NAME)

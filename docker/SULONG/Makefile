@@ -1,12 +1,12 @@
-GRAAL_GIT_TAG = "vm-1.0.0-rc9"
+GRAALVM_CE_VERSION = "1.0.0-rc16"
 
 DOCKER_IMAGE_NAME = "cicro/sulong"
-DOCKER_IMAGE_VERSION = $(GRAAL_GIT_TAG)
+DOCKER_IMAGE_VERSION = graalvm-ce-$(GRAALVM_CE_VERSION)
 
 .PHONY: build
 
 build: Dockerfile
-	docker build --build-arg GRAAL_GIT_TAG=$(GRAAL_GIT_TAG) -t $(DOCKER_IMAGE_NAME):$(GRAAL_GIT_TAG) ./
+	docker build --build-arg GRAALVM_CE_VERSION=$(GRAALVM_CE_VERSION) -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) ./
 
 pull:
-	docker pull $(DOCKER_IMAGE_NAME):$(GRAAL_GIT_TAG)
+	docker pull $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
