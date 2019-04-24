@@ -145,6 +145,8 @@ harness.add_runtime('diehard-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS":
 harness.add_runtime('rpmalloc-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
 harness.add_runtime('jemalloc-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
 harness.add_runtime('scalloc-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
+harness.add_runtime('lockfree-malloc-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
+harness.add_runtime('mesh-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
 harness.add_runtime('hoard-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
 harness.add_runtime('freeguard-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
 harness.add_runtime('libdislocator-O3', {"CC": "${CLANG}", "AS": "${CLANG}", "CFLAGS": "-Wno-everything -O3"})
