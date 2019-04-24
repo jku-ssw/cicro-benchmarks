@@ -1,5 +1,5 @@
 GIT_TAG = "master"
-GRAALVM_VERSION = "1.0.0-rc15"
+GRAALVM_VERSION = "1.0.0-rc16"
 
 .PHONY: build pull
 

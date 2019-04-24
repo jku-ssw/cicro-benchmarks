@@ -1,5 +1,5 @@
 ARG CACHE_TAG=latest
-ARG GRAALVM_VERSION=graalvm-ce-1.0.0-rc15
+ARG GRAALVM_VERSION=graalvm-ce-1.0.0-rc16
 
 FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 

@@ -1,4 +1,4 @@
-GRAALVM_VERSION = "graalvm-ce-1.0.0-rc15"
+GRAALVM_VERSION = "graalvm-ce-1.0.0-rc16"
 
 DOCKER_IMAGE_NAME = "cicro/benchmark-sulong"
 
