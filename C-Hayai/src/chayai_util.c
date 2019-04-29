@@ -24,7 +24,7 @@ char *chayai_util_get_tmp_dir() {
         return tmp_dir;
     }
 
-    // check for enviroment variable
+    // check for environment variable
     char *env_var = getenv(WORKDIR_ENV_VARIABLE); // secure_getenv would require "#define _GNU_SOURCE"
     if(env_var != NULL) {
         return env_var;

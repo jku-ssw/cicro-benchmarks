@@ -4,7 +4,7 @@ FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 
 FROM cicro/benchmark-base:${CACHE_TAG}
 
-# install our enviroment for the specific benchmark
+# install our environment for the specific benchmark
 RUN apt-get update && apt-get install -y gcc-8
 RUN apt-get update && apt-get install -y git
 
@@ -15,7 +15,7 @@ RUN gcc -Wall -mmpx -fcheck-pointer-bounds -fPIC -O3 -g -D_POSIX_C_SOURCE=200809
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
-# configure benchmark enviroment
+# configure benchmark environment
 RUN echo "GCC=/usr/bin/gcc-8" > /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "--filter-runtime=(introspection)", "--suffix=-v8"] FOREGROUND

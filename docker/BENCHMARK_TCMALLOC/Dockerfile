@@ -13,7 +13,7 @@ RUN cd gperftools && ./autogen.sh && ./configure && make install
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
-# configure benchmark enviroment
+# configure benchmark environment
 RUN echo "LD_PRELOAD=/usr/local/lib/libtcmalloc.so.4.5.3" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/tcmalloc.json", "--filter-runtime=(tcmalloc-O3)"] FOREGROUND

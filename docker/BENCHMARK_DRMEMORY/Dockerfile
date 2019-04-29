@@ -9,7 +9,7 @@ RUN wget -O - "${DRMEMORY_URL}" | tar -xz -C /
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
-# configure benchmark enviroment
+# configure benchmark environment
 RUN echo "DR_MEMORY=/`ls / | grep -i DrMemory`/bin64/drmemory" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/drmemory.json", "--filter-runtime=(drmemory)"] FOREGROUND

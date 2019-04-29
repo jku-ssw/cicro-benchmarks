@@ -14,7 +14,7 @@ RUN cd Archipelago && make && make install
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
-# configure benchmark enviroment
+# configure benchmark environment
 # RUN echo "LD_PRELOAD=libmesh.so" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/archipelago.json", "--filter-runtime=(archipelago-O3)"] FOREGROUND

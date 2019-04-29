@@ -23,7 +23,7 @@ VOLUME /data
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
-# configure benchmark enviroment
+# configure benchmark environment
 RUN echo "CLANG=/usr/bin/clang-6.0" > /benchmarks/configs/env \
     && echo "LLVM_COMPILER=clang" >> /benchmarks/configs/env \
     && echo "LLVM_CC_NAME=clang-6.0" >> /benchmarks/configs/env \

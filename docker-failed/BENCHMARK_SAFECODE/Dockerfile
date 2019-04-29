@@ -4,7 +4,7 @@ FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 
 FROM cicro/benchmark-clang-base:${CACHE_TAG}
 
-# install our enviroment for the specific benchmark
+# install our environment for the specific benchmark
 RUN apt-get update && apt-get install -y --no-install-recommends python git libomp-dev
 
 ARG SAFECODE_GIT_TAG=7a4fe7379e9bc07cbb663ee7d9f7820b1bacf3c2
@@ -20,7 +20,7 @@ RUN cd safecode-llvm37/projects/safecode && ./configure && make -j4
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
-# configure benchmark enviroment
+# configure benchmark environment
 RUN echo "CLANG=/safecode-llvm37/build/Release+Asserts/bin/clang\nSAFECODE_DIR=/safecode-llvm37/build/Release+Asserts" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/safecode.json", "--filter-runtime=(safecode-O3)"] FOREGROUND

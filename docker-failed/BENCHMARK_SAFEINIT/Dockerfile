@@ -14,7 +14,7 @@ RUN cd safeinit/llvm && mkdir build && cd build && cmake .. -DCMAKE_C_COMPILER=/
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
-# configure benchmark enviroment
+# configure benchmark environment
 RUN echo "" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/safeinit.json", "--filter-runtime=(safeinit-O3)"] FOREGROUND

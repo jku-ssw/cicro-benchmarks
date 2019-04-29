@@ -4,7 +4,7 @@ FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 
 FROM cicro/benchmark-base:${CACHE_TAG}
 
-# install our enviroment for the specific benchmark
+# install our environment for the specific benchmark
 RUN apt-get update && apt-get install -y --no-install-recommends python git libomp-dev
 
 ARG DANGSAN_GIT_TAG=78006af30db70e42df25b7d44352ec717f6b0802
@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends bison
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
-# configure benchmark enviroment
+# configure benchmark environment
 RUN echo "" >> /benchmarks/configs/env
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/softboundcets.json", "--filter-runtime=softboundcets"] FOREGROUND

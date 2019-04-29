@@ -13,7 +13,7 @@ RUN cd scalloc && tools/make_deps.sh && build/gyp/gyp --depth=. scalloc.gyp && B
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
-# configure benchmark enviroment
+# configure benchmark environment
 RUN echo "LD_PRELOAD=/scalloc/out/Release/lib.target/libscalloc.so" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/scalloc.json", "--filter-runtime=(scalloc-O3)"] FOREGROUND

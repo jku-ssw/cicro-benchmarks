@@ -4,7 +4,7 @@ FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 
 FROM cicro/benchmark-base:${CACHE_TAG}
 
-# install our enviroment for the specific benchmark
+# install our environment for the specific benchmark
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential curl libcap-dev git cmake libncurses5-dev python-minimal python-pip unzip wget libtcmalloc-minimal4 libgoogle-perftools-dev libomp-dev python3 python3-pip python3-setuptools file
 RUN pip3 install wllvm
 
@@ -34,7 +34,7 @@ RUN mkdir klee_build_dir && cd klee_build_dir && CXXFLAGS="-D_GLIBCXX_USE_CXX11_
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
-# configure benchmark enviroment
+# configure benchmark environment
 RUN echo "CLANG=/usr/bin/clang" >> /benchmarks/configs/env \
     && echo "KLEE=/klee_build_dir/bin/klee" >> /benchmarks/configs/env \
     && echo "WLLVM_DIR=/usr/local/bin" >> /benchmarks/configs/env \

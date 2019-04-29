@@ -4,7 +4,7 @@ FROM cicro/benchmark-harness:${CACHE_TAG} as harness
 
 FROM cicro/benchmark-base:${CACHE_TAG}
 
-# install our enviroment for the specific benchmark
+# install our environment for the specific benchmark
 RUN apt-get update && apt-get install -y --no-install-recommends python git libomp-dev
 
 ARG SOFTBOUND_GIT_TAG=9c4b6c2b1701923304ed3caea97ec6edd524ff38
@@ -20,7 +20,7 @@ COPY --from=harness /benchmarks /benchmarks
 
 RUN ls /softboundcets-3.8.0/runtime
 
-# configure benchmark enviroment
+# configure benchmark environment
 RUN echo "CLANG=/softboundcets-3.8.0/llvm-38/build/bin/clang" >> /benchmarks/configs/env && \
     echo "SOFTBOUND_RUNTIME_DIR=/softboundcets-3.8.0/runtime" >> /benchmarks/configs/env
 

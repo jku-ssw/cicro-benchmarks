@@ -7,7 +7,7 @@
 [2018-11-23 09:59:21,347] [ INFO     ]   * ack-O3 (bench.py:617)
 Do you want to continue with the benchmarks? [Y/n] [2018-11-23 09:59:21,370] [ WARNING  ]  please set all scaling_governor to "performance" (using "sudo ./tools/ondemand.sh start") (bench.py:100)
 
-[2018-11-23 09:59:23,244] [ INFO     ]  start with the execution of the runtime enviroment "ack-O3" (bench.py:278)
+[2018-11-23 09:59:23,244] [ INFO     ]  start with the execution of the runtime environment "ack-O3" (bench.py:278)
 [2018-11-23 09:59:23,361] [ INFO     ]  execute clean step for "ack-O3" (bench.py:297)
 [2018-11-23 09:59:23,361] [ INFO     ]  clean benchmark directory (bench.py:129)
 Makefile:489: *** Cannot proceed: makefile fragments not detected! Run configure first.  Stop.

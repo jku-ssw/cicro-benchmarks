@@ -10,7 +10,7 @@ RUN cd jemalloc-5.1.0 && ./autogen.sh && ./configure && make
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
-# configure benchmark enviroment
+# configure benchmark environment
 RUN echo "LD_PRELOAD=/jemalloc-5.1.0/lib/libjemalloc.so.2" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/jemalloc.json", "--filter-runtime=(jemalloc-O3)"] FOREGROUND

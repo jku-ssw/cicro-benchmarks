@@ -231,7 +231,7 @@ class BenchmarkingHarness(object):
         assert 'CC' in make_env and 'AS' in make_env
 
         logger.debug('register runtime to benchmark harness: "%s"', name)
-        self.registered_runtimes[name] = {'make_env': make_env,  # enviroment variables required for make
+        self.registered_runtimes[name] = {'make_env': make_env,  # environment variables required for make
                                           'build_system_func': build_system_func,  # function to get system informations
                                           'make_func': make_func,  # function executed to build all benchmarks
                                           'exec_func': exec_func,  # function to execute a single benchmark
@@ -239,7 +239,7 @@ class BenchmarkingHarness(object):
 
     def print_runtimes(self):
         print()
-        print(" {:<30} | {}".format('runtime enviroment', 'enviroment variables'))
+        print(" {:<30} | {}".format('runtime environment', 'environment variables'))
         print("{:-<32}|{:-<50}".format('', ''))
         for runtime, values in self.registered_runtimes.items():
             print(" {:<30} | {}".format(runtime, values['make_env']))
@@ -294,7 +294,7 @@ class BenchmarkingHarness(object):
 
         no_error = True
 
-        logger.info('start with the execution of the runtime enviroment "%s"', runtime)
+        logger.info('start with the execution of the runtime environment "%s"', runtime)
 
         try:
             # clean step
@@ -328,7 +328,7 @@ class BenchmarkingHarness(object):
 
                 if build_system_func:
                     try:
-                        # Use our expanded enviroment variables
+                        # Use our expanded environment variables
                         build_system_data = build_system_func(exp_make_env)
                         if build_system_data:
                             logger.debug('build system extracted: %s', build_system_data)
@@ -343,7 +343,7 @@ class BenchmarkingHarness(object):
 
             # execution step
             for run_id in range(kwargs.get('runs', 1)):
-                logger.info('run %d of %d with the runtime enviroment "%s"', run_id+1, kwargs.get('runs', 1), runtime)
+                logger.info('run %d of %d with the runtime environment "%s"', run_id+1, kwargs.get('runs', 1), runtime)
                 for _harness in self.find_all_harness():
                     harness_name = _harness[:-len('_test')] if _harness.endswith('_test') else _harness
                     harness_path = os.path.join(self.testdir, _harness)
@@ -447,7 +447,7 @@ class BenchmarkingHarness(object):
         except KeyboardInterrupt:
             raise
         except:  # NOQA: E722
-            logger.exception('Something went wrong while executing the runtime enviroment "%s"', runtime)
+            logger.exception('Something went wrong while executing the runtime environment "%s"', runtime)
             return False
         finally:
             try:
@@ -469,7 +469,7 @@ def add_default_runtimes(harness):
                 key, value = line.rstrip().split('=', 1)
                 os.environ[key] = value
     elif os.path.isfile(ENV_EXAMPLE_FILE):
-        logger.warning('"%s" does not exist, use example file to specify required enviroment variables', ENV_FILE)
+        logger.warning('"%s" does not exist, use example file to specify required environment variables', ENV_FILE)
         with open(ENV_EXAMPLE_FILE) as f:
             for line in f:
                 key, value = line.rstrip().split('=', 1)
@@ -484,7 +484,7 @@ def add_default_runtimes(harness):
 
     def wllvm_make(workdir, make_env, **kwargs):
             if 'LLVM_COMPILER' not in os.environ:
-                logger.error('enviroment variable "LLVM_COMPILER" is required to build with wllvm')
+                logger.error('environment variable "LLVM_COMPILER" is required to build with wllvm')
                 return False
 
             return BenchmarkingHarness.default_make(workdir, make_env, **kwargs)

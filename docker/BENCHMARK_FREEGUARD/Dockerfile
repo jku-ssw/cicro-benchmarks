@@ -12,7 +12,7 @@ RUN cd FreeGuard && make SSE2RNG=1
 # our benchmarking project
 COPY --from=harness /benchmarks /benchmarks
 
-# configure benchmark enviroment
+# configure benchmark environment
 RUN echo "LD_PRELOAD=/FreeGuard/libfreeguard.so" >> /benchmarks/configs/env.run
 
 ENTRYPOINT ["/benchmarks/tools/bench.py", "/data/freeguard.json", "--filter-runtime=(freeguard-O3)"] FOREGROUND
